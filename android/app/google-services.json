@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "521080035115",
+    "project_id": "alkwaityalawalproject",
+    "storage_bucket": "alkwaityalawalproject.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521080035115:android:093dba3a11210608cb976e",
+        "android_client_info": {
+          "package_name": "com.alkwaityalawalapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbbMmM9lpftW1WF4R3pG_mceEZgQEzDoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
