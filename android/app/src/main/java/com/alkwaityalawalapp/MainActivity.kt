@@ -1,4 +1,4 @@
-package com.alkwaityalawalapp
+package com.alkwaityalawal
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

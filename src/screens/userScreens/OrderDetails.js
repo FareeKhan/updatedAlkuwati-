@@ -155,7 +155,9 @@ const OrderDetails = ({ navigation, route }) => {
 
 
     const onPressEmptyAddress = () => {
-        navigation.navigate("ShippingAddress")
+        navigation.navigate("ShippingAddress",{
+            isMap:true
+        })
         // if (userId) {
         //     navigation.navigate("ShippingAddress")
         // } else {
@@ -245,7 +247,7 @@ const OrderDetails = ({ navigation, route }) => {
                         <TextInput
                             placeholder={t('enderPromo')}
                             placeholderTextColor={'#cecece'}
-                            style={{ color: "#000", textAlign: I18nManager.isRTL ? 'left' : 'left', height: 38 }}
+                            style={{ color: "#000", textAlign: I18nManager.isRTL ? 'right' : 'left', height: 38 ,width:"85%"}}
                             value={promoCode}
                             onChangeText={setPromoCode}
                             maxLength={8}

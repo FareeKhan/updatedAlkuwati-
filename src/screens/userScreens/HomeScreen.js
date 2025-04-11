@@ -10,16 +10,23 @@ import {
   Text,
   TouchableOpacity,
   View,
+  PermissionsAndroid,
 } from 'react-native';
 import React, { useEffect, useState, useRef } from 'react';
 import ExportSvg from '../../constants/ExportSvg';
 import { color } from '../../constants/color';
-
+import notifee, {
+  AndroidImportance,
+  AndroidVisibility,
+  AndroidStyle,
+  AndroidColor,
+} from '@notifee/react-native';
 import {
   homeBanner,
   newArrivals,
   getSettingOption,
   categoriesListSubTwoCategory,
+  categoriesListSub,
 } from '../../services/UserServices';
 
 import SingleProductCard from '../../components/SingleProductCard';
@@ -64,6 +71,7 @@ const HomeScreen = ({ navigation }) => {
   const [getOptionNameThree, setOptionNameThree] = useState();
   const [getOptionWhatsApp, setOptionWhatsApp] = useState();
   const [arrivalCategories, setArrivalCategories] = useState([]);
+  const [firstName, setFirstNames] = useState([]);
 
   const viewRef = useRef(null);
   const animation = 'fadeInRightBig';
@@ -116,6 +124,8 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
+
+
   const funCategories = async () => {
     setLoader(true);
     try {
@@ -156,7 +166,6 @@ const HomeScreen = ({ navigation }) => {
 
     try {
       const result = await newArrivals(name);
-      console.log('-->>trending', result)
       if (result?.status) {
         // setIsLoader(false);
         // setArrivalData(result?.data);
@@ -166,49 +175,19 @@ const HomeScreen = ({ navigation }) => {
         setIsLoader(false);
       }
     } catch (error) {
-      
+
       setIsLoader(false);
       console.log(error);
-    }finally{
+    } finally {
       setLoader(false);
     }
   };
 
 
 
-  const getNewArrivalsTwo = async name => {
-    try {
-      const result = await newArrivals(name);
-      if (result?.status) {
-        setIsLoader(false);
-        setArrivalDataTwo(result?.data);
-        setOptionNameTwo(name);
-      } else {
-        setIsLoader(false);
-      }
-    } catch (error) {
-      setIsLoader(false);
-      console.log(error);
-    }
-  };
-
-  const getNewArrivalsThree = async name => {
-    try {
-      const result = await newArrivals(name);
-      if (result?.status) {
-        setIsLoader(false);
-        setArrivalDataThree(result?.data);
-        setOptionNameThree(name);
-      } else {
-        setIsLoader(false);
-      }
-    } catch (error) {
-      setIsLoader(false);
-      console.log(error);
-    }
-  };
 
   const renderItem = ({ item, index }) => {
+
     return (
       <Animatable.View
         animation={animationMain}
@@ -218,8 +197,8 @@ const HomeScreen = ({ navigation }) => {
           activeOpacity={1}
           onPress={() =>
             navigation.navigate('SameProduct', {
-              text: 'Shirts2',
-              subC_ID: 25,
+              text: item?.link_category,
+              subC_ID: item?.id,
             })
 
           }>
@@ -294,14 +273,12 @@ const HomeScreen = ({ navigation }) => {
       </Animatable.View>
     );
   };
+
+
   // || isLoader
   if (loader) {
     return <ScreenLoader />;
   }
-
-
-  console.log('shehzadData', arrivalData)
-
 
   return (
     <View style={styles.mainContainer}>
@@ -309,8 +286,6 @@ const HomeScreen = ({ navigation }) => {
         isDrawer={true}
         cartIcon={true}
       />
-
-
 
       <View style={{ flexDirection: 'row' }}>
         <Text style={styles.welcomeTxt}>{t('welcome')}</Text>
@@ -324,11 +299,6 @@ const HomeScreen = ({ navigation }) => {
         <TouchableOpacity
           style={[styles.searchBox]}
           onPress={() => setModalVisible(true)}>
-          {/* <SearchInput 
-                    value={search}
-                    onChangeText={setSearch}
-                    
-                    /> */}
           <ExportSvg.Search
             style={{
               marginLeft: 18,
@@ -337,9 +307,6 @@ const HomeScreen = ({ navigation }) => {
           />
           <Text style={{ color: '#00000080' }}>{t('search_here')}</Text>
         </TouchableOpacity>
-        {/*<TouchableOpacity onPress={() => navigation.navigate('Filters')}>
-                    <ExportSvg.Filter />
-                </TouchableOpacity>*/}
       </View>
 
       <ScrollView
@@ -380,39 +347,8 @@ const HomeScreen = ({ navigation }) => {
             snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
             snapToAlignment="start"
             decelerationRate="fast"
-          //numColumns={2}
-          //columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
           />
         </View>
-
-        {/* <>
-          <View style={styles.arrivalBox}>
-            <Text style={styles.arrivalTxt}>{getOptionNameOne}</Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('SameProduct', {
-                selected: getOptionNameOne,
-                subC_ID: 48
-              })}>
-              <Text style={styles.viewTxt}>{t('view_all')}</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={{ flex: 1 }}>
-            <FlatList
-              horizontal
-              data={arrivalData}
-              keyExtractor={(item, index) => index?.toString()}
-              renderItem={renderArrivalItem}
-              showsVerticalScrollIndicator={false}
-              snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-              snapToAlignment="start"
-              decelerationRate="fast"
-            //numColumns={2}
-            //columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
-            />
-          </View>
-        </> */}
-
 
         {
           arrivalCategories?.map((item, index) => {
@@ -425,7 +361,7 @@ const HomeScreen = ({ navigation }) => {
                     <TouchableOpacity
                       onPress={() => navigation.navigate('SameProduct', {
                         selected: item?.value,
-                        subC_ID: 48
+                        subC_ID: item?.id
                       })}>
                       <Text style={styles.viewTxt}>{t('view_all')}</Text>
                     </TouchableOpacity>
@@ -444,27 +380,22 @@ const HomeScreen = ({ navigation }) => {
                     snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
                     snapToAlignment="start"
                     decelerationRate="fast"
-                  //numColumns={2}
-                  //columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
                   />
 
 
 
 
                   {secBanners?.map((banner) => {
-                    console.log('showmeBannnerssss',banner)
                     return (
                       banner.show_after_section_number === (index) && (
-                        // <div className="section-banner my-4" key={`banner-${banner.id}`}>
-                        //   <img
-                        //     src={banner.image}
-                        //     alt={banner.link_category}
-                        //     className="img-fluid w-100"
-                        //     style={{ maxHeight: '300px', objectFit: 'cover' }}
-                        //   />
-                        // </div>
-
-                         <Image source={{ uri: banner.image }}    borderRadius={10}           style={{ width: "100%" , height: 180,marginVertical:15 }}/>
+                        <TouchableOpacity onPress={() => {
+                          navigation.navigate('SameProduct', {
+                            text: banner?.link_category,
+                            subC_ID: banner?.id,
+                          });
+                        }} >
+                          <Image source={{ uri: banner.image }} borderRadius={10} style={{ width: "100%", height: 180, marginVertical: 15 }} />
+                        </TouchableOpacity>
 
                       )
                     )
@@ -474,98 +405,6 @@ const HomeScreen = ({ navigation }) => {
             )
           })
         }
-
-
-
-        {/* {arrivalData.length > 0 && (
-          <>
-            <View style={styles.arrivalBox}>
-              <Text style={styles.arrivalTxt}>{getOptionNameOne}</Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('SameProduct', {
-                  selected: getOptionNameOne,
-                  subC_ID: 48
-                })}>
-                <Text style={styles.viewTxt}>{t('view_all')}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <FlatList
-                horizontal
-                data={arrivalData}
-                keyExtractor={(item, index) => index?.toString()}
-                renderItem={renderArrivalItem}
-                showsVerticalScrollIndicator={false}
-                snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-                snapToAlignment="start"
-                decelerationRate="fast"
-              //numColumns={2}
-              //columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
-              />
-            </View>
-          </>
-        )}
-        {arrivalDataTwo.length > 0 && (
-          <>
-            <View style={styles.arrivalBox}>
-              <Text style={styles.arrivalTxt}>{getOptionNameTwo}</Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('SameProduct', {
-                  selected: getOptionNameTwo,
-                  subC_ID: 48
-                })}
-              >
-                <Text style={styles.viewTxt}>{t('view_all')}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <FlatList
-                horizontal
-                data={arrivalDataTwo}
-                keyExtractor={(item, index) => index?.toString()}
-                renderItem={renderArrivalItem}
-                showsVerticalScrollIndicator={false}
-                snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-                snapToAlignment="start"
-                decelerationRate="fast"
-              //numColumns={2}
-              //columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
-              />
-            </View>
-          </>
-        )}
-        {arrivalDataThree.length > 0 && (
-          <>
-            <View style={styles.arrivalBox}>
-              <Text style={styles.arrivalTxt}>{getOptionNameThree}</Text>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('SameProduct', {
-                  selected: getOptionNameThree,
-                  subC_ID: 48
-                })}
-              >
-                <Text style={styles.viewTxt}>{t('view_all')}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <FlatList
-                horizontal
-                data={arrivalDataThree}
-                keyExtractor={(item, index) => index?.toString()}
-                renderItem={renderArrivalItem}
-                showsVerticalScrollIndicator={false}
-                snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-                snapToAlignment="start"
-                decelerationRate="fast"
-              //numColumns={2}
-              //columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
-              />
-            </View>
-          </>
-        )} */}
       </ScrollView>
 
       <SearchModal

@@ -9,6 +9,7 @@ export const OTP_URL = 'https://admin.homee.ae/';
 
 // export const SP_KEY = 'pk_test_51Pjir909Qlf6znZyPJKWaATb6BQCubm7NTPIGBL0449uEjz82nv7d6fHGGOOwinDogCK3uJYWtJzdWhvFrQDjoEx00e5Iv94BY'
 export const SP_KEY = 'pk_test_51PV9zKFt9d3eerZLogRwve2G5YO4ZUNIUnLCEFpiljRIfKVN7hI7dle16OjcnN2ly7T2vwmB9FWJG0JGzSMCQnNe00k69iWIhI'
+export const GOOGLE_API='AIzaSyAo2MfsEOJJqEyVA2iQ1xWVWcMQm_NnVV8'
 
 export const discountProducts = [
     {

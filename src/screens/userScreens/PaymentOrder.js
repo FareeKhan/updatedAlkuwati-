@@ -273,7 +273,8 @@ const PaymentOrder = ({ navigation, route }) => {
     handlePress()
   }, [])
 
-
+console.log('heyshowmeAddress',reduxAddress)
+console.log('userIduserIduserIduserId',userId)
   const handlePress = async () => {
     const response = await addShippingAddress(reduxAddress, userId)
     console.log('charsss',response)

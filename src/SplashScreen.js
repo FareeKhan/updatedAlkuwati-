@@ -1,11 +1,11 @@
- import { I18nManager, StyleSheet, Text, View } from 'react-native'
+ import { Dimensions, I18nManager, Image, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { color } from './constants/color'
 import ExportSvg from './constants/ExportSvg'
 import { useSelector } from 'react-redux'
 import { TabRouter } from '@react-navigation/native'
 import { loginData, isLogin } from './redux/reducer/Auth'
-
+const {width,height} = Dimensions.get('screen')
 //dispatch(loginData({userId: 1}))
 
 const SplashScreen = ({ navigation }) => {
@@ -25,17 +25,17 @@ const SplashScreen = ({ navigation }) => {
 
     return (
         <View style={styles.mainContainer}>
-            <ExportSvg.SplashLogo />
+            {/* <ExportSvg.SplashLogo /> */}
+            <Image source={require('./assets/Splash.png')} style={{width:width,height:height}}  />
         </View>
     )
 }
-
 export default SplashScreen
 
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
-        backgroundColor: color.theme,
+        // backgroundColor: color.theme,
         alignItems: "center",
         justifyContent: "center"
     }

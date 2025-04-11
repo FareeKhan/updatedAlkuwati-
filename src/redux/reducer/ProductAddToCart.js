@@ -25,6 +25,13 @@ export const productAddToCart = createSlice({
                 // existId.price = price * counter
 
             }
+
+            const finalPrice = state.cartProducts.reduce((total, item) => {
+                return total + item.counter * parseFloat(item.price);
+            }, 0)
+                .toFixed(2);
+
+            state.totalPrice = finalPrice
         },
         incrementCounter: (state, action) => {
             const product = state.cartProducts.find((item) => item.id === action.payload);
@@ -74,6 +81,6 @@ export const productAddToCart = createSlice({
     }
 });
 
-export const { addProductToCart, incrementCounter, decrementCounter, deleteProduct, handleTotalPrice, clearCart,handlePromo } = productAddToCart.actions;
+export const { addProductToCart, incrementCounter, decrementCounter, deleteProduct, handleTotalPrice, clearCart, handlePromo } = productAddToCart.actions;
 
 export default productAddToCart.reducer;

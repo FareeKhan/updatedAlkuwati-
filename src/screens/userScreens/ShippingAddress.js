@@ -12,8 +12,9 @@ import {
   I18nManager,
   Modal,
   Pressable,
+  Dimensions,
 } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { color } from '../../constants/color';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
@@ -32,10 +33,15 @@ import { useTranslation } from 'react-i18next';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomDropDown from '../../components/CustomDropDown';
 import ScreenView from '../../components/ScreenView';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
+import Entypo from 'react-native-vector-icons/Entypo'
+import EvilIcons from 'react-native-vector-icons/EvilIcons'
+import { LocationPermission } from '../../components/LocationPermission';
+import Geolocation from '@react-native-community/geolocation';
+const { height } = Dimensions.get('screen')
 
 const ShippingAddress = ({ navigation, route }) => {
-  const { id, btnText } = route.params ?? '';
+  const { id, btnText, isMap } = route.params ?? '';
   const dispatch = useDispatch();
   const userId = useSelector(state => state.auth.userId);
   const reduxAddress = useSelector((item) => item?.customerAddress?.storeAddress)
@@ -60,7 +66,125 @@ const ShippingAddress = ({ navigation, route }) => {
   const [isLoader, setIsLoader] = useState(false);
   const [loader, setLoader] = useState(false);
   const [showCountry, setShowCountry] = useState(false);
+  const [countryCodes, setCountryCodes] = useState('+965');
   const [showGover, setShowGover] = useState(false);
+  const [isMapOpened, setIsMapOpened] = useState(false);
+  const [pickupLocation, setPickupLocation] = useState({
+    latitude: 25.197741664033977,
+    longitude: 55.27969625835015,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+
+  const mapRef = useRef(null);
+
+
+
+  useEffect(() => {
+    const staticLocation = {
+      latitude: 25.197741664033977,
+      longitude: 55.27969625835015,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    }
+
+    if (isMap) {
+      getCurrentLocation()
+    } else {
+      if (userAddress) {
+        setPickupLocation(userAddress?.pickupLocation ? userAddress?.pickupLocation : staticLocation)
+        setIsMapOpened(true)
+      } else {
+        getCurrentLocation()
+      }
+    }
+
+  }, [])
+
+  console.log('dasd', userAddress)
+
+  useEffect(() => {
+
+    if (
+      pickupLocation?.latitude &&
+      pickupLocation?.longitude &&
+      mapRef.current
+    ) {
+      const location = {
+        latitude: pickupLocation?.latitud,
+        longitude: pickupLocation?.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      };
+      setTimeout(() => {
+        if (mapRef.current) {
+          mapRef.current.animateToRegion(location, 1000);
+        }
+      }, 300);
+      error => {
+        console.log('Location error:', error);
+      },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    }
+  }, [pickupLocation]);
+
+  const getCurrentLocation = async () => {
+    const result = await LocationPermission();
+    console.log('fareed', result)
+    if (result == 'granted') {
+      Geolocation.getCurrentPosition(
+        position => {
+          const { latitude, longitude } = position?.coords;
+
+          const location = {
+            latitude,
+            longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          };
+
+          setPickupLocation(location);
+
+          setTimeout(() => {
+            if (mapRef.current) {
+              mapRef.current.animateToRegion(location, 1000);
+            }
+          }, 300);
+          error => {
+            console.log('Location error:', error);
+          },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+
+          // if (mapRef.current) {
+          //   mapRef.current.animateToRegion(
+          //     {
+          //       latitude: latitude,
+          //       longitude: longitude,
+          //       latitudeDelta: 0.01,
+          //       longitudeDelta: 0.01,
+          //     },
+          //     100,
+          //   );
+          // }
+
+
+          // showFetchAddress(
+          //   latitude,
+          //   longitude,
+          //   'pickup',
+          // );
+
+
+        },
+        error => {
+          console.log('ss', error);
+        },
+      );
+    } else {
+      Alert.alert(t('PleaseAllow'));
+    }
+  };
+
 
   // const userAddress = useSelector(
   //   state => state?.customerAddress,
@@ -91,7 +215,6 @@ const ShippingAddress = ({ navigation, route }) => {
     setVilla(userAddress?.address);
   }, [userAddress]);
 
-  console.log('showiiiin', fullName);
 
   const handleEdit = async () => {
     try {
@@ -109,26 +232,32 @@ const ShippingAddress = ({ navigation, route }) => {
     {
       label: 'الكويت',
       id: 1,
+      code: '+965',
     },
     {
       label: 'المملكة العربية السعودية',
       id: 2,
+      code: '+966',
     },
     {
       label: 'الإمارات العربية المتحدة',
       id: 3,
+      code: '+971',
     },
     {
       label: 'البحرين',
       id: 4,
+      code: '+973',
     },
     {
       label: 'قطر',
       id: 5,
+      code: '+974',
     },
     {
       label: 'عمان',
       id: 6,
+      code: '+968',
     },
   ];
 
@@ -136,28 +265,35 @@ const ShippingAddress = ({ navigation, route }) => {
     {
       label: t('Kuwait'),
       id: 1,
+      code: '+965',
     },
     {
       label: t('Saudi Arabia'),
       id: 2,
+      code: '+966',
     },
     {
       label: t('United Arab Emirates'),
       id: 3,
+      code: '+971',
     },
     {
       label: t('Bahrain'),
       id: 4,
+      code: '+973',
     },
     {
       label: t('Qatar'),
       id: 5,
+      code: '+974',
     },
     {
       label: t('Oman'),
       id: 6,
+      code: '+968',
     },
   ];
+  
 
   const governorate_ar = [
     {
@@ -215,13 +351,32 @@ const ShippingAddress = ({ navigation, route }) => {
 
   // useEffect(() => { }, [userAddress]);
 
+
   const saveAddress = () => {
+
+    if (!isMapOpened) {
+      alert(t('selectLocation'))
+      return
+    }
+
+    if (phoneNumber?.length < 8) {
+      Alert.alert(t('fillNo'));
+      return;
+    }
+
+    if (!fullName || !villa || !city || !area || !country) {
+      Alert.alert(t('fillAll'));
+      return;
+    }
+
+
+
     if (userId) {
       handlePress()
     } else {
       let updatedPhoneNumber =
-        phoneNumber[0] === '0' ? phoneNumber.slice(1) : phoneNumber;
-      updatedPhoneNumber = '+965' + updatedPhoneNumber;
+        phoneNumber[0] === '0' ? phoneNumber?.slice(1) : phoneNumber;
+      updatedPhoneNumber = countryCodes + updatedPhoneNumber;
       const addressredux = {
         fullName: fullName,
         street: piece,
@@ -232,6 +387,7 @@ const ShippingAddress = ({ navigation, route }) => {
         phone: updatedPhoneNumber,
         country: country,
         address: villa,
+        pickupLocation: pickupLocation
 
       };
       dispatch(
@@ -252,6 +408,8 @@ const ShippingAddress = ({ navigation, route }) => {
     }
   }
 
+  console.log('userId',userId)
+
   const handlePress = async () => {
     // console.log(phoneNumber?.slice(1),'phoneNumber')
     console.log('trending');
@@ -260,7 +418,6 @@ const ShippingAddress = ({ navigation, route }) => {
       piece == '' ||
       city == '' ||
       piece == '' ||
-      email == '' ||
       area == '' ||
       country == ''
     ) {
@@ -272,7 +429,7 @@ const ShippingAddress = ({ navigation, route }) => {
       if (phoneNumber.length == 8) {
         let updatedPhoneNumber =
           phoneNumber[0] === '0' ? phoneNumber.slice(1) : phoneNumber;
-        updatedPhoneNumber = '+965' + updatedPhoneNumber;
+        updatedPhoneNumber = countryCodes + updatedPhoneNumber;
         const addressredux = {
           fullName: fullName,
           street: piece,
@@ -283,11 +440,15 @@ const ShippingAddress = ({ navigation, route }) => {
           phone: updatedPhoneNumber,
           country: country,
           address: villa,
+          pickupLocation: pickupLocation
         };
         console.log(addressredux, 'addressredux');
         const response = await (userAddress && id
           ? editShippingAddress(addressredux, userId, id)
           : addShippingAddress(addressredux, userId));
+
+
+          console.log('heyareryou',response)
 
         if (response?.data) {
           dispatch(
@@ -336,6 +497,9 @@ const ShippingAddress = ({ navigation, route }) => {
       setIsLoader(false);
     }
 
+
+
+
     //setIsLoader(true)
     /* try {
              const response = await addShippingAddress(fullName, street, city, area, phoneNumber, address, zipCode, countryCode, country, userId)
@@ -349,11 +513,11 @@ const ShippingAddress = ({ navigation, route }) => {
                          totalPrice: totalPrice
                      })
                  }
- 
+   
              } else {
                  setIsLoader(false)
                  alert('Your Data is not Correct')
- 
+   
              }
          } catch (error) {
              setIsLoader(false)
@@ -385,7 +549,28 @@ const ShippingAddress = ({ navigation, route }) => {
     return <ScreenLoader />;
   }
 
-  console.log('country', country);
+  const handleMapPress = (e) => {
+    const { coordinate } = e.nativeEvent;
+    setPickupLocation({
+      ...coordinate,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    });
+    setIsMapOpened(true)
+  };
+
+
+  useEffect(() => {
+    const selectedCountry = countries_en.find((item) => item.label === country);
+  
+    if (selectedCountry) {
+      setCountryCodes(selectedCountry.code);
+    } else {
+      setCountryCodes(''); // Optional fallback
+    }
+  }, [country]);
+
+
 
   return (
     // <View scrollable={true} style={{paddingTop:60}}>
@@ -443,7 +628,7 @@ const ShippingAddress = ({ navigation, route }) => {
               borderBottomColor: '#ccc',
               // paddingBottom: 10,
             }}>
-            <Text style={{ color: '#000' }}>{'\u2066+965\u2069'}</Text>
+            <Text style={{ color: '#000' }}>{`\u2066${countryCodes}\u2069`}</Text>
             <TextInput
               placeholder={t('phoneNumber')}
               value={phoneNumber}
@@ -492,13 +677,54 @@ const ShippingAddress = ({ navigation, route }) => {
           onChangeText={setVilla}
         />
 
+        {
+          isMapOpened ?
+            <View>
+              <View style={{
+                width: '100%',
+                height: 150,
+                borderRadius: 5,
+                overflow: "hidden",
+                borderWidth: 0.5,
+                marginVertical: 10,
+                marginTop: 15
 
-        <TouchableOpacity onPress={()=>setModalVisible(true)} style={styles.addCardBox}>
-          <View style={styles.addCardPlusBox}>
-            <Text style={styles.plusIcon}>+</Text>
-          </View>
-          <Text style={{ fontSize: 16, fontFamily: "Montserrat-Medium", color: color.theme }}>{t('addLocation')}</Text>
-        </TouchableOpacity>
+              }}>
+                <MapView
+                  ref={mapRef}
+                  style={{ width: '100%', height: 150 }}
+                  scrollEnabled={false}
+                  zoomEnabled={false}
+                  rotateEnabled={false}
+                  pitchEnabled={false}
+                  showsCompass={false}
+                  region={pickupLocation}
+                // initialRegion={{
+                //   latitude: pickupLocation.latitude,
+                //   longitude: pickupLocation.longitude,
+                //   latitudeDelta: 0.01,
+                //   longitudeDelta: 0.01,
+                // }}
+                >
+
+                  <Marker coordinate={pickupLocation} />
+                </MapView>
+              </View>
+              <TouchableOpacity onPress={() => setModalVisible(true)} style={{ borderWidth: 1, marginBottom: 5, paddingVertical: 10, alignItems: "center", borderColor: color.theme, borderRadius: 10 }}>
+                <Text style={{ color: color.theme, fontSize: 16 }}>{t('changeAddress')}</Text>
+              </TouchableOpacity>
+            </View>
+
+            :
+
+            <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.addCardBox}>
+              <View style={styles.addCardPlusBox}>
+                <Text style={styles.plusIcon}>+</Text>
+              </View>
+              <Text style={{ fontSize: 16, fontFamily: "Montserrat-Medium", color: color.theme }}>{t('addLocation')}</Text>
+            </TouchableOpacity>
+        }
+
 
 
 
@@ -558,16 +784,7 @@ const ShippingAddress = ({ navigation, route }) => {
             <CustomButton
               title={btnText !== undefined ? btnText : t('save')}
               onPress={saveAddress}
-              disabled={
-                btnText == 'Save' &&
-                fullName == userAddress?.full_name &&
-                city == userAddress?.city &&
-                area == userAddress?.area &&
-                phoneNumber == userAddress?.phone &&
-                piece == userAddress?.piece &&
-                // governorate == userAddress?.governorate &&
-                country == userAddress?.country
-              }
+
             />
           )}
         </View>
@@ -587,17 +804,44 @@ const ShippingAddress = ({ navigation, route }) => {
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>Hello World!</Text>
-            <MapView
-              style={{ width: "100%", height: 500 }}
-              initialRegion={{
-                latitude: 37.78825,
-                longitude: -122.4324,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-              }}
-            />
+            {/* <Text style={styles.modalText}>Hello World!</Text> */}
 
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={{ height: 30, width: 30, backgroundColor: color.theme, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, top: Platform.OS == 'ios' ? 50 : 30, left: Platform.OS == 'ios' ? 30 : 20 }}>
+              <Entypo name={'cross'} size={20} color={color.white} />
+            </TouchableOpacity>
+
+            <MapView
+              ref={mapRef}
+              style={{ width: "100%", height: height / 1.1 - 50 }}
+              // initialRegion={{
+              //   latitude: 25.197741664033977,
+              //   longitude: 55.27969625835015,
+              //   latitudeDelta: 0.0922,
+              //   longitudeDelta: 0.0421,
+              // }}
+              initialRegion={{
+                latitude: pickupLocation.latitude,
+                longitude: pickupLocation.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+
+              onPress={handleMapPress}
+            >
+
+              <Marker
+                coordinate={pickupLocation}
+              />
+
+            </MapView>
+
+            <TouchableOpacity activeOpacity={0.8} onPress={() => getCurrentLocation()} style={{ height: 45, width: 45, backgroundColor: color.theme, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: 100, left: Platform.OS == 'ios' ? 30 : 20 }}>
+              <EvilIcons name={'location'} size={30} color={color.white} />
+            </TouchableOpacity>
+
+            <TouchableOpacity  activeOpacity={0.8} onPress={() => setModalVisible(false)} style={{ height: 45, width: "80%", backgroundColor: color.theme, borderRadius: 10, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: Platform.OS == 'ios' ? 50 : 30,  }}>
+              <Text style={{color:"#fff",fontWeight:"500"}}>{t('confirm')}</Text>
+            </TouchableOpacity>
             {/* <Pressable
                 style={[styles.button, styles.buttonClose]}
                 onPress={() => setModalVisible(!modalVisible)}>
@@ -677,8 +921,8 @@ const styles = StyleSheet.create({
   modalView: {
     backgroundColor: 'white',
     // borderRadius: 20,
-    height: 500,
-    padding: 35,
+    // height: 500,
+    // padding: 35,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -706,7 +950,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalText: {
-    marginBottom: 15,
+    // marginBottom: 15,
     textAlign: 'center',
   },
 });

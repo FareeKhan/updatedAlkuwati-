@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text } from 'react-native'
+import { View, StyleSheet, Text, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import ExportSvg from '../constants/ExportSvg'
 import * as Animatable from 'react-native-animatable';
@@ -21,6 +21,7 @@ const HeaderLogo = () => {
                     bounceEffectOut={1}
                     style={{}}
                 >
+                    {/* <Image source={require('../assets/logoImg.png')} style={{width:100,height:100}}  /> */}
                     <ExportSvg.SmallLogo />
                 </RNBounceable>
             </Animatable.Text>

@@ -229,6 +229,20 @@ const UserProfile = ({ navigation }) => {
       { text: t("OK"), onPress: () => LogoutPress() },
     ]);
 
+
+    const handleEmailPress = () => {
+      const email = 'info@alkwaityalawal.com';
+      const subject = 'Hello';
+      const body = 'I would like to get in touch with you.';
+      
+      const mailUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      
+      Linking.openURL(mailUrl).catch(err => {
+        Alert.alert('Error', 'Could not open mail app.');
+        console.error('Email error:', err);
+      });
+    };
+
   return (
     <DrawerSceneWrapper>
       <View style={styles.mainContainer}>
@@ -338,7 +352,7 @@ const UserProfile = ({ navigation }) => {
                       }
                     />
                     <TouchableOpacity
-                      onPress={() => OpenURLButton(SupportURL)}
+                      onPress={() => handleEmailPress()}
                       style={styles.userContainer}
                     >
                       <View

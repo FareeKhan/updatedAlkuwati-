@@ -4,25 +4,25 @@ import ExportSvg from '../constants/ExportSvg';
 import SingleProductCard from './SingleProductCard';
 import { searchProductByName } from '../services/UserServices';
 import { color } from '../constants/color';
-const {height } = Dimensions.get('screen')
+const { height } = Dimensions.get('screen')
 import { useTranslation } from 'react-i18next';
 
-const SearchModal = ({setModalVisible,modalVisible,navigation}) => {
+const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
     const [search, setSearch] = useState('')
     const [foundProduct, setFoundProduct] = useState()
     const { t } = useTranslation();
 
-    useEffect(()=>{
-            searchProduct()
-    },[search])
+    useEffect(() => {
+        searchProduct()
+    }, [search])
 
 
     const searchProduct = async () => {
         try {
             const result = await searchProductByName(search)
             if (result?.status) {
-              setFoundProduct(result?.data)
-            }else{
+                setFoundProduct(result?.data)
+            } else {
                 setFoundProduct([])
             }
         } catch (error) {
@@ -35,70 +35,78 @@ const SearchModal = ({setModalVisible,modalVisible,navigation}) => {
         navigation.navigate('ProductDetails', { id: id })
         setSearch('')
         setFoundProduct('')
+    } 
+    
+    
+    const onPressCross = () => {
+       setModalVisible(false)
+       setSearch('')
     }
 
 
 
-  return (
-    <View style={styles.centeredView}>
-    <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-            setModalVisible(!modalVisible);
-        }}>
-        <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-                <View style={styles.searchBoxContainer}>
-                    <TouchableOpacity onPress={() => setModalVisible(false)}>
-                        <ExportSvg.crossIcons />
-                    </TouchableOpacity>
-                    <TextInput
-                        placeholder={t("search_here")}
-                        value={search}
-                        onChangeText={setSearch}
-                        style={{textAlign:I18nManager.isRTL? 'right' : 'left', marginLeft: 10,color:"#000",paddingVertical:15,width:'80%'}}
-                        placeholderTextColor={"#00000080"}
-                    />
-                    <TouchableOpacity onPress={searchProduct} style={styles.rightIconSearch}>
-                        <ExportSvg.Search />
-                    </TouchableOpacity>
-                </View>
 
-               
-                <View style={{ flex: 1 }}>
-                    <FlatList
-                        data={foundProduct}
-                        keyExtractor={(item, index) => index?.toString()}
-                        showsVerticalScrollIndicator={false}
-                        numColumns={2}
-                        ListEmptyComponent={()=>{
-                        return(
-                        <View style={{alignItems:"center",justifyContent:"center",flex:1,height:height/1.5}}>
-                            <Text style={{color:"#000"}}>{t("no_product_found")}</Text>
+
+    return (
+        <View style={styles.centeredView}>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    setModalVisible(!modalVisible);
+                }}>
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <View style={styles.searchBoxContainer}>
+                            <TouchableOpacity onPress={onPressCross}>
+                                <ExportSvg.crossIcons />
+                            </TouchableOpacity>
+                            <TextInput
+                                placeholder={t("search_here")}
+                                value={search}
+                                onChangeText={setSearch}
+                                style={{ textAlign: I18nManager.isRTL ? 'right' : 'left', marginLeft: 10, color: "#000", paddingVertical: 15, width: '80%' }}
+                                placeholderTextColor={"#00000080"}
+                            />
+                            <TouchableOpacity onPress={searchProduct} style={styles.rightIconSearch}>
+                                <ExportSvg.Search />
+                            </TouchableOpacity>
                         </View>
 
-                        )
-                        }}
-                        columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
-                        renderItem={({ item }) => {
-                            return (
-                                <SingleProductCard
-                                    item={item}
-                                    onPress={() => onPressSearch(item?.pid)}
-                                />
-                            )
-                        }}
 
-                    />
+                        <View style={{ flex: 1 }}>
+                            <FlatList
+                                data={search?.length>0 && foundProduct}
+                                keyExtractor={(item, index) => index?.toString()}
+                                showsVerticalScrollIndicator={false}
+                                numColumns={2}
+                                ListEmptyComponent={() => {
+                                    return (
+                                        <View style={{ alignItems: "center", justifyContent: "center", flex: 1, height: height / 1.5 }}>
+                                            <Text style={{ color: "#000" }}>{t("no_product_found")}</Text>
+                                        </View>
+
+                                    )
+                                }}
+                                columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
+                                renderItem={({ item }) => {
+                                    return (
+                                        <SingleProductCard
+                                            item={item}
+                                            onPress={() => onPressSearch(item?.pid)}
+                                        />
+                                    )
+                                }}
+
+                            />
+                        </View>
+
+                    </View>
                 </View>
-              
-            </View>
+            </Modal>
         </View>
-    </Modal>
-</View>
-  )
+    )
 }
 
 export default SearchModal
@@ -107,14 +115,15 @@ const styles = StyleSheet.create({
 
     centeredView: {
         flex: 1,
-       /* backgroundColor: '#00000030',*/
+        /* backgroundColor: '#00000030',*/
 
     },
     modalView: {
         flex: 1,
         paddingTop: 50,
         backgroundColor: 'white',
-        borderRadius: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -132,7 +141,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         height: 50,
         borderRadius: 30,
-        marginBottom:15
+        marginBottom: 15
     },
     rightIconSearch: {
         marginLeft: "auto",

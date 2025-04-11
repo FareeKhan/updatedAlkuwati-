@@ -40,8 +40,8 @@ export const HomeStack = () => {
             <Stack.Screen name="ProductDetails" component={ProductDetails} options={{ headerShown: false }} />
             <Stack.Screen name="CategoriesList" component={CategoriesList} />
             <Stack.Screen name="ShippingAddress" component={ShippingAddress} options={{
-                presentation: "modal",
-                gestureEnabled: true,
+                // presentation: "modal",
+                // gestureEnabled: true,
             }} />
             <Stack.Screen name="OrderDetails" component={OrderDetails} />
             <Stack.Screen name="PaymentOrder" component={PaymentOrder} />

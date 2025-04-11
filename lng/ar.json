@@ -103,7 +103,7 @@
   "cancel": "إلغاء", 
   "ok": "موافق",
 "support": "الدعم",
-  "paymentSuccess": "تم الدفع بنجاح!",
+  "paymentSuccess": "تم إتمام الطلب بنجاح !",
 "paymentSubText": "لقد أكملت عملية الدفع بنجاح'\n'يرجى تأكيد عملية الدفع!",
 "continueShopping": "متابعة التسوق",
 
@@ -146,7 +146,11 @@
   "PleasePromo": "يرجى إدخال رمز العرض",
   "villa":"الفيلا / الشقة",
   "addAddress": "يرجى إضافة العنوان",
-  "addLocation": "إضافة الموقع"
+  "addLocation": "إضافة الموقع",
+  "selectLocation": "يرجى اختيار موقعك",
+  "PleaseAllow": "يرجى السماح بالوصول إلى موقعك",
+  "outOfStock":"المخزون غير متوفر",
+  "confirm":"تأكيد الموقع"
 
 
 }

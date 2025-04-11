@@ -33,22 +33,20 @@ import { useTranslation } from 'react-i18next';
 
 
 import HeaderBox from '../../components/HeaderBox';
-
 import CustomLoader from '../../components/CustomLoader';
 
 
 
 
 const SameProduct = ({ navigation, route }) => {
-
-
-  const { text, subC_ID, selected, navID } = route?.params;
+  const { text, subC_ID, selected, navID, } = route?.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [storeData, setStoreData] = useState();
   const [isLoader, setIsLoader] = useState(false);
   const [productLoader, setProductLoader] = useState(false);
   const [selectedCat, setSelectedCat] = useState();
   const [storeCategories, setStoreCategories] = useState();
+  const [allProducts, setAllProducts] = useState([]);
   const { t } = useTranslation();
 
 
@@ -56,11 +54,15 @@ const SameProduct = ({ navigation, route }) => {
   const durationInner = 1000;
   const delayInner = 100;
 
+  useEffect(() => {
+    LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
+    getCatList();
+  }, []);
+
   const getCatList = async () => {
     setIsLoader(true);
     try {
       const response = await categoriesListSub(subC_ID);
-      console.log('response', response);
       if (response?.status) {
         setIsLoader(false);
         if (response?.data) {
@@ -74,25 +76,21 @@ const SameProduct = ({ navigation, route }) => {
     }
   };
 
-  const [categoriesData, setCategoriesData] = useState({}); 
-  console.log('ssss',categoriesData)
-
+  const [categoriesData, setCategoriesData] = useState({});
 
   const getcategoriesProduct = async value => {
     if (categoriesData[value]) {
       setStoreData(categoriesData[value]);
       return;
     }
-  
+
     setProductLoader(true)
     try {
       const response = await fetchCategoryProducts(value);
+      // const response = await fetchCategoryProducts(firstName[0]);
       if (response?.status) {
         setProductLoader(false);
-        console.log(response?.data, value);
         setStoreData(response?.data);
-
-
 
         setCategoriesData(prev => ({
           ...prev,
@@ -109,78 +107,47 @@ const SameProduct = ({ navigation, route }) => {
     }
   };
 
-  // const getcategoriesProduct = async (value) => {
-  //   console.log('hello', value);
-  //   setProductLoader(true);
-  
-  //   try {
-  //     const response = await axios.get(`${baseUrl}/getProductsByType/categories/${value}`, {
-  //       headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' },
-  //       params: { timestamp: new Date().getTime() }, // Prevent browser cache
-  //     });
-  
-  //     console.log('fareeed', response.data);
-  
-  //     if (response?.status === 200) {
-  //       setStoreData([...response?.data]); // Force React to detect change
-  //       setProductLoader(false);
-  //     } else {
-  //       setProductLoader(false);
-  //     }
-  //   } catch (error) {
-  //     setProductLoader(false);
-  //     console.log('API Error:', error);
-  //   }
-  // };
-  
-  
-  
-
-  // const getcategoriesProduct = async value => {
-  //   console.log('Selected Category:', value);
-  //   setProductLoader(true);
-  
-  //   try {
-  //     // Force fresh data instead of cache
-  //     const response = await cache.get(
-  //       `${baseUrl}/getProductsByType/categories/${value}`,
-  //       { force: true } // This forces Axios to bypass cache and make a fresh request
-  //     );
-  
-  //     if (response?.status === 200) {
-  //       setProductLoader(false);
-  //       console.log('Fetched Data:', response?.data);
-  //       setStoreData(response?.data);
-  //     } else {
-  //       setProductLoader(false);
-  //     }
-  //   } catch (error) {
-  //     setProductLoader(false);
-  //     console.log('API Error:', error);
-  //   } finally {
-  //     setProductLoader(false);
-  //   }
-  // };
-  
-
-
-
-
-
-
   const funCategories = val => {
+    console.log('ooobhaikyahsow',val)
     getcategoriesProduct(val);
     setSelectedCat(val);
   };
+  useEffect(()=>{
+    checkCatData()
+  },[])
+
+
+  const checkCatData = async ()=> {
+    try {
+      const allResponses = await Promise.all(
+        storeCategories.map((item) => fetchCategoryProducts(item?.name)) // assuming item has an 'id'
+      );
+      setAllProducts(allResponses)
+
+      console.log('isHello',allResponses)
+    } catch (error) {
+
+    }
+
+  };
+
+
+  const isCheckRelatedPRoduct = (value)=>{
+    console.log('shumaila',value)
+    try {
+     const result = allProducts?.filter((item)=>item?.categories == value)
+     console.log('dsds',result[0]?.data)
+    //  setStoreData()
+    } catch (error) {
+      
+    }
+  }
 
   useEffect(() => {
     selected && funCategories(selected);
   }, [selected]);
 
-  useEffect(() => {
-    LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
-    getCatList();
-  }, []);
+
 
 
   const renderItem = ({ item, index }) => {
@@ -201,26 +168,6 @@ const SameProduct = ({ navigation, route }) => {
   };
 
 
-  // useEffect(() => {
-  //   // similarProducts();
-  // }, []);
-
-  // const similarProducts = async () => {
-  //   setIsLoader(true);
-  //   try {
-  //     const result = await getSameProduct(text);
-  //     if (result?.status) {
-  //       setIsLoader(false);
-  //       setStoreData(result?.data);
-  //     } else {
-  //       setIsLoader(false);
-  //       alert(response?.message);
-  //     }
-  //   } catch (error) {
-  //     setIsLoader(false);
-  //     console.log(error);
-  //   }
-  // };
 
   if (isLoader) {
     return <ScreenLoader />;

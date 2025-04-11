@@ -171,7 +171,7 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
                         <TouchableOpacity onPress={() => setModalVisible(false)} style={{ height: 30, width: 30, backgroundColor: color.theme, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, top:Platform.OS == 'ios'? 50:30, left:Platform.OS=='ios'? 30:20 }}>
                             <Entypo name={'cross'} size={20} color={color.white} />
                         </TouchableOpacity>
-                        <ImageViewer imageUrls={images} />
+                        <ImageViewer imageUrls={images} backgroundColor={'#fff'}/>
 
                     </View>
                 </View>

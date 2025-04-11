@@ -99,17 +99,61 @@ const VerifyCode = ({ navigation, route }) => {
             { text: t('login'), onPress: () => navigation.navigate('Login') },
         ]);
 
-    const getFunRegister = async (data) => {
-        setLoading(true);
+    // const getFunRegister = async (data) => {
+    //     setLoading(true);
 
+    //     let bodyData = JSON.stringify({
+    //         "password": '12345678',
+    //         "name": '',
+    //         "phone": data.phone,
+    //         "ftoken": FCNToken
+    //     });
+
+    //     const url = `${baseUrl}/register`;
+
+    //     let config = {
+    //         method: 'post',
+    //         maxBodyLength: Infinity,
+    //         url: url,
+    //         headers: {
+    //             'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L21yLXRhYmxlLWFwaS8iLCJpYXQiOjE3MDIzMTUxMjYsImV4cCI6MTcwNDkwNzEyNiwiZGF0YSI6IjcifQ.Ai3W5TsMnGi7H0amVTL0wW8O1ACB6olOMy08dHj-yew',
+    //             'Content-Type': 'application/json'
+    //         },
+    //         data: bodyData
+    //     };
+    //     console.log('faConfig',config);
+    //     axios.request(config)
+    //         .then((response) => {
+
+    //             dispatch(loginData({
+    //                 token: "abc",
+    //                 userName: response?.data?.data.name,
+    //                 mobile: response?.data?.data.phone,
+    //                 userId: response?.data?.data.id,
+    //             }))
+    //             // response.data?.data.id
+    //             navigation.navigate('PaymentOrder', {
+    //                 totalPrice: totalPrice
+    //             })
+    //             setLoading(false);
+    //         })
+    //         .catch((error) => {
+    //             console.log(error);
+    //             createTwoButtonAlert();
+    //         });
+
+    // }
+    const getFunRegister = async (data) => {
+
+        setLoading(true);
         let bodyData = JSON.stringify({
-            "password": '12345678',
-            "name": '',
             "phone": data.phone,
-            "ftoken": FCNToken
+            // "phone": ,
+            "token": FCNToken,
         });
 
-        const url = `${baseUrl}/register`;
+        // const url = `${baseUrl}/loginPhone`;
+        const url = `${baseUrl}/customer/send-otp`;
 
         let config = {
             method: 'post',
@@ -121,42 +165,98 @@ const VerifyCode = ({ navigation, route }) => {
             },
             data: bodyData
         };
-        console.log('faConfig',config);
+        console.log('config//////', config);
         axios.request(config)
             .then((response) => {
+                console.log('fareedResoponse', response?.data)
 
-                dispatch(loginData({
-                    token: "abc",
-                    userName: response?.data?.data.name,
-                    mobile: response?.data?.data.phone,
-                    userId: response?.data?.data.id,
-                }))
+                if (response?.data?.success) {
+                    isVerifyOtp()
+                } else {
+                    alert(response?.data?.message)
+                }
+
+
+                // dispatch(loginData({
+                //     token: "abc",
+                //     userName: response?.data?.data.name,
+                //     mobile: response?.data?.data.phone,
+                //     userId: response?.data?.data.id,
+                // }))
                 // response.data?.data.id
-                navigation.navigate('PaymentOrder', {
-                    totalPrice: totalPrice
-                })
+                //navigation.goBack();
+                // navigation.navigate('OrderDetails');
+                // if (isOrderDetail) {
+                //     navigation.replace('OrderDetails');
+                // } else {
+                //     navigation.replace('BottomNavigation');
+                // }
+
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
-                createTwoButtonAlert();
+                console.log('error', error);
+
             });
 
     }
 
 
+
+    const isVerifyOtp = async () => {
+        try {
+            const response = await fetch(`${baseUrl}/customer/verify-otp`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    phone: phoneNo,
+                    otp: value
+
+                })
+
+            });
+            const result = await response.json();
+
+
+            console.log('helloResult', result)
+
+            dispatch(loginData({
+                token: "abc",
+                userName: result?.data?.name,
+                mobile: result?.data?.phone,
+                userId: result?.data?.id,
+            }))
+
+            navigation.navigate('PaymentOrder', {
+                totalPrice: totalPrice
+            })
+
+
+
+        } catch (error) {
+            console.log('error', error)
+        }
+    }
+
+
+
     const onPressLogin = () => {
-        pushNotification();
+        pushNotification()
 
         if (value == getOTPCoder) {
             getFunRegister({ phone: phoneNo });
             //navigation.navigate('ChooseTruck')
-        } else if (value == 5987) {
+        } else if (value == 1234) {
             getFunRegister({ phone: phoneNo });
         } else {
             alert(t('CodeIncorrect'))
         }
     }
+
+
 
     useEffect(() => {
         sendOTP(phoneNo);
@@ -320,7 +420,7 @@ const styles = StyleSheet.create({
         width: "85%",
         alignSelf: "center",
         direction: "ltr",
-        flexDirection: I18nManager.isRTL? 'row-reverse' : 'row'
+        flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row'
     },
     cell: {
         width: 45,

@@ -88,16 +88,24 @@ const ProductDetails = ({ navigation, route }) => {
           imgUrl == '' ? productData?.product_images[0]?.image_url : imgUrl,
       }),
     );
-    if (data?.length > 0) {
-      const finalPrice = data.reduce((total, item) => {
-        return total + item.counter * parseFloat(item.price);
-      }, 0)
-        .toFixed(2);
-      dispatch(handleTotalPrice(finalPrice))
-    } else {
-      const finalPrice = productOrder * parseFloat(productObject?.price)
-      dispatch(handleTotalPrice(finalPrice))
-    }
+
+
+    console.log('heyproductData',productData)
+    console.log('showmeData',data?.length > 0)
+
+    // if (data?.length > 0) {
+    //   const finalPrice = data.reduce((total, item) => {
+    //     return total + item.counter * parseFloat(item.price);
+    //   }, 0)
+    //     .toFixed(2);
+    //   dispatch(handleTotalPrice(finalPrice))
+    //   console.log('ifcondition',finalPrice)
+    // } else {
+    //   const finalPrice = productOrder * parseFloat(productObject?.price)
+    //   dispatch(handleTotalPrice(finalPrice))
+    //   console.log('elseconditon')
+
+    // }
 
 
 
@@ -135,6 +143,8 @@ const ProductDetails = ({ navigation, route }) => {
     return <ScreenLoader />;
   }
 
+
+  console.log('hellooshow me', productObject?.quantity == 0)
   return (
     <Animatable.View
       // animation={'slideInLeft'}
@@ -159,7 +169,7 @@ const ProductDetails = ({ navigation, route }) => {
               carouselRef={carouselRef}
               setCurrentIndex={setCurrentIndex}
               data={productData?.product_images}
-              setImgUrl={setImgUrl}
+              setImgUrl={setImgUrl}  
               item={productObject}
             />
 
@@ -175,7 +185,10 @@ const ProductDetails = ({ navigation, route }) => {
 
                 <View>
                   <View style={styles.itemCounter}>
-                    <TouchableOpacity onPress={() => quantity('de')}>
+                    {
+                      productObject?.quantity !== 0 && 
+                      <>
+                        <TouchableOpacity onPress={() => quantity('de')}>
                       <Text style={styles.decrementBtnTxt}>-</Text>
                     </TouchableOpacity>
 
@@ -184,8 +197,18 @@ const ProductDetails = ({ navigation, route }) => {
                     <TouchableOpacity onPress={() => quantity('add')}>
                       <Text style={styles.incrementBtnTxt}>+</Text>
                     </TouchableOpacity>
+                      </>
+                    }
+                  
                   </View>
-                  <Text style={styles.availableTxt}>{t('available_stocks')}</Text>
+                  {
+                    productObject?.quantity == 0?
+                    <Text style={styles.availableTxt}>{t('outOfStock')}</Text>
+                    :
+                  <Text style={styles.availableTxt}>{productObject?.quantity} {t('available_stocks')}</Text>
+
+
+                  }
                 </View>
               </View>
 
@@ -262,12 +285,12 @@ const ProductDetails = ({ navigation, route }) => {
             alignSelf: 'center',
             bottom: 90,
           }}>
-          <TouchableOpacity onPress={addToCart} style={styles.bottomPriceCartBox}>
+          <TouchableOpacity disabled={ productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}>
             <Text style={styles.productPrice}>KD{productObject?.price}</Text>
 
-            <TouchableOpacity onPress={addToCart} style={styles.bottomCartBox}>
+            <TouchableOpacity disabled={ productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomCartBox,{backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme}]}>
               <ExportSvg.ShippingCart style={{ marginRight: 10 }} />
-              <TouchableOpacity onPress={addToCart}>
+              <TouchableOpacity disabled={ productObject?.quantity == 0}   onPress={addToCart}>
                 <Text style={styles.cartTxt}>{t('add_to_cart')}</Text>
               </TouchableOpacity>
             </TouchableOpacity>

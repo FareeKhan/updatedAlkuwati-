@@ -85,15 +85,15 @@ const Login = ({ navigation, route }) => {
     });
 
     const getFunLogin = async (data) => {
-        console.log('--->>>', data)
         setLoading(true);
         let bodyData = JSON.stringify({
-            // "phone": data.phone,
-            "phone": "+96511122233",
-            "ftoken": FCNToken,
+            "phone": data.phone,
+            // "phone": ,
+            "token": FCNToken,
         });
 
-        const url = `${baseUrl}/loginPhone`;
+        // const url = `${baseUrl}/loginPhone`;
+        const url = `${baseUrl}/customer/send-otp`;
 
         let config = {
             method: 'post',
@@ -108,21 +108,29 @@ const Login = ({ navigation, route }) => {
         console.log('config//////', config);
         axios.request(config)
             .then((response) => {
+                console.log('fareedResoponse', response?.data)
 
-                dispatch(loginData({
-                    token: "abc",
-                    userName: response?.data?.data.name,
-                    mobile: response?.data?.data.phone,
-                    userId: response?.data?.data.id,
-                }))
+                if (response?.data?.success) {
+                    isVerifyOtp()
+                } else {
+                    alert(response?.data?.message)
+                }
+
+
+                // dispatch(loginData({
+                //     token: "abc",
+                //     userName: response?.data?.data.name,
+                //     mobile: response?.data?.data.phone,
+                //     userId: response?.data?.data.id,
+                // }))
                 // response.data?.data.id
                 //navigation.goBack();
                 // navigation.navigate('OrderDetails');
-                if (isOrderDetail) {
-                    navigation.replace('OrderDetails');
-                } else {
-                    navigation.replace('BottomNavigation');
-                }
+                // if (isOrderDetail) {
+                //     navigation.replace('OrderDetails');
+                // } else {
+                //     navigation.replace('BottomNavigation');
+                // }
 
                 setLoading(false);
             })
@@ -133,12 +141,50 @@ const Login = ({ navigation, route }) => {
 
     }
 
+
+
+    const isVerifyOtp = async () => {
+        try {
+            const response = await fetch(`${baseUrl}/customer/verify-otp`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    phone: phoneNo,
+                    otp: value
+
+                })
+
+            });
+            const result = await response.json();
+            dispatch(loginData({
+                token: "abc",
+                userName: result?.data?.name,
+                mobile: result?.data?.phone,
+                userId: result?.data?.id,
+            }))
+
+            if (isOrderDetail) {
+                navigation.replace('OrderDetails');
+            } else {
+                navigation.replace('BottomNavigation');
+            }
+
+
+
+        } catch (error) {
+            console.log('error', error)
+        }
+    }
+
     const onPressLogin = () => {
 
         if (value == getOTPCoder) {
             getFunLogin({ phone: phoneNo });
             //navigation.navigate('ChooseTruck')
-        } else if (value == 5987) {
+        } else if (value == 1234) {
             getFunLogin({ phone: phoneNo });
         } else {
             alert(t('CodeIncorrect'))

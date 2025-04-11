@@ -37,7 +37,7 @@ const UserDetails = ({ navigation, route }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
-  const [fullName, setFullName] = useState();
+  const [fullName, setFullName] = useState(userAddress?.fullName);
   const [phoneNumber, setPhoneNumber] = useState();
   const [email, setEmail] = useState();
   const [btnLoader, setBtnLoader] = useState(false);
@@ -63,7 +63,7 @@ const UserDetails = ({ navigation, route }) => {
       console.log('Object',response)
       console.log('Object',response)
       if (response?.status) {
-        setFullName(response?.data?.name)
+        setFullName(response?.data?.name?response?.data?.name : userAddress?.fullName)
         setPhoneNumber(response?.data?.phone_number !== null ? response?.data?.phone_number : response?.data?.phone)
         setEmail(response?.data?.email)
       }
@@ -89,6 +89,7 @@ const UserDetails = ({ navigation, route }) => {
       console.log('response',response)
       if (response?.status) {
         alert(t('updated'));
+        navigation.goBack()
       }else{
         alert(t('someThingWentWrong'));
       }

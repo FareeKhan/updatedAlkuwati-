@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "521080035115",
-    "project_id": "alkwaityalawalproject",
-    "storage_bucket": "alkwaityalawalproject.firebasestorage.app"
+    "project_number": "697573678829",
+    "project_id": "kuwaiti-notification",
+    "storage_bucket": "kuwaiti-notification.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:521080035115:android:093dba3a11210608cb976e",
+        "mobilesdk_app_id": "1:697573678829:android:4cdb67d18d3d9bc507b6e4",
         "android_client_info": {
-          "package_name": "com.alkwaityalawalapp"
+          "package_name": "com.alkwaityalawal"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBbbMmM9lpftW1WF4R3pG_mceEZgQEzDoU"
+          "current_key": "AIzaSyA_mdeoc5AT60Km6umAkxldka3UYNUyoPA"
         }
       ],
       "services": {

@@ -7,9 +7,7 @@ const CustomInput = ({ placeholder, value, onChangeText, title, style, ...props 
     <View style={style}>
       {
         title &&
-        <View style={{flexDirection:'row' }}>
-        <Text style={{ marginBottom: 5, color: color.theme, fontFamily: "Montserrat-Medium",}}>{title}</Text>
-        </View>
+        <Text style={{ textAlign:"left",marginBottom: 5, color: color.theme, fontFamily: "Montserrat-Medium",}}>{title}</Text>
       }
       <TextInput
       

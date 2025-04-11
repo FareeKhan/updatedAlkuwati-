@@ -196,7 +196,9 @@ const SavedAddresses = ({ navigation, route }) => {
 
             {
                 isAdd &&
-                <TouchableOpacity style={{ borderWidth: 1, alignSelf: "baseline", paddingHorizontal: 10, paddingVertical: 2, borderRadius: 5, borderColor: "#cecece" }} onPress={() => navigation.navigate('ShippingAddress')}>
+                <TouchableOpacity style={{ borderWidth: 1, alignSelf: "baseline", paddingHorizontal: 10, paddingVertical: 2, borderRadius: 5, borderColor: "#cecece" }} onPress={() => navigation.navigate('ShippingAddress',{
+                    isMap:true
+                })}>
                     <CustomText style={{ fontSize: 16, fontWeight: "600", color: color.theme, textAlign: "left" }}>+ {t('addNew')}</CustomText>
                 </TouchableOpacity>
             }
@@ -213,12 +215,16 @@ const SavedAddresses = ({ navigation, route }) => {
                     renderItem={renderItem}
                 />
             </View>
+{
+    data?.length>0 &&
+    <CustomButton
+    title={t('continue')}
+    style={{marginBottom:20}}
+    onPress={()=>navigation.goBack()}
+/>
 
-            <CustomButton
-                title={t('continue')}
-                style={{marginBottom:20}}
-                onPress={()=>navigation.goBack()}
-            />
+}
+          
         </ScreenView>
     )
 }
