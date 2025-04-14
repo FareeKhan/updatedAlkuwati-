@@ -582,10 +582,10 @@ const ShippingAddress = ({ navigation, route }) => {
     // console.log('Center Location:-->', newRegion);
     // console.log('Center Location:', newRegion.latitude, newRegion.longitude);
     setPickupLocation({
-      latitude:newRegion.latitude,
-      longitude:newRegion.longitude,
-      latitudeDelta:newRegion.latitudeDelta,
-      longitudeDelta:newRegion.longitudeDelta,
+      latitude: newRegion.latitude,
+      longitude: newRegion.longitude,
+      latitudeDelta: newRegion.latitudeDelta,
+      longitudeDelta: newRegion.longitudeDelta,
     });
     setPanLoader(false); // show l
     setIsMapOpened(true)
@@ -634,6 +634,63 @@ const ShippingAddress = ({ navigation, route }) => {
           autoCapitalize={false}
           keyboardType={'email'}
         /> */}
+
+
+        <CustomDropDown
+          data={I18nManager.isRTL ? countries_ar : countries_en}
+          title={t('Country')}
+          placeholder={t('Country')}
+          setValue={setCountry}
+          value={country}
+        />
+
+        {country == t('Kuwait') ? (
+          <CustomDropDown
+            data={I18nManager.isRTL ? governorate_ar : governorate_en}
+            title={t('governorate')}
+            placeholder={t('governorate')}
+            setValue={setArea}
+            value={area}
+          />
+        ) : (
+          <View>
+            <Text
+              style={{
+                textAlign: 'left',
+                marginBottom: 10,
+                color: color.theme,
+                marginTop: 20,
+              }}>
+              {t('governorate')}
+            </Text>
+
+            <TextInput
+              placeholder={t('governorate')}
+              value={area}
+              onChangeText={setArea}
+              autoCorrect={false}
+              maxLength={10}
+              style={{
+                color: '#000',
+                height: 50,
+                paddingHorizontal: 10,
+                textAlign: I18nManager.isRTL ? 'right' : 'left',
+                writingDirection: 'rtl',
+                backgroundColor: '#cccccc70',
+                borderRadius: 7,
+              }}
+              placeholderTextColor={'#cecece'}
+            />
+          </View>
+        )}
+
+
+
+
+
+
+
+
         <View style={{ marginTop: 20 }}>
           <Text
             style={{ textAlign: 'left', marginBottom: 10, color: color.theme }}>
@@ -749,53 +806,7 @@ const ShippingAddress = ({ navigation, route }) => {
 
 
 
-        <CustomDropDown
-          data={I18nManager.isRTL ? countries_ar : countries_en}
-          title={t('Country')}
-          placeholder={t('Country')}
-          setValue={setCountry}
-          value={country}
-        />
 
-        {country == t('Kuwait') ? (
-          <CustomDropDown
-            data={I18nManager.isRTL ? governorate_ar : governorate_en}
-            title={t('governorate')}
-            placeholder={t('governorate')}
-            setValue={setArea}
-            value={area}
-          />
-        ) : (
-          <View>
-            <Text
-              style={{
-                textAlign: 'left',
-                marginBottom: 10,
-                color: color.theme,
-                marginTop: 20,
-              }}>
-              {t('governorate')}
-            </Text>
-
-            <TextInput
-              placeholder={t('governorate')}
-              value={area}
-              onChangeText={setArea}
-              autoCorrect={false}
-              maxLength={10}
-              style={{
-                color: '#000',
-                height: 50,
-                paddingHorizontal: 10,
-                textAlign: I18nManager.isRTL ? 'right' : 'left',
-                writingDirection: 'rtl',
-                backgroundColor: '#cccccc70',
-                borderRadius: 7,
-              }}
-              placeholderTextColor={'#cecece'}
-            />
-          </View>
-        )}
 
         <View style={{ marginTop: 50 }}>
           {isLoader ? (
@@ -848,9 +859,9 @@ const ShippingAddress = ({ navigation, route }) => {
               onRegionChange={onRegionChange}
               onRegionChangeComplete={onRegionChangeComplete}
             />
-               
 
-            <TouchableOpacity activeOpacity={0.8} onPress={() => getCurrentLocation()} style={{ height: 45, width: 45,  borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: "50%", left:"50%" }}>
+
+            <TouchableOpacity activeOpacity={0.8} onPress={() => getCurrentLocation()} style={{ height: 45, width: 45, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: "50%", left: "50%" }}>
               <FontAwesome6 name={'location-dot'} size={40} color={color.theme} />
             </TouchableOpacity>
 
@@ -859,7 +870,7 @@ const ShippingAddress = ({ navigation, route }) => {
             </TouchableOpacity>
 
             <TouchableOpacity activeOpacity={0.8} onPress={() => setModalVisible(false)} style={{ height: 45, width: "80%", backgroundColor: color.theme, borderRadius: 10, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: Platform.OS == 'ios' ? 50 : 30, }}>
-              <Text style={{ color: "#fff", fontWeight: "500" }}>{panLoader?  t('loading')+' .....': t('confirm')}</Text>
+              <Text style={{ color: "#fff", fontWeight: "500" }}>{panLoader ? t('loading') + ' .....' : t('confirm')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -961,7 +972,7 @@ const styles = StyleSheet.create({
     // marginBottom: 15,
     textAlign: 'center',
   },
-  markerFixed:{
+  markerFixed: {
     position: 'absolute',
   }
 });
