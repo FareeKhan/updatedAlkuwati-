@@ -163,8 +163,9 @@ const BottomNavigation = () => {
                 }}
             />
             <Tab.Screen
-                name="DiscountProducts"
-                component={DiscountProducts}
+                name="AllProducts"
+                // component={DiscountProducts}
+                component={AllProducts}
                 options={{
                     tabBarIcon: ({ size, color, focused }) => {
                         return (
@@ -172,7 +173,8 @@ const BottomNavigation = () => {
                                 <View style={[styles.iconContainer, focused && { backgroundColor: "#67300F" }]}>
                                     <MaterialIcons name="discount" size={20} color={focused ? "#fff" : "#67300F"} style={{ marginBottom: 0 }} />
                                 </View>
-                                {focused && <Text numberOfLines={1} style={[styles.tabTxt, { width: I18nManager.isRTL ? 55 : 70 }]}>{t("discount_name")}</Text>}
+                                {/* {focused && <Text numberOfLines={1} style={[styles.tabTxt, { width: I18nManager.isRTL ? 55 : 70 }]}>{t("discount_name")}</Text>} */}
+                                {focused && <Text numberOfLines={1} style={[styles.tabTxt, { width: I18nManager.isRTL ? 55 : 70 }]}>{t("categories")}</Text>}
                             </View>
                         )
                     },

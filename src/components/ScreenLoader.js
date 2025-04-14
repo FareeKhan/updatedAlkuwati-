@@ -1,4 +1,4 @@
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { color } from '../constants/color'
 import * as Animatable from 'react-native-animatable';
@@ -7,9 +7,10 @@ import ExportSvg from '../constants/ExportSvg';
 const ScreenLoader = ({ title, onPress, style }) => {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Animatable.Text animation="slideInDown" iterationCount="infinite" direction="alternate">
-        <ExportSvg.SmallLogo />
-      </Animatable.Text>      
+      <Animatable.View  animation="slideInDown" iterationCount="infinite" direction="alternate">
+        {/* <ExportSvg.SmallLogo /> */}
+        <Image  source={require('../assets/logoShow.png')} resizeMode='center'   /> 
+      </Animatable.View>      
       <ActivityIndicator color="#bb5533" size="large"  style={{marginTop:25}} />
     </View>
   )

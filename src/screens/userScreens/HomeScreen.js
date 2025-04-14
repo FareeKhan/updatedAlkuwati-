@@ -276,6 +276,7 @@ const HomeScreen = ({ navigation }) => {
 
 
   // || isLoader
+  // if (loader) {
   if (loader) {
     return <ScreenLoader />;
   }

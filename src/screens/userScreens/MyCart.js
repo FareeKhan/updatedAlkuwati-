@@ -161,7 +161,7 @@ const MyCart = ({ navigation }) => {
             flexGrow: 1,
             marginBottom: 60,
             marginTop: 10,
-            paddingBottom:data?.length>=4 ? 100 :20
+            paddingBottom:data?.length>=3 ? 100 :20
           }}>
           <View>
             <FlatList

@@ -1,4 +1,4 @@
-import { ActivityIndicator, Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {  Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import ExportSvg from '../constants/ExportSvg'
 import { color } from '../constants/color'
@@ -9,7 +9,7 @@ import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import { addProductToCart } from '../redux/reducer/ProductAddToCart'
 import { useNavigation } from '@react-navigation/native'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import CustomToast from './CustomToast'
+
 import { useTranslation } from 'react-i18next'
 import { productDetails } from '../services/UserServices'
 import LottieView from 'lottie-react-native'
@@ -53,11 +53,8 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
         image: item?.image
 
       }))
-
-
-
     }
-  }
+}
 
 
   // new code 
@@ -84,7 +81,6 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
 
     try {
       const response = await productDetails(item?.pid);
-      console.log(response?.color_variants, '[[[')
       if (response?.status) {
         setIsColor(response?.color_variants?.length > 0)
         setIsSize(response?.size_variants?.length > 0)

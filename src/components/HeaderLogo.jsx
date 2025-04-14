@@ -21,8 +21,9 @@ const HeaderLogo = () => {
                     bounceEffectOut={1}
                     style={{}}
                 >
+                    <Image  source={require('../assets/logoShow.png')} style={{width:100,height:50}} /> 
                     {/* <Image source={require('../assets/logoImg.png')} style={{width:100,height:100}}  /> */}
-                    <ExportSvg.SmallLogo />
+                    {/* <ExportSvg.SmallLogo /> */}
                 </RNBounceable>
             </Animatable.Text>
         </View>

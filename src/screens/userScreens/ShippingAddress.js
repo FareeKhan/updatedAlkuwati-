@@ -39,6 +39,7 @@ import EvilIcons from 'react-native-vector-icons/EvilIcons'
 import { LocationPermission } from '../../components/LocationPermission';
 import Geolocation from '@react-native-community/geolocation';
 const { height } = Dimensions.get('screen')
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6'
 
 const ShippingAddress = ({ navigation, route }) => {
   const { id, btnText, isMap } = route.params ?? '';
@@ -69,6 +70,7 @@ const ShippingAddress = ({ navigation, route }) => {
   const [countryCodes, setCountryCodes] = useState('+965');
   const [showGover, setShowGover] = useState(false);
   const [isMapOpened, setIsMapOpened] = useState(false);
+  const [panLoader, setPanLoader] = useState(false);
   const [pickupLocation, setPickupLocation] = useState({
     latitude: 25.197741664033977,
     longitude: 55.27969625835015,
@@ -293,7 +295,7 @@ const ShippingAddress = ({ navigation, route }) => {
       code: '+968',
     },
   ];
-  
+
 
   const governorate_ar = [
     {
@@ -408,7 +410,7 @@ const ShippingAddress = ({ navigation, route }) => {
     }
   }
 
-  console.log('userId',userId)
+  console.log('userId', userId)
 
   const handlePress = async () => {
     // console.log(phoneNumber?.slice(1),'phoneNumber')
@@ -448,7 +450,7 @@ const ShippingAddress = ({ navigation, route }) => {
           : addShippingAddress(addressredux, userId));
 
 
-          console.log('heyareryou',response)
+        console.log('heyareryou', response)
 
         if (response?.data) {
           dispatch(
@@ -545,6 +547,7 @@ const ShippingAddress = ({ navigation, route }) => {
   //   }
   // };
 
+
   if (loader) {
     return <ScreenLoader />;
   }
@@ -562,7 +565,7 @@ const ShippingAddress = ({ navigation, route }) => {
 
   useEffect(() => {
     const selectedCountry = countries_en.find((item) => item.label === country);
-  
+
     if (selectedCountry) {
       setCountryCodes(selectedCountry.code);
     } else {
@@ -570,7 +573,24 @@ const ShippingAddress = ({ navigation, route }) => {
     }
   }, [country]);
 
+  const onRegionChange = () => {
+    setPanLoader(true); // show loader
+  };
 
+  const onRegionChangeComplete = (newRegion) => {
+    // setRegion(newRegion);
+    // console.log('Center Location:-->', newRegion);
+    // console.log('Center Location:', newRegion.latitude, newRegion.longitude);
+    setPickupLocation({
+      latitude:newRegion.latitude,
+      longitude:newRegion.longitude,
+      latitudeDelta:newRegion.latitudeDelta,
+      longitudeDelta:newRegion.longitudeDelta,
+    });
+    setPanLoader(false); // show l
+    setIsMapOpened(true)
+
+  };
 
   return (
     // <View scrollable={true} style={{paddingTop:60}}>
@@ -825,38 +845,25 @@ const ShippingAddress = ({ navigation, route }) => {
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
               }}
+              onRegionChange={onRegionChange}
+              onRegionChangeComplete={onRegionChangeComplete}
+            />
+               
 
-              onPress={handleMapPress}
-            >
-
-              <Marker
-                coordinate={pickupLocation}
-              />
-
-            </MapView>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => getCurrentLocation()} style={{ height: 45, width: 45,  borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: "50%", left:"50%" }}>
+              <FontAwesome6 name={'location-dot'} size={40} color={color.theme} />
+            </TouchableOpacity>
 
             <TouchableOpacity activeOpacity={0.8} onPress={() => getCurrentLocation()} style={{ height: 45, width: 45, backgroundColor: color.theme, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: 100, left: Platform.OS == 'ios' ? 30 : 20 }}>
               <EvilIcons name={'location'} size={30} color={color.white} />
             </TouchableOpacity>
 
-            <TouchableOpacity  activeOpacity={0.8} onPress={() => setModalVisible(false)} style={{ height: 45, width: "80%", backgroundColor: color.theme, borderRadius: 10, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: Platform.OS == 'ios' ? 50 : 30,  }}>
-              <Text style={{color:"#fff",fontWeight:"500"}}>{t('confirm')}</Text>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => setModalVisible(false)} style={{ height: 45, width: "80%", backgroundColor: color.theme, borderRadius: 10, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: Platform.OS == 'ios' ? 50 : 30, }}>
+              <Text style={{ color: "#fff", fontWeight: "500" }}>{panLoader?  t('loading')+' .....': t('confirm')}</Text>
             </TouchableOpacity>
-            {/* <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => setModalVisible(!modalVisible)}>
-                <Text style={styles.textStyle}>Hide Modal</Text>
-              </Pressable> */}
           </View>
         </View>
       </Modal>
-
-
-
-
-
-
-
 
     </View>
   );
@@ -919,6 +926,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalView: {
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: 'white',
     // borderRadius: 20,
     // height: 500,
@@ -953,6 +961,9 @@ const styles = StyleSheet.create({
     // marginBottom: 15,
     textAlign: 'center',
   },
+  markerFixed:{
+    position: 'absolute',
+  }
 });
 
 // import {

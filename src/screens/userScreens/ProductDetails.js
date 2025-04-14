@@ -285,7 +285,8 @@ const ProductDetails = ({ navigation, route }) => {
             alignSelf: 'center',
             bottom: 90,
           }}>
-          <TouchableOpacity disabled={ productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}>
+          {/* <TouchableOpacity disabled={ productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}> */}
+          <TouchableOpacity  onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}>
             <Text style={styles.productPrice}>KD{productObject?.price}</Text>
 
             <TouchableOpacity disabled={ productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomCartBox,{backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme}]}>
