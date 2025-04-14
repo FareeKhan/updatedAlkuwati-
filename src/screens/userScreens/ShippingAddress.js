@@ -105,30 +105,30 @@ const ShippingAddress = ({ navigation, route }) => {
 
   console.log('dasd', userAddress)
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    if (
-      pickupLocation?.latitude &&
-      pickupLocation?.longitude &&
-      mapRef.current
-    ) {
-      const location = {
-        latitude: pickupLocation?.latitud,
-        longitude: pickupLocation?.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      };
-      setTimeout(() => {
-        if (mapRef.current) {
-          mapRef.current.animateToRegion(location, 1000);
-        }
-      }, 300);
-      error => {
-        console.log('Location error:', error);
-      },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    }
-  }, [pickupLocation]);
+  //   if (
+  //     pickupLocation?.latitude &&
+  //     pickupLocation?.longitude &&
+  //     mapRef.current
+  //   ) {
+  //     const location = {
+  //       latitude: pickupLocation?.latitud,
+  //       longitude: pickupLocation?.longitude,
+  //       latitudeDelta: 0.01,
+  //       longitudeDelta: 0.01,
+  //     };
+  //     // setTimeout(() => {
+  //     //   if (mapRef.current) {
+  //     //     mapRef.current.animateToRegion(location, 1000);
+  //     //   }
+  //     // }, 300);
+  //     error => {
+  //       console.log('Location error:', error);
+  //     },
+  //       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+  //   }
+  // }, [pickupLocation]);
 
   const getCurrentLocation = async () => {
     const result = await LocationPermission();
@@ -552,15 +552,15 @@ const ShippingAddress = ({ navigation, route }) => {
     return <ScreenLoader />;
   }
 
-  const handleMapPress = (e) => {
-    const { coordinate } = e.nativeEvent;
-    setPickupLocation({
-      ...coordinate,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
-    });
-    setIsMapOpened(true)
-  };
+  // const handleMapPress = (e) => {
+  //   const { coordinate } = e.nativeEvent;
+  //   setPickupLocation({
+  //     ...coordinate,
+  //     latitudeDelta: 0.01,
+  //     longitudeDelta: 0.01,
+  //   });
+  //   setIsMapOpened(true)
+  // };
 
 
   useEffect(() => {
@@ -861,9 +861,9 @@ const ShippingAddress = ({ navigation, route }) => {
             />
 
 
-            <TouchableOpacity activeOpacity={0.8} onPress={() => getCurrentLocation()} style={{ height: 45, width: 45, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: "50%", left: "50%" }}>
+            <View activeOpacity={0.8}  style={{ height: 45, width: 45, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: "50%", left: "50%" }}>
               <FontAwesome6 name={'location-dot'} size={40} color={color.theme} />
-            </TouchableOpacity>
+            </View>
 
             <TouchableOpacity activeOpacity={0.8} onPress={() => getCurrentLocation()} style={{ height: 45, width: 45, backgroundColor: color.theme, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: 100, left: Platform.OS == 'ios' ? 30 : 20 }}>
               <EvilIcons name={'location'} size={30} color={color.white} />
@@ -937,7 +937,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalView: {
-    ...StyleSheet.absoluteFillObject,
+    // ...StyleSheet.absoluteFillObject,
     backgroundColor: 'white',
     // borderRadius: 20,
     // height: 500,
