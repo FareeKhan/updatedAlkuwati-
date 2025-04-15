@@ -286,6 +286,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: color.theme,
     marginBottom: 10,
+    textAlign:"left"
   },
 
   arrivalTitle: {

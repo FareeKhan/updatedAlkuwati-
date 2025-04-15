@@ -213,7 +213,8 @@ const VerifyCode = ({ navigation, route }) => {
                 },
                 body: JSON.stringify({
                     phone: phoneNo,
-                    otp: value
+                    otp: value,
+                    token:FCNToken
 
                 })
 

@@ -46,6 +46,8 @@ const Login = ({ navigation, route }) => {
         }
     }
 
+    console.log('sss',FCNToken)
+
 
     const generateOTP = (limit) => {
         var digits = '0123456789';
@@ -112,7 +114,6 @@ const Login = ({ navigation, route }) => {
         console.log('config//////', config);
         axios.request(config)
             .then((response) => {
-                console.log('fareedResoponse', response?.data)
 
                 if (response?.data?.success) {
                     isVerifyOtp()
