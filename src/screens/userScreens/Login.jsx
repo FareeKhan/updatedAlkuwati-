@@ -16,6 +16,7 @@ import messaging, { firebase } from '@react-native-firebase/messaging';
 import { baseUrl, OTP_URL } from '../../constants/data';
 import HeaderLogo from '../../components/HeaderLogo'
 import { loginData } from '../../redux/reducer/Auth';
+import CustomDropDown from '../../components/CustomDropDown';
 
 const CELL_COUNT = 4;
 const Login = ({ navigation, route }) => {
@@ -29,6 +30,9 @@ const Login = ({ navigation, route }) => {
     const [getOTPCoder, setOTPCoder] = useState();
     const [getTextReSend, setTextReSend] = useState();
     const [phoneNo, setPhoneNo] = useState('')
+    const [country, setCountry] = useState('الكويت');
+  const [countryCodes, setCountryCodes] = useState('+965');
+
 
     const [value, setValue] = useState('')
     const [FCNToken, setFCNToken] = useState();
@@ -200,7 +204,7 @@ const Login = ({ navigation, route }) => {
             Alert.alert(t('isNotValid'));
         } else {
             let updatedPhoneNumber = phoneNo[0] === '0' ? phoneNo.slice(1) : phoneNo;
-            updatedPhoneNumber = '+965' + updatedPhoneNumber;
+            updatedPhoneNumber = countryCodes + updatedPhoneNumber;
             sendOTP(updatedPhoneNumber);
         }
     }
@@ -225,6 +229,83 @@ const Login = ({ navigation, route }) => {
         setOTPCoder()
     }
 
+    useEffect(() => {
+        const selectedCountry = countries_en.find((item) => item.label === country);
+    
+        if (selectedCountry) {
+          setCountryCodes(selectedCountry.code);
+        } else {
+          setCountryCodes(''); // Optional fallback
+        }
+      }, [country]);
+
+
+    const countries_ar = [
+        {
+          label: 'الكويت',
+          id: 1,
+          code: '+965',
+        },
+        {
+          label: 'المملكة العربية السعودية',
+          id: 2,
+          code: '+966',
+        },
+        {
+          label: 'الإمارات العربية المتحدة',
+          id: 3,
+          code: '+971',
+        },
+        {
+          label: 'البحرين',
+          id: 4,
+          code: '+973',
+        },
+        {
+          label: 'قطر',
+          id: 5,
+          code: '+974',
+        },
+        {
+          label: 'عمان',
+          id: 6,
+          code: '+968',
+        },
+      ];
+    
+      const countries_en = [
+        {
+          label: t('Kuwait'),
+          id: 1,
+          code: '+965',
+        },
+        {
+          label: t('Saudi Arabia'),
+          id: 2,
+          code: '+966',
+        },
+        {
+          label: t('United Arab Emirates'),
+          id: 3,
+          code: '+971',
+        },
+        {
+          label: t('Bahrain'),
+          id: 4,
+          code: '+973',
+        },
+        {
+          label: t('Qatar'),
+          id: 5,
+          code: '+974',
+        },
+        {
+          label: t('Oman'),
+          id: 6,
+          code: '+968',
+        },
+      ];
+
     return (
         <View style={styles.mainContainer}>
             <Screen>
@@ -240,7 +321,7 @@ const Login = ({ navigation, route }) => {
                         <Text style={styles.subTitle}>{t('enterDigits')}</Text>
 
                         <Text style={styles.subTitle}>
-                            {'\u2066'}+965{phoneNo && phoneNo[0] === '0' ? phoneNo.slice(1) : phoneNo}{'\u2069'}
+                            {'\u2066'}{countryCodes}{phoneNo && phoneNo[0] === '0' ? phoneNo.slice(1) : phoneNo}{'\u2069'}
                         </Text>
 
                         {/* <Text style={styles.subTitle}>
@@ -297,8 +378,19 @@ const Login = ({ navigation, route }) => {
                     :
                     <View style={{}}>
                         <View style={{ marginTop: 20 }}>
+
+                        <CustomDropDown
+          data={I18nManager.isRTL ? countries_ar : countries_en}
+          title={t('Country')}
+          placeholder={t('Country')}
+          setValue={setCountry}
+          value={country}
+        />
+
+
+
                             <Text
-                                style={{ textAlign: 'left', marginBottom: 10, color: color.theme }}>
+                                style={{ textAlign: 'left', marginBottom: 10, color: color.theme,marginTop:20 }}>
                                 {t('phoneNumber')}
                             </Text>
                             <View
@@ -311,7 +403,7 @@ const Login = ({ navigation, route }) => {
                                     paddingBottom: 10,
 
                                 }}>
-                                <Text style={{ color: "#000" }}>{'\u2066+965\u2069'}</Text>
+                                <Text style={{ color: "#000" }}>{`\u2066${countryCodes}\u2069`}</Text>
                                 <TextInput
                                     placeholder={t('phoneNumber')}
                                     value={phoneNo}

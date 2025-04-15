@@ -131,6 +131,7 @@ const BottomNavigation = () => {
                 name="HomeStack"
                 component={HomeStack}
                 options={{
+               
                     tabBarButton: (props) => {
                         const navigation = useNavigation(); // ✅ Fix: Use useNavigation()
                 
