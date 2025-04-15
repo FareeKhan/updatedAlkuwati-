@@ -225,7 +225,7 @@ const VerifyCode = ({ navigation, route }) => {
             console.log('helloResult', result)
 
             dispatch(loginData({
-                token: "abc",
+                token:FCNToken,
                 userName: result?.data?.name,
                 mobile: result?.data?.phone,
                 userId: result?.data?.id,
