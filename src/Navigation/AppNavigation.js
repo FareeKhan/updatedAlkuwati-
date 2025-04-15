@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import i18next, { changeLanguage } from "i18next";
 import { changeDirection } from "../redux/reducer/Auth";
 import RNRestart from 'react-native-restart';
+import Video, {VideoRef} from 'react-native-video';
 
 
 LogBox.ignoreAllLogs();
@@ -44,6 +45,7 @@ console.log('=>',isLanguage)
   }, []);
 
   if (isSplashScreen) {
+  // if (true) {
     return <SplashScreen />;
   }
 
