@@ -262,7 +262,7 @@ export const orderConfirmed = async (productNo, address, totalPrice, data, email
                     "payment_status": "pending",
                     "paymentType": token_obj,
                     "total_price": totalPrice,
-                    "subtotal_price": 0,
+                    "subtotal_price": totalPrice,
                     "discount": 0,
                     "delivery_price": 0,
                     "Avenue": "demo",

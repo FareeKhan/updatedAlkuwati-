@@ -1,3 +1,16 @@
+// product view time -> local storage -> current time
+// -> -> firebase notification, dynamic topic product_id_${ID} 
+// messaging()
+//  .subscribeToTopic(`product_view_${product?.id}`)
+//  .then(() => console.log('Subscribed to topic!'));
+
+// index.tsx app.tsx, local storage, product_* delete > 24 hours
+// -> > firebase loop unsubscribe topic
+
+// messaging().unsubscribeToTp/....
+// delete
+
+
 import {
   I18nManager,
   Platform,
@@ -285,8 +298,8 @@ const ProductDetails = ({ navigation, route }) => {
             alignSelf: 'center',
             bottom: 90,
           }}>
-          <TouchableOpacity disabled={ productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}>
-          {/* <TouchableOpacity  onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}> */}
+          {/* <TouchableOpacity disabled={ productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}> */}
+          <TouchableOpacity  onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}>
             <Text style={styles.productPrice}>KD{productObject?.price}</Text>
 
             <TouchableOpacity disabled={ productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomCartBox,{backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme}]}>

@@ -158,14 +158,15 @@ const Login = ({ navigation, route }) => {
                 },
                 body: JSON.stringify({
                     phone: phoneNo,
-                    otp: value
+                    otp: value,
+                    token:FCNToken
 
                 })
 
             });
             const result = await response.json();
             dispatch(loginData({
-                token: "abc",
+                token: FCNToken,
                 userName: result?.data?.name,
                 mobile: result?.data?.phone,
                 userId: result?.data?.id,
