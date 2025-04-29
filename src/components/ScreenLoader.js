@@ -7,10 +7,9 @@ import ExportSvg from '../constants/ExportSvg';
 const ScreenLoader = ({ title, onPress, style }) => {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Animatable.View  animation="slideInDown" iterationCount="infinite" direction="alternate">
-        {/* <ExportSvg.SmallLogo /> */}
+      {/* <Animatable.View  animation="slideInDown" iterationCount="infinite" direction="alternate">
         <Image  source={require('../assets/logoShow.png')} resizeMode='center'   /> 
-      </Animatable.View>      
+      </Animatable.View>       */}
       <ActivityIndicator color="#bb5533" size="large"  style={{marginTop:25}} />
     </View>
   )
@@ -28,3 +27,5 @@ const styles = StyleSheet.create({
   },
 
 })
+
+        {/* <ExportSvg.SmallLogo /> */}

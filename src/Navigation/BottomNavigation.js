@@ -28,6 +28,7 @@ import HomeScreen from '../screens/userScreens/HomeScreen';
 import ViewAllProduct from '../screens/userScreens/ViewAllProduct';
 import { useNavigation } from '@react-navigation/native';
 import SavedAddresses from '../screens/userScreens/SavedAddresses';
+import AntDesign from 'react-native-vector-icons/AntDesign'
 
 const Tab = createBottomTabNavigator();
 
@@ -172,9 +173,9 @@ const BottomNavigation = () => {
                         return (
                             <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#eee", borderRadius: 30 }}>
                                 <View style={[styles.iconContainer, focused && { backgroundColor: "#67300F" }]}>
-                                    <MaterialIcons name="discount" size={20} color={focused ? "#fff" : "#67300F"} style={{ marginBottom: 0 }} />
+                                    {/* <MaterialIcons name="discount" size={20} color={focused ? "#fff" : "#67300F"} style={{ marginBottom: 0 }} /> */}
+                                    <AntDesign name="appstore1" size={15} color={focused ? "#fff" : "#67300F"} style={{ marginBottom: 0 }} />
                                 </View>
-                                {/* {focused && <Text numberOfLines={1} style={[styles.tabTxt, { width: I18nManager.isRTL ? 55 : 70 }]}>{t("discount_name")}</Text>} */}
                                 {focused && <Text numberOfLines={1} style={[styles.tabTxt, { width: I18nManager.isRTL ? 55 : 70 }]}>{t("categories")}</Text>}
                             </View>
                         )

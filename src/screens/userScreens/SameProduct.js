@@ -37,7 +37,6 @@ import CustomLoader from '../../components/CustomLoader';
 
 
 
-
 const SameProduct = ({ navigation, route }) => {
   const { text, subC_ID, selected, navID, } = route?.params;
   const [modalVisible, setModalVisible] = useState(false);
@@ -147,9 +146,6 @@ const SameProduct = ({ navigation, route }) => {
     selected && funCategories(selected);
   }, [selected]);
 
-
-
-
   const renderItem = ({ item, index }) => {
     return (
       <>
@@ -166,8 +162,6 @@ const SameProduct = ({ navigation, route }) => {
       </>
     );
   };
-
-
 
   if (isLoader) {
     return <ScreenLoader />;

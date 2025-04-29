@@ -14,6 +14,7 @@
 import {
   I18nManager,
   Platform,
+  SafeAreaView,
   ScrollView,
   Share,
   StyleSheet,
@@ -102,27 +103,6 @@ const ProductDetails = ({ navigation, route }) => {
       }),
     );
 
-
-    console.log('heyproductData',productData)
-    console.log('showmeData',data?.length > 0)
-
-    // if (data?.length > 0) {
-    //   const finalPrice = data.reduce((total, item) => {
-    //     return total + item.counter * parseFloat(item.price);
-    //   }, 0)
-    //     .toFixed(2);
-    //   dispatch(handleTotalPrice(finalPrice))
-    //   console.log('ifcondition',finalPrice)
-    // } else {
-    //   const finalPrice = productOrder * parseFloat(productObject?.price)
-    //   dispatch(handleTotalPrice(finalPrice))
-    //   console.log('elseconditon')
-
-    // }
-
-
-
-
     if (id && selectedSize) {
       navigation.navigate('MyCart');
     }
@@ -151,170 +131,162 @@ const ProductDetails = ({ navigation, route }) => {
     }
   };
 
-
   if (isLoader) {
     return <ScreenLoader />;
   }
 
 
-  console.log('hellooshow me', productObject?.quantity == 0)
   return (
-    <Animatable.View
-      // animation={'slideInLeft'}
-      // duration={1000}
-      // delay={100}
-      style={{ flex: 1 }}>
-      <View style={styles.mainContainer}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingHorizontal: 15 }}>
+    <SafeAreaView style={styles.mainContainer}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 15 }}>
 
-          <HeaderBox
-            catName={selectedCat}
-            share={true}
-            onPressShare={() => sharePress(productObject?.name, productObject?.price)}
+        <HeaderBox
+          catName={selectedCat}
+          share={true}
+          onPressShare={() => sharePress(productObject?.name, productObject?.price)}
+        />
+
+        <View>
+          <ProductSlider
+            currentIndex={currentIndex}
+            carouselRef={carouselRef}
+            setCurrentIndex={setCurrentIndex}
+            data={productData?.product_images}
+            setImgUrl={setImgUrl}
+            item={productObject}
           />
 
-          <View>
-            <ProductSlider
-              currentIndex={currentIndex}
-              carouselRef={carouselRef}
-              setCurrentIndex={setCurrentIndex}
-              data={productData?.product_images}
-              setImgUrl={setImgUrl}  
-              item={productObject}
-            />
-
-            <View style={styles.productDetailContainer}>
-              <View style={styles.productNamePriceBox}>
-                <View style={{ width: '70%' }}>
-                  <Text style={styles.productName}>{productObject?.name}</Text>
-                  <Text style={styles.productSubTxt}>{productObject?.barCode}</Text>
-                  {/* <Text style={styles.productSubTxt}>
+          <View style={styles.productDetailContainer}>
+            <View style={styles.productNamePriceBox}>
+              <View style={{ width: '70%' }}>
+                <Text style={styles.productName}>{productObject?.name}</Text>
+                <Text style={styles.productSubTxt}>{productObject?.barCode}</Text>
+                {/* <Text style={styles.productSubTxt}>
                   {removeHTMLCode(productObject?.description)}
                 </Text> */}
-                </View>
-
-                <View>
-                  <View style={styles.itemCounter}>
-                    {
-                      productObject?.quantity !== 0 && 
-                      <>
-                        <TouchableOpacity onPress={() => quantity('de')}>
-                      <Text style={styles.decrementBtnTxt}>-</Text>
-                    </TouchableOpacity>
-
-                    <Text style={styles.counterNumberTxt}>{productOrder}</Text>
-
-                    <TouchableOpacity onPress={() => quantity('add')}>
-                      <Text style={styles.incrementBtnTxt}>+</Text>
-                    </TouchableOpacity>
-                      </>
-                    }
-                  
-                  </View>
-                  {
-                    productObject?.quantity == 0?
-                    <Text style={styles.availableTxt}>{t('outOfStock')}</Text>
-                    :
-                  <Text style={styles.availableTxt}>{t('available_stocks')}</Text>
-
-
-                  }
-                </View>
               </View>
 
-              {size?.length > 0 && (
-                <Text style={[styles.productName]}>{t('p_size')}</Text>
-              )}
-              <View style={styles.SizeColorContainer}>
-                <View style={styles.sizeContainer}>
-                  {size?.map((item, index) => {
+              <View>
+                <View style={styles.itemCounter}>
+                  {
+                    productObject?.quantity !== 0 &&
+                    <>
+                      <TouchableOpacity onPress={() => quantity('de')}>
+                        <Text style={styles.decrementBtnTxt}>-</Text>
+                      </TouchableOpacity>
+
+                      <Text style={styles.counterNumberTxt}>{productOrder}</Text>
+
+                      <TouchableOpacity onPress={() => quantity('add')}>
+                        <Text style={styles.incrementBtnTxt}>+</Text>
+                      </TouchableOpacity>
+                    </>
+                  }
+
+                </View>
+                {
+                  productObject?.quantity == 0 ?
+                    <Text style={styles.availableTxt}>{t('outOfStock')}</Text>
+                    :
+                    <Text style={styles.availableTxt}>{t('available_stocks')}</Text>
+
+
+                }
+              </View>
+            </View>
+
+            {size?.length > 0 && (
+              <Text style={[styles.productName]}>{t('p_size')}</Text>
+            )}
+            <View style={styles.SizeColorContainer}>
+              <View style={styles.sizeContainer}>
+                {size?.map((item, index) => {
+                  return (
+                    <TouchableOpacity
+                      onPress={() => setSelectedSize(item?.sid)}
+                      style={[
+                        styles.sizeInnerBox,
+                        selectedSize == item?.sid && {
+                          backgroundColor: color.theme,
+                          borderColor: color.theme,
+                        },
+                      ]}
+                      key={index}>
+                      <Text
+                        style={{
+                          color: selectedSize == item?.sid ? '#fff' : '#000',
+                          fontWeight: '500',
+                        }}>
+                        {item?.lable}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+              {colorVariants?.length > 0 && (
+                <View style={[styles.sizeContainer, styles.colorBox]}>
+                  {colorVariants?.map((item, index) => {
                     return (
                       <TouchableOpacity
-                        onPress={() => setSelectedSize(item?.sid)}
+                        key={index}
+                        onPress={() => setSelectedColorId(item?.id)}
+                        activeOpacity={0.6}
                         style={[
-                          styles.sizeInnerBox,
-                          selectedSize == item?.sid && {
-                            backgroundColor: color.theme,
-                            borderColor: color.theme,
+                          styles.innerColorStyle,
+                          {
+                            backgroundColor: item?.value,
+                            marginRight:
+                              index == colorVariants?.length - 1 ? 0 : 10,
                           },
-                        ]}
-                        key={index}>
-                        <Text
-                          style={{
-                            color: selectedSize == item?.sid ? '#fff' : '#000',
-                            fontWeight: '500',
-                          }}>
-                          {item?.lable}
-                        </Text>
+                        ]}>
+                        {selectedColorId == item?.id && <ExportSvg.whiteTick />}
                       </TouchableOpacity>
                     );
                   })}
                 </View>
+              )}
+            </View>
 
-                {colorVariants?.length > 0 && (
-                  <View style={[styles.sizeContainer, styles.colorBox]}>
-                    {colorVariants?.map((item, index) => {
-                      return (
-                        <TouchableOpacity
-                          key={index}
-                          onPress={() => setSelectedColorId(item?.id)}
-                          activeOpacity={0.6}
-                          style={[
-                            styles.innerColorStyle,
-                            {
-                              backgroundColor: item?.value,
-                              marginRight:
-                                index == colorVariants?.length - 1 ? 0 : 10,
-                            },
-                          ]}>
-                          {selectedColorId == item?.id && <ExportSvg.whiteTick />}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                )}
-              </View>
-
-              <View style={{ flexDirection: 'row' }}>
-                <Text
-                  style={[styles.productName, { marginTop: colorVariants?.length == 0 && size?.length == 0 ? -20 : 20, marginBottom: 5 }]}>
-                  {t('p_description')}
-                </Text>
-              </View>
-
-              <Text style={{ ...styles.productDesc }}>
-                {removeHTMLCode(productObject?.description)}
+            <View style={{ flexDirection: 'row' }}>
+              <Text
+                style={[styles.productName, { marginTop: colorVariants?.length == 0 && size?.length == 0 ? -20 : 20, marginBottom: 5 }]}>
+                {t('p_description')}
               </Text>
             </View>
-          </View>
-        </ScrollView>
-        <View
-          style={{
-            position: 'absolute',
-            width: '90%',
-            alignSelf: 'center',
-            bottom: 90,
-          }}>
-          <TouchableOpacity disabled={ productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}>
-          {/* <TouchableOpacity  onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}> */}
-            <Text style={styles.productPrice}>KD{productObject?.price}</Text>
 
-            <TouchableOpacity disabled={ productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomCartBox,{backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme}]}>
-              <ExportSvg.ShippingCart style={{ marginRight: 10 }} />
-              <TouchableOpacity disabled={ productObject?.quantity == 0}   onPress={addToCart}>
-                <Text style={styles.cartTxt}>{t('add_to_cart')}</Text>
-              </TouchableOpacity>
+            <Text style={{ ...styles.productDesc }}>
+              {removeHTMLCode(productObject?.description)}
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+      <View
+        style={{
+          position: 'absolute',
+          width: '90%',
+          alignSelf: 'center',
+          bottom: 90,
+        }}>
+        <TouchableOpacity disabled={productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomPriceCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}>
+          {/* <TouchableOpacity  onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}> */}
+          <Text style={styles.productPrice}>KD{productObject?.price}</Text>
+
+          <TouchableOpacity disabled={productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}>
+            <ExportSvg.ShippingCart style={{ marginRight: 10 }} />
+            <TouchableOpacity disabled={productObject?.quantity == 0} onPress={addToCart}>
+              <Text style={styles.cartTxt}>{t('add_to_cart')}</Text>
             </TouchableOpacity>
           </TouchableOpacity>
-        </View>
-
-
-
+        </TouchableOpacity>
       </View>
-    </Animatable.View >
+
+
+
+    </SafeAreaView>
   );
 };
 

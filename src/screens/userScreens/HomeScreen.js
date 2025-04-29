@@ -49,6 +49,8 @@ import { useSelector } from 'react-redux';
 import HeaderBox from '../../components/HeaderBox';
 import LottieView from "lottie-react-native";
 
+const screenWidth = Dimensions.get('window').width;
+
 registercustomAnimations();
 const AnimatedPressButton = withPressAnimated(RNBounceable);
 
@@ -65,13 +67,10 @@ const HomeScreen = ({ navigation }) => {
   const [isLoader, setIsLoader] = useState(false);
   const [loader, setLoader] = useState(false);
   const { t } = useTranslation();
-  const [getOption, setOption] = useState();
-  const [getOptionNameOne, setOptionNameOne] = useState();
-  const [getOptionNameTwo, setOptionNameTwo] = useState();
-  const [getOptionNameThree, setOptionNameThree] = useState();
-  const [getOptionWhatsApp, setOptionWhatsApp] = useState();
+ 
   const [arrivalCategories, setArrivalCategories] = useState([]);
   const [firstName, setFirstNames] = useState([]);
+  const [imageHeights, setImageHeights] = useState({}); 
 
   const viewRef = useRef(null);
   const animation = 'fadeInRightBig';
@@ -184,6 +183,18 @@ const HomeScreen = ({ navigation }) => {
   };
 
 
+  useEffect(() => {
+    secBanners?.forEach(banner => {
+      if (!imageHeights[banner.id]) {
+        Image.getSize(banner.image, (width, height) => {
+          const calculatedHeight = (screenWidth * height) / width;
+          setImageHeights(prev => ({ ...prev, [banner.id]: calculatedHeight }));
+        }, error => console.log('Error loading image size:', error));
+      }
+    });
+  }, [secBanners]);
+
+
 
 
   const renderItem = ({ item, index }) => {
@@ -275,8 +286,6 @@ const HomeScreen = ({ navigation }) => {
   };
 
 
-  // || isLoader
-  // if (loader) {
   if (loader) {
     return <ScreenLoader />;
   }
@@ -387,6 +396,7 @@ const HomeScreen = ({ navigation }) => {
 
 
                   {secBanners?.map((banner) => {
+                            const bannerHeight = imageHeights[banner.id] || 100; 
                     return (
                       banner.show_after_section_number === (index) && (
                         <TouchableOpacity onPress={() => {
@@ -395,7 +405,7 @@ const HomeScreen = ({ navigation }) => {
                             subC_ID: banner?.id,
                           });
                         }} >
-                          <Image source={{ uri: banner.image }} borderRadius={10} style={{ width: "100%", height: 180, marginVertical: 15 }} />
+                          <Image source={{ uri: banner.image }} borderRadius={10} style={{ width: "100%", height: bannerHeight, marginVertical: 15 }} />
                         </TouchableOpacity>
 
                       )

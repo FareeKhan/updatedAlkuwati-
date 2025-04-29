@@ -1,6 +1,5 @@
 import { Modal, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React from 'react'
-import ExportSvg from '../constants/ExportSvg';
 import { color } from '../constants/color';
 import HeaderLogo from './HeaderLogo';
 import { useTranslation } from 'react-i18next';

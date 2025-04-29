@@ -20,22 +20,17 @@ const SplashScreen = ({ navigation }) => {
       I18nManager.forceRTL(false);
       I18nManager.allowRTL(false);
     }
-    ;
-
   }, [isLanguage])
+
   const videoRef = useRef();
+
+
   return (
     <View style={styles.mainContainer}>
       {/* <ExportSvg.SplashLogo /> */}
       <Video
-        // Can be a URL or a local file.
         source={require('./assets/splash.mp4')}
-        // Store reference  
         ref={videoRef}
-        // Callback when remote video is buffering                                      
-        // onBuffer={onBuffer}
-        // Callback when video cannot be loaded              
-        // onError={onError}
         style={styles.backgroundVideo}
       />
       {/* <Image source={require('./assets/Splash.png')} style={{width:width,height:height}}  /> */}
@@ -47,9 +42,9 @@ export default SplashScreen
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    // backgroundColor: color.theme,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    backgroundColor:"#e8e7ec"
   },
   backgroundVideo: {
     position: 'absolute',
