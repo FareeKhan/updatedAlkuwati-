@@ -8,6 +8,7 @@
   "new_arrivals": "وصلنا حديثاً",
   "no_product_found": "لم يتم العثور على منتج",
   "price_range": "نطاق السعر",
+  "videoSection": "قسم الفيديو",
   // "categories": "الاقسام",
   "categories": "الفئات",
   "sorting": "الترتيب",
@@ -152,7 +153,8 @@
   "PleaseAllow": "يرجى السماح بالوصول إلى موقعك",
   "outOfStock":"المخزون غير متوفر",
   "confirm":"تأكيد الموقع",
-  "loading": "جارٍ التحميل"
+  "loading": "جارٍ التحميل",
+  "reels": "الريلز"
 
 
 }

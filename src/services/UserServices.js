@@ -339,6 +339,27 @@ export const editAddress = async (id) => {
     }
 };
 
+
+
+
+
+export const dummyCategories = async (id) => {
+    try {
+        const response = await fetch(`https://fakestoreapi.com/products`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+        });
+        const result = await response.json();
+        return result;
+
+    } catch (e) {
+        console.log('oo', e)
+    }
+};
+
 // const startEditing = async (addressId) => {
 //     try {
 //       const response = await axios.get(`${BASE_URL}address/${addressId}`);

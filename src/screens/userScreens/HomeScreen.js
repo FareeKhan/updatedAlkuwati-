@@ -27,6 +27,7 @@ import {
   getSettingOption,
   categoriesListSubTwoCategory,
   categoriesListSub,
+  dummyCategories,
 } from '../../services/UserServices';
 
 import SingleProductCard from '../../components/SingleProductCard';
@@ -48,11 +49,21 @@ import registercustomAnimations, { ANIMATIONS } from './animations';
 import { useSelector } from 'react-redux';
 import HeaderBox from '../../components/HeaderBox';
 import LottieView from "lottie-react-native";
+import SliderDots from '../../components/SliderDots';
 
 const screenWidth = Dimensions.get('window').width;
 
 registercustomAnimations();
 const AnimatedPressButton = withPressAnimated(RNBounceable);
+
+
+const newCatData = [
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_QcxHp6g0eeP4a_oIdDIuDtfYxdyId9Z8RA&s',
+  'https://img.freepik.com/free-photo/man-beige-shirt-pants-casual-wear-fashion_53876-102889.jpg?semt=ais_hybrid&w=740',
+  'https://img.freepik.com/free-photo/man-beige-shirt-pants-casual-wear-fashion_53876-102889.jpg?semt=ais_hybrid&w=740',
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_QcxHp6g0eeP4a_oIdDIuDtfYxdyId9Z8RA&s',
+
+]
 
 const HomeScreen = ({ navigation }) => {
   const data = useSelector(state => state.cartProducts?.cartProducts);
@@ -61,16 +72,17 @@ const HomeScreen = ({ navigation }) => {
   const [banner, setBanner] = useState([]);
   const [secBanners, setSecBanners] = useState([]);
   const [arrivalData, setArrivalData] = useState([]);
-  const [arrivalDataTwo, setArrivalDataTwo] = useState([]);
-  const [arrivalDataThree, setArrivalDataThree] = useState([]);
   const [getCategoies, setCategoies] = useState([]);
   const [isLoader, setIsLoader] = useState(false);
   const [loader, setLoader] = useState(false);
+  const [currentIndexDot, setCurrentIndexDot] = useState('');
+  const [newCategories, setNewCategories] = useState([]);
+
   const { t } = useTranslation();
- 
+
   const [arrivalCategories, setArrivalCategories] = useState([]);
   const [firstName, setFirstNames] = useState([]);
-  const [imageHeights, setImageHeights] = useState({}); 
+  const [imageHeights, setImageHeights] = useState({});
 
   const viewRef = useRef(null);
   const animation = 'fadeInRightBig';
@@ -89,13 +101,13 @@ const HomeScreen = ({ navigation }) => {
     discountHomeBanner();
     funCategories();
     getSettingOptionShow();
+    dummyJson();
   }, []);
 
   const getSettingOptionShow = async () => {
     setLoader(true);
     try {
       const result = await getSettingOption();
-      console.log('--?>>', result)
       if (result?.status) {
         // setSetting(result?.data);
         let categories = result?.data?.filter((item) => item.name === 'home_category');
@@ -122,6 +134,28 @@ const HomeScreen = ({ navigation }) => {
       console.log(error);
     }
   };
+
+
+
+  const dummyJson = async () => {
+    setLoader(true);
+    try {
+      const result = await dummyCategories();
+      if (result?.length > 0) {
+        // setNewCategories(result)
+      }
+
+
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+
+
+
+
 
 
 
@@ -286,9 +320,57 @@ const HomeScreen = ({ navigation }) => {
   };
 
 
-  if (loader) {
-    return <ScreenLoader />;
+  const renderItemNewList = ({ item, index }) => {
+    return (
+      <View style={styles.newCatContainer}>
+        <Image source={{ uri: item }} style={{ width: "100%", height: 350 }} />
+
+        <View style={styles.innerNewCatBox}>
+          <Text style={styles.txtNewCat}>White Shirt</Text>
+        </View>
+      </View>
+    )
   }
+
+
+  console.log('secBannerssecBannerssecBannerssecBanners', secBanners)
+
+  const renderListBanner = ({ item, index }) => {
+    const bannerHeight = imageHeights[item.id] || 100;
+    return (
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() =>
+          navigation.navigate('SameProduct', {
+            text: item?.link_category,
+            subC_ID: item?.id,
+          })
+        }
+        style={{ marginHorizontal: 20, marginRight: 30, height: imageHeights }}
+      >
+        <ImageBackground
+          source={{ uri: item?.image }}
+          style={{ width: width / 1.1, height: bannerHeight }}
+          borderRadius={10}>
+        </ImageBackground>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 15, justifyContent: "center" }}>
+          {
+            secBanners?.map(() => {
+              return (
+                <View style={{ width: 8, height: 8, backgroundColor: "red", borderRadius: 50 }} />
+              )
+            })
+          }
+        </View>
+
+      </TouchableOpacity>
+    )
+  }
+
+
+  // if (loader) {
+  //   return <ScreenLoader />;
+  // }
 
   return (
     <View style={styles.mainContainer}>
@@ -346,6 +428,13 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.viewTxt}>{t('view_all')}</Text>
           </TouchableOpacity>
         </View>
+
+
+        {/* nategories section */}
+
+
+
+
         <View style={{}}>
           <FlatList
             horizontal
@@ -359,6 +448,17 @@ const HomeScreen = ({ navigation }) => {
             decelerationRate="fast"
           />
         </View>
+
+
+        <FlatList
+          data={newCatData}
+          keyExtractor={(item, index) => index?.toString()}
+          renderItem={renderItemNewList}
+          columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 15 }}
+          numColumns={2}
+
+
+        />
 
         {
           arrivalCategories?.map((item, index) => {
@@ -393,10 +493,32 @@ const HomeScreen = ({ navigation }) => {
                   />
 
 
+                  {/* <View style={{ marginHorizontal: -15 }}>
+                    <FlatList
+                      horizontal
+                      data={secBanners}
+                      renderItem={renderListBanner}
+                      keyExtractor={(item, index) => index?.toString()}
+                      showsHorizontalScrollIndicator={false}
+                      pagingEnabled
+                      // snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
+                      snapToAlignment="start"
+                      decelerationRate="fast"
+                    />
+                  </View> */}
 
 
-                  {secBanners?.map((banner) => {
-                            const bannerHeight = imageHeights[banner.id] || 100; 
+                  <SliderDots
+                    data={secBanners}
+                    imageHeights={imageHeights}
+                  />
+
+
+
+
+
+                  {/* {secBanners?.map((banner) => {
+                    const bannerHeight = imageHeights[banner.id] || 100;
                     return (
                       banner.show_after_section_number === (index) && (
                         <TouchableOpacity onPress={() => {
@@ -407,10 +529,9 @@ const HomeScreen = ({ navigation }) => {
                         }} >
                           <Image source={{ uri: banner.image }} borderRadius={10} style={{ width: "100%", height: bannerHeight, marginVertical: 15 }} />
                         </TouchableOpacity>
-
                       )
                     )
-                  })}
+                  })} */}
                 </View>
               </>
             )
@@ -580,4 +701,20 @@ const styles = StyleSheet.create({
     color: '#000',
     fontSize: 10,
   },
+  newCatContainer: {
+    width: "48%",
+    height: 350,
+    borderRadius: 30,
+    overflow: "hidden"
+  },
+  innerNewCatBox: {
+    position: "absolute",
+    left: "35%",
+    top: "50%"
+  },
+  txtNewCat: {
+    fontSize: 13,
+    color: color.theme,
+    fontWeight: "500"
+  }
 });

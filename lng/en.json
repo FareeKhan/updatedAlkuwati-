@@ -9,6 +9,7 @@
     "no_product_found": "No Product Found",
     "price_range": "Price Range",
     "categories": "Catogories",
+    "videoSection": "Video Section",
     "sorting": "Sorting",
     "apply": "Apply",
     "my_cart": "My Cart",
@@ -158,6 +159,7 @@
      "outOfStock":"Out of Stock",
      "confirm":"Confirm",
      "loading":"Loading",
+     "reels":"Reels",
 
      
 

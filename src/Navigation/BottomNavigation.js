@@ -19,7 +19,7 @@ import SameProduct from '../screens/userScreens/SameProduct';
 import { HomeStack } from './HomeStack';
 import { ProfileTab } from './ProfileTab';
 import { FaviStack } from './FaviStack';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Entypo from 'react-native-vector-icons/Entypo';
 import { useTranslation } from 'react-i18next';
 import DiscountProducts from '../screens/userScreens/DiscountProducts';
 import VerifyCode from '../screens/userScreens/VerifyCode';
@@ -29,6 +29,7 @@ import ViewAllProduct from '../screens/userScreens/ViewAllProduct';
 import { useNavigation } from '@react-navigation/native';
 import SavedAddresses from '../screens/userScreens/SavedAddresses';
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import VideoScreen from '../screens/userScreens/VideoScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -166,7 +167,6 @@ const BottomNavigation = () => {
             />
             <Tab.Screen
                 name="AllProducts"
-                // component={DiscountProducts}
                 component={AllProducts}
                 options={{
                     tabBarIcon: ({ size, color, focused }) => {
@@ -177,6 +177,24 @@ const BottomNavigation = () => {
                                     <AntDesign name="appstore1" size={15} color={focused ? "#fff" : "#67300F"} style={{ marginBottom: 0 }} />
                                 </View>
                                 {focused && <Text numberOfLines={1} style={[styles.tabTxt, { width: I18nManager.isRTL ? 55 : 70 }]}>{t("categories")}</Text>}
+                            </View>
+                        )
+                    },
+                    title: ""
+                }}
+            />
+
+              <Tab.Screen
+                name="VideoScreen"
+                component={VideoScreen}
+                options={{
+                    tabBarIcon: ({ size, color, focused }) => {
+                        return (
+                            <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#eee", borderRadius: 30 }}>
+                                <View style={[styles.iconContainer, focused && { backgroundColor: "#67300F" }]}>
+                                    <Entypo name="folder-video" size={15} color={focused ? "#fff" : "#67300F"} style={{ marginBottom: 0 }} />
+                                </View>
+                                {focused && <Text numberOfLines={1} style={[styles.tabTxt, { width: I18nManager.isRTL ? 45 : 70 }]}>{t("reels")}</Text>}
                             </View>
                         )
                     },
