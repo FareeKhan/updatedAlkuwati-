@@ -58,6 +58,25 @@ export const newArrivals = async (name) => {
 
 
 
+export const getFeaturedData = async () => {
+    try {
+        const response = await fetch(`${baseUrl}/get-featured-categories`, {
+
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+        });
+
+        const result = await response.json();
+        return result;
+
+    } catch (e) {
+        console.log('oo', e)
+    }
+};
+
 
 export const getSameProduct = async (name) => {
     try {
@@ -346,6 +365,26 @@ export const editAddress = async (id) => {
 export const dummyCategories = async (id) => {
     try {
         const response = await fetch(`https://fakestoreapi.com/products`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+        });
+        const result = await response.json();
+        return result;
+
+    } catch (e) {
+        console.log('oo', e)
+    }
+};
+
+
+export const getReels = async (id) => {
+    try {
+        const response = await fetch(`${baseUrl}/get-reels`, {
+
+        // const response = await fetch(`http://192.168.70.206:8000/api/get-reels`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

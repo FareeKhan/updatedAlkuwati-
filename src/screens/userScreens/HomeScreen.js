@@ -28,6 +28,7 @@ import {
   categoriesListSubTwoCategory,
   categoriesListSub,
   dummyCategories,
+  getFeaturedData,
 } from '../../services/UserServices';
 
 import SingleProductCard from '../../components/SingleProductCard';
@@ -76,7 +77,7 @@ const HomeScreen = ({ navigation }) => {
   const [isLoader, setIsLoader] = useState(false);
   const [loader, setLoader] = useState(false);
   const [currentIndexDot, setCurrentIndexDot] = useState('');
-  const [newCategories, setNewCategories] = useState([]);
+  const [featureData, setFeatureData] = useState([]);
 
   const { t } = useTranslation();
 
@@ -102,6 +103,7 @@ const HomeScreen = ({ navigation }) => {
     funCategories();
     getSettingOptionShow();
     dummyJson();
+    GetFeatured();
   }, []);
 
   const getSettingOptionShow = async () => {
@@ -203,6 +205,28 @@ const HomeScreen = ({ navigation }) => {
         // setIsLoader(false);
         // setArrivalData(result?.data);
         setArrivalData(prev => [...prev, result?.data]);
+        // setOptionNameOne(name);
+      } else {
+        setIsLoader(false);
+      }
+    } catch (error) {
+
+      setIsLoader(false);
+      console.log(error);
+    } finally {
+      setLoader(false);
+    }
+  };
+
+
+  const GetFeatured = async () => {
+
+    try {
+      const result = await getFeaturedData();
+      console.log('ssss',result)
+      if (result?.status) {
+        setFeatureData(result?.data)
+        // setArrivalData(result?.data);
         // setOptionNameOne(name);
       } else {
         setIsLoader(false);
@@ -322,18 +346,22 @@ const HomeScreen = ({ navigation }) => {
 
   const renderItemNewList = ({ item, index }) => {
     return (
-      <View style={styles.newCatContainer}>
-        <Image source={{ uri: item }} style={{ width: "100%", height: 350 }} />
+      <TouchableOpacity 
+      onPress={() => navigation.navigate('SameProduct', {
+        selected: '',
+        subC_ID: item?.parent_id
+      })}
+      style={styles.newCatContainer}>
+        <Image source={{ uri: item?.image }} style={{ width: "100%", height: 350 }} />
 
         <View style={styles.innerNewCatBox}>
-          <Text style={styles.txtNewCat}>White Shirt</Text>
+          {/* <Text style={styles.txtNewCat}>White Shirt</Text> */}
         </View>
-      </View>
+      </TouchableOpacity>
     )
   }
 
 
-  console.log('secBannerssecBannerssecBannerssecBanners', secBanners)
 
   const renderListBanner = ({ item, index }) => {
     const bannerHeight = imageHeights[item.id] || 100;
@@ -451,7 +479,7 @@ const HomeScreen = ({ navigation }) => {
 
 
         <FlatList
-          data={newCatData}
+          data={featureData}
           keyExtractor={(item, index) => index?.toString()}
           renderItem={renderItemNewList}
           columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 15 }}

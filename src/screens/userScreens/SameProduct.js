@@ -62,12 +62,16 @@ const SameProduct = ({ navigation, route }) => {
     setIsLoader(true);
     try {
       const response = await categoriesListSub(subC_ID);
+      console.log('---->>>',response,subC_ID)
       if (response?.status) {
         setIsLoader(false);
         if (response?.data) {
           funCategories(selected ? selected : response?.data[0].name);
         }
         setStoreCategories(response?.data);
+      }else{
+      setIsLoader(false);
+
       }
     } catch (error) {
       setIsLoader(false);
