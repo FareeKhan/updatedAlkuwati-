@@ -7,7 +7,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
+  
   TouchableOpacity,
   View,
   PermissionsAndroid,
@@ -30,11 +30,10 @@ import {
   dummyCategories,
   getFeaturedData,
 } from '../../services/UserServices';
+import Text from '../../components/CustomText'
 
 import SingleProductCard from '../../components/SingleProductCard';
 import SearchModal from '../../components/SearchModal';
-import { DrawerActions } from '@react-navigation/native';
-import ScreenLoader from '../../components/ScreenLoader';
 
 const { width } = Dimensions.get('screen');
 const ITEM_WIDTH = Dimensions.get('window').width * 0.8;
@@ -102,7 +101,6 @@ const HomeScreen = ({ navigation }) => {
     discountHomeBanner();
     funCategories();
     getSettingOptionShow();
-    dummyJson();
     GetFeatured();
   }, []);
 
@@ -132,22 +130,6 @@ const HomeScreen = ({ navigation }) => {
       //   getNewArrivalsThree(result?.data[22].value);
       //   setOption(result?.data);
       // }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-
-
-  const dummyJson = async () => {
-    setLoader(true);
-    try {
-      const result = await dummyCategories();
-      if (result?.length > 0) {
-        // setNewCategories(result)
-      }
-
-
     } catch (error) {
       console.log(error);
     }
@@ -352,10 +334,10 @@ const HomeScreen = ({ navigation }) => {
         subC_ID: item?.parent_id
       })}
       style={styles.newCatContainer}>
-        <Image source={{ uri: item?.image }} style={{ width: "100%", height: 350 }} />
+        <Image source={{ uri: item?.image }} style={{ width: "100%", height:150 }} />
 
         <View style={styles.innerNewCatBox}>
-          {/* <Text style={styles.txtNewCat}>White Shirt</Text> */}
+          <Text style={styles.txtNewCat}>{item?.name}</Text>
         </View>
       </TouchableOpacity>
     )
@@ -731,18 +713,21 @@ const styles = StyleSheet.create({
   },
   newCatContainer: {
     width: "48%",
-    height: 350,
-    borderRadius: 30,
+    height: 150,
+    borderRadius: 15,
     overflow: "hidden"
   },
   innerNewCatBox: {
     position: "absolute",
     left: "35%",
-    top: "50%"
+    bottom: 10,
+    backgroundColor:"#00000050",
+    paddingHorizontal:10,
+    borderRadius:2
   },
   txtNewCat: {
     fontSize: 13,
-    color: color.theme,
+    color:color.white,
     fontWeight: "500"
   }
 });
