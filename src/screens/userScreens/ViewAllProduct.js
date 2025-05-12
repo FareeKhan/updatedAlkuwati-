@@ -59,7 +59,7 @@ const ViewAllProduct = ({ navigation, route }) => {
                     item={item}
                     countList={1 + index}
                     onPress={() => navigation.navigate('ProductDetails', {
-                        id: item?.pid,
+                        id: item?.id,
                         selectedCat: listName
                     })}
                 />

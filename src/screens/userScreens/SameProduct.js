@@ -158,7 +158,7 @@ const SameProduct = ({ navigation, route }) => {
           countList={1 + index}
           isShowPlusIcon={true}
           onPress={() => navigation.navigate('ProductDetails', {
-            id: item?.pid,
+            id: item?.id,
             selectedCat: selectedCat
 
           })}

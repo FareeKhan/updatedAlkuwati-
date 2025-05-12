@@ -25,10 +25,10 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const favoriteList = useSelector((state) => state?.favorite?.AddInFavorite)
 
-  const isCheck = data?.some((value) => value?.id == item?.pid)
+  const isCheck = data?.some((value) => value?.id == item?.id)
 
 
-  const isFavorite = favoriteList.some(favorite => favorite.pid === item.pid);
+  const isFavorite = favoriteList.some(favorite => favorite.pid === item.id);
 
   const animation = 'fadeInUp';
   const durationInner = 1000;
@@ -40,14 +40,14 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
 
     if (isFavorite) {
       dispatch(removeFavorite({
-        id: item?.pid
+        id: item?.id
       }))
       ReactNativeHapticFeedback.trigger('impactLight');
     } else {
       ReactNativeHapticFeedback.trigger('notificationError');
       dispatch(productFavorite({
         price: item?.price,
-        pid: item?.pid,
+        pid: item?.id,
         productName: item?.name,
         description: removeHTMLCode(item?.description),
         image: item?.image

@@ -18,7 +18,7 @@ const MyFavorite = ({ navigation }) => {
             <>
                 <SingleProductCard
                     item={item}
-                    onPress={() => navigation.navigate('ProductDetails', { id: item?.pid })}
+                    onPress={() => navigation.navigate('ProductDetails', { id: item?.id })}
                 />
             </>
         )
