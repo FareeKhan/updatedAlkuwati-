@@ -1,5 +1,5 @@
 import { ActivityIndicator, Alert, Animated as Anim, Dimensions, FlatList, I18nManager, Image, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import Carousel from 'react-native-snap-carousel';
 import { color } from '../constants/color';
 import ExportSvg from '../constants/ExportSvg';
@@ -11,6 +11,8 @@ import { GestureHandlerRootView, PinchGestureHandler } from 'react-native-gestur
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 const { width, height } = Dimensions.get('screen')
 import ImageViewer from 'react-native-image-zoom-viewer';
+import Video from 'react-native-video';
+import YoutubePlayer from 'react-native-youtube-iframe';
 
 
 
@@ -22,16 +24,32 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 
 // },]
 
-const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setImgUrl, item }) => {
+
+
+const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setImgUrl, item ,selectedImage}) => {
+
+    // const conCatImages = item?.youtube_urls?.concat(data?.map((item) => item?.image_url))
+    // console.log('conCatImagesconCatImagesconCatImages', conCatImages)
+
+    const conCatImages = [
+        ...(item?.youtube_urls || []),
+        ...(data?.map((item) => item?.image_url) || [])
+    ];
+
+    const playerRef = useRef();
     const dispatch = useDispatch()
     const [modalVisible, setModalVisible] = useState(false);
     const [loader, setLoader] = useState(true);
+    const [paused, setPaused] = useState(false);
+    const [playing, setPlaying] = useState(false);
 
     const favoriteList = useSelector((state) => state?.favorite?.AddInFavorite)
-    const isFavorite = favoriteList.some(favorite => favorite.pid === item.pid);
+    const isFavorite = favoriteList.some(favorite => favorite.pid === item.id);
 
 
     const images = data?.map((item) => ({ url: item?.image_url }))
+    // const images = conCatImages?.map(url => ({ url }));
+    console.log('--->>>',images)
 
     const removeHTMLCode = (value) => {
         if (value) {
@@ -48,28 +66,36 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
         setImgUrl(data[index]?.image_url);
     }
     const favoriteProduct = (item) => {
+        console.log('item-->>',data[0]?.image_url)
         if (isFavorite) {
             dispatch(removeFavorite({
-                id: item?.pid
+                id: item?.id
             }))
         } else {
-
             dispatch(productFavorite({
                 price: item?.price,
-                pid: item?.pid,
+                pid: item?.id,
                 productName: item?.name,
                 description: removeHTMLCode(item?.description),
-                image: item?.image
+                // image: item?.image_url
+                image: data[0]?.image_url
             }))
         }
     }
 
+    const onStateChange = useCallback((state) => {
+        if (state === 'ended') {
+            setPlaying(false);
+        }
+    }, []);
 
-    const renderItem1 = ({ item, index }) => {
+
+    const renderItem1 = ({ item: mediaItem, index }) => {
+        const isVideo = mediaItem?.includes("youtu") || mediaItem?.endsWith(".mp4") || mediaItem?.endsWith(".mov");
         return (
             <View style={styles.renderItem1_container}>
                 {
-                    data?.length > 1 &&
+                    conCatImages?.length > 1 &&
                     <TouchableOpacity
                         style={[styles.iconCommon, styles.iconLeft]}
                         onPress={() => {
@@ -84,20 +110,48 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
 
                 }
 
-
                 {
                     loader &&
                     <View style={[styles.renderItem1_img, { marginBottom: 10, borderColor: "#cecece", marginRight: 5, alignItems: "center", justifyContent: "center", borderRadius: 20, position: "absolute", zIndex: 100 }]} >
                         <ActivityIndicator size="large" color={color.theme} style={styles.loader} />
                     </View>
-
                 }
-                <TouchableOpacity activeOpacity={1} onPress={() => setModalVisible(true)} style={styles.renderItem1_img}>
-                    <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: item?.image_url }} style={styles.renderItem1_img} />
-                </TouchableOpacity>
+       
 
                 {
-                    data?.length > 1 &&
+                    isVideo ?
+                        <View style={{ }}  >
+                            <YoutubePlayer
+                                ref={playerRef}
+                                height={250}
+                                play={playing}
+                                videoId={
+                                    mediaItem?.includes("v=")
+                                      ? mediaItem?.split("v=")[1]?.split("&")[0]
+                                      : mediaItem?.includes("/embed/")
+                                      ? mediaItem?.split("/embed/")[1]?.split("?")[0]
+                                      : mediaItem
+                                  }
+                                onChangeState={onStateChange}
+                            />
+
+                        </View>
+                        :
+                       <TouchableOpacity activeOpacity={1} onPress={() => setModalVisible(true)} style={[ styles.renderItem1_img]}>
+                       {/* <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: item?.image_url }} style={styles.renderItem1_img} /> */}
+                       <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: mediaItem }} style={[styles.renderItem1_img]} />
+                   </TouchableOpacity>
+                }
+
+
+
+
+
+
+
+
+                {
+                    conCatImages?.length > 1 &&
                     <TouchableOpacity
                         style={[styles.iconCommon, styles.iconRight]}
                         onPress={() => {
@@ -117,22 +171,34 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
     };
 
 
-
-
-
     return (
         <GestureHandlerRootView>
             <View style={styles.carouselContainer}>
                 <Carousel
                     ref={carouselRef}
                     layout={"default"}
-                    data={data}
+                    // data={data}
+                    data={conCatImages}
                     renderItem={renderItem1}
                     sliderWidth={Dimensions.get('screen').width}
                     itemWidth={Dimensions.get('screen').width}
-                    onSnapToItem={handleSnapToItem}
+                    autoplayInterval={4000}
+                    loop={true}
+                    inactiveSlideScale={1}
+                    pagingEnabled={true}
+                    horizontal={true}
+                    useScrollView={true}
+                    // onSnapToItem={handleSnapToItem}
+                    enableMomentum={true}
+                // onSnapToItem={handleSnapToItem}
+
                 />
+
+
+
             </View>
+
+
 
             <View style={{ flexDirection: "row", justifyContent: "center", top: -30 }}>
                 {
@@ -168,10 +234,10 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
                 }}>
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <TouchableOpacity onPress={() => setModalVisible(false)} style={{ height: 30, width: 30, backgroundColor: color.theme, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, top:Platform.OS == 'ios'? 50:30, left:Platform.OS=='ios'? 30:20 }}>
+                        <TouchableOpacity onPress={() => setModalVisible(false)} style={{ height: 30, width: 30, backgroundColor: color.theme, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, top: Platform.OS == 'ios' ? 50 : 30, left: Platform.OS == 'ios' ? 30 : 20 }}>
                             <Entypo name={'cross'} size={20} color={color.white} />
                         </TouchableOpacity>
-                        <ImageViewer imageUrls={images} backgroundColor={'#fff'}/>
+                        <ImageViewer imageUrls={images} backgroundColor={'#fff'} />
 
                     </View>
                 </View>
@@ -186,6 +252,7 @@ const styles = StyleSheet.create({
 
 
     renderItem1_container: {
+        flex:1
     },
 
 
@@ -256,6 +323,13 @@ const styles = StyleSheet.create({
     modalText: {
         marginBottom: 15,
         textAlign: 'center',
+    },
+    video: {
+        // height: '100%',
+        // width: '100%',
+
+        width: Dimensions.get('screen').width,
+        height: Dimensions.get('screen').height / 3,
     },
 })
 

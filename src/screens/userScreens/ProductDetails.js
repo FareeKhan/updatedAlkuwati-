@@ -12,7 +12,10 @@
 
 
 import {
+  Animated,
+  Dimensions,
   I18nManager,
+  Image,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -21,6 +24,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  PanResponder
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import ExportSvg from '../../constants/ExportSvg';
@@ -41,6 +45,7 @@ const ProductDetails = ({ navigation, route }) => {
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const { t } = useTranslation();
   const [isLoader, setIsLoader] = useState(false);
+  const pan = useRef(new Animated.ValueXY()).current;
 
   const { id, selectedCat } = route.params;
 
@@ -50,6 +55,7 @@ const ProductDetails = ({ navigation, route }) => {
   const [productData, setProductData] = useState([]);
   const [productObject, setProductObject] = useState('');
   const [selectedColorId, setSelectedColorId] = useState('');
+  const [selectedImage, setSelectedImage] = useState('');
   const [imgUrl, setImgUrl] = useState('');
   const carouselRef = useRef(null);
 
@@ -67,6 +73,19 @@ const ProductDetails = ({ navigation, route }) => {
     return '';
   };
 
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return Math.abs(gestureState.dx) > 20; // Detect horizontal swipe
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dx > 50 || gestureState.dx < -50) {
+          setSelectedImage(null);
+        }
+      },
+    })
+  ).current;
+
   useEffect(() => {
     getProductDetail();
   }, []);
@@ -75,9 +94,10 @@ const ProductDetails = ({ navigation, route }) => {
     setIsLoader(true);
     try {
       const response = await productDetails(id);
+      // const response = await productDetails(876);
       if (response?.status) {
         setProductData(response);
-        setProductObject(response?.data[0]);
+        setProductObject(response?.data);
         setIsLoader(false);
       }
     } catch (error) {
@@ -131,11 +151,11 @@ const ProductDetails = ({ navigation, route }) => {
     }
   };
 
-  if (isLoader) {
-    return <ScreenLoader />;
-  }
+  // if (isLoader) {
+  //   return <ScreenLoader />;
+  // }
 
-
+  console.log('sss', selectedImage)
   return (
     <SafeAreaView style={styles.mainContainer}>
       <ScrollView
@@ -150,23 +170,40 @@ const ProductDetails = ({ navigation, route }) => {
         />
 
         <View>
-          <ProductSlider
-            currentIndex={currentIndex}
-            carouselRef={carouselRef}
-            setCurrentIndex={setCurrentIndex}
-            data={productData?.product_images}
-            setImgUrl={setImgUrl}
-            item={productObject}
-          />
+          {
+            selectedImage ?
+            <Animated.View
+            {...panResponder.panHandlers}
+            style={[styles.renderItem1_img, { marginLeft: -15 }]}
+          >
+            <Image
+              resizeMode="cover"
+              source={{ uri: selectedImage }}
+              style={[styles.renderItem1_img]}
+            />
+          </Animated.View>
+            //  <View style={[styles.renderItem1_img,{marginLeft:-15}]} >
+            //    <Image resizeMode='cover' source={{ uri: selectedImage }} style={[styles.renderItem1_img]} />
+            //  </View>
+
+              :
+              <ProductSlider
+                currentIndex={currentIndex}
+                carouselRef={carouselRef}
+                setCurrentIndex={setCurrentIndex}
+                data={productData?.product_images}
+                setImgUrl={setImgUrl}
+                item={productObject}
+                selectedImage={selectedImage}
+              />
+          }
+
 
           <View style={styles.productDetailContainer}>
             <View style={styles.productNamePriceBox}>
               <View style={{ width: '70%' }}>
                 <Text style={styles.productName}>{productObject?.name}</Text>
-                <Text style={styles.productSubTxt}>{productObject?.barCode}</Text>
-                {/* <Text style={styles.productSubTxt}>
-                  {removeHTMLCode(productObject?.description)}
-                </Text> */}
+                <Text style={styles.productSubTxt}>{productObject?.barcode}</Text>
               </View>
 
               <View>
@@ -198,58 +235,67 @@ const ProductDetails = ({ navigation, route }) => {
               </View>
             </View>
 
-            {size?.length > 0 && (
+
+            {productData?.variants?.length > 0 && (
+              <Text style={[styles.productName, { marginTop: 20 }]}>{t('color')}</Text>
+            )}
+            <ScrollView horizontal >
+              {
+                productData?.variants?.map((item, index) => {
+                  return (
+                    <TouchableOpacity onPress={() => setSelectedImage(item?.image)} style={{ marginTop: 15 }}>
+                      <Image source={{ uri: item?.image }} style={{ width: 100, height: 100 }} />
+                    </TouchableOpacity>
+                  )
+                })
+              }
+            </ScrollView>
+
+
+
+
+
+
+            {productData?.variants?.length > 0 && (
               <Text style={[styles.productName]}>{t('p_size')}</Text>
             )}
-            <View style={styles.SizeColorContainer}>
-              <View style={styles.sizeContainer}>
-                {size?.map((item, index) => {
-                  return (
-                    <TouchableOpacity
-                      onPress={() => setSelectedSize(item?.sid)}
-                      style={[
-                        styles.sizeInnerBox,
-                        selectedSize == item?.sid && {
-                          backgroundColor: color.theme,
-                          borderColor: color.theme,
-                        },
-                      ]}
-                      key={index}>
-                      <Text
-                        style={{
-                          color: selectedSize == item?.sid ? '#fff' : '#000',
-                          fontWeight: '500',
-                        }}>
-                        {item?.lable}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
 
-              {colorVariants?.length > 0 && (
-                <View style={[styles.sizeContainer, styles.colorBox]}>
-                  {colorVariants?.map((item, index) => {
+            <View style={styles.SizeColorContainer}>
+              <ScrollView horizontal>
+
+                <View style={styles.sizeContainer}>
+                  {productData?.variants?.map((item, index) => {
                     return (
                       <TouchableOpacity
-                        key={index}
-                        onPress={() => setSelectedColorId(item?.id)}
-                        activeOpacity={0.6}
+                        // onPress={() => setSelectedSize(item?.sid)}
+                        onPress={() => setSelectedSize(item?.size)}
                         style={[
-                          styles.innerColorStyle,
-                          {
-                            backgroundColor: item?.value,
-                            marginRight:
-                              index == colorVariants?.length - 1 ? 0 : 10,
+                          styles.sizeInnerBox,
+                          selectedSize == item?.size && {
+                            backgroundColor: color.theme,
+                            borderColor: color.theme,
                           },
-                        ]}>
-                        {selectedColorId == item?.id && <ExportSvg.whiteTick />}
+                        ]}
+                        key={index}>
+                        <Text
+                          style={{
+                            color: selectedSize == item?.size ? '#fff' : '#000',
+                            fontWeight: '500',
+                          }}>
+                          {item?.size}
+                        </Text>
                       </TouchableOpacity>
                     );
                   })}
                 </View>
-              )}
+              </ScrollView>
+
+
             </View>
+
+          
+
+
 
             <View style={{ flexDirection: 'row' }}>
               <Text
@@ -260,6 +306,7 @@ const ProductDetails = ({ navigation, route }) => {
 
             <Text style={{ ...styles.productDesc }}>
               {removeHTMLCode(productObject?.description)}
+              {/* {productObject?.description} */}
             </Text>
           </View>
         </View>
@@ -399,8 +446,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   innerColorStyle: {
-    width: 20,
-    height: 20,
+    // width: 20,
+    // height: 20,
+    width: 100,
+    height: 100,
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
@@ -437,5 +486,9 @@ const styles = StyleSheet.create({
   cartTxt: {
     color: color.theme,
     fontFamily: 'Montserrat-SemiBold',
+  },
+  renderItem1_img: {
+    width: Dimensions.get('screen').width,
+    height: Dimensions.get('screen').height / 2 - 20,
   },
 });
