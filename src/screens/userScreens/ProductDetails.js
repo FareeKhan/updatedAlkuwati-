@@ -151,9 +151,9 @@ const ProductDetails = ({ navigation, route }) => {
     }
   };
 
-  // if (isLoader) {
-  //   return <ScreenLoader />;
-  // }
+  if (isLoader) {
+    return <ScreenLoader />;
+  }
 
   console.log('sss', selectedImage)
   return (
