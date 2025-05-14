@@ -34,8 +34,8 @@ import { productDetails } from '../../services/UserServices';
 import { useDispatch, useSelector } from 'react-redux';
 import { addProductToCart, handleTotalPrice } from '../../redux/reducer/ProductAddToCart';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
-import * as Animatable from 'react-native-animatable';
 import { useTranslation } from 'react-i18next';
+import AntDesign from 'react-native-vector-icons/AntDesign'
 
 import HeaderBox from '../../components/HeaderBox';
 
@@ -172,19 +172,33 @@ const ProductDetails = ({ navigation, route }) => {
         <View>
           {
             selectedImage ?
-            <Animated.View
-            {...panResponder.panHandlers}
-            style={[styles.renderItem1_img, { marginLeft: -15 }]}
-          >
-            <Image
-              resizeMode="cover"
-              source={{ uri: selectedImage }}
-              style={[styles.renderItem1_img]}
-            />
-          </Animated.View>
-            //  <View style={[styles.renderItem1_img,{marginLeft:-15}]} >
-            //    <Image resizeMode='cover' source={{ uri: selectedImage }} style={[styles.renderItem1_img]} />
-            //  </View>
+              // <Animated.View
+              //   {...panResponder.panHandlers}
+              //   style={[styles.renderItem1_img, { marginLeft: -15 }]}
+              // >
+              //   <Image
+              //     resizeMode="cover"
+              //     source={{ uri: selectedImage }}
+              //     style={[styles.renderItem1_img]}
+              //   />
+              // </Animated.View>
+              <View >
+                <TouchableOpacity style={{position:"absolute",zIndex:100,top:"45%"}} onPress={() => setSelectedImage(null)}>
+                  <AntDesign name={I18nManager.isRTL ? 'right' : 'left'} size={20} color={'#ececec'} />
+                </TouchableOpacity>
+
+                <Image
+                  resizeMode="cover"
+                  source={{ uri: selectedImage }}
+                  style={[styles.renderItem1_img, { marginLeft: -15 }]}
+                />
+                <TouchableOpacity style={{position:"absolute",zIndex:100,top:"45%",right:0}} onPress={() => setSelectedImage(null)}>
+                  <AntDesign name={I18nManager.isRTL ? 'left' : 'right'} size={20} color={'#ececec'} />
+                </TouchableOpacity>
+
+              </View>
+
+
 
               :
               <ProductSlider
@@ -293,7 +307,7 @@ const ProductDetails = ({ navigation, route }) => {
 
             </View>
 
-          
+
 
 
 

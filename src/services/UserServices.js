@@ -512,7 +512,7 @@ export const tokenPrice = async (token, price) => {
 
 export const searchProductByName = async (productName) => {
     try {
-        const response = await fetch(`${baseUrl}/getProductName/${productName}`, {
+        const response = await fetch(`${baseUrl}/getProductName?name=${productName}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
