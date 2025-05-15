@@ -167,9 +167,9 @@ const SameProduct = ({ navigation, route }) => {
     );
   };
 
-  if (isLoader) {
-    return <ScreenLoader />;
-  }
+  // if (isLoader) {
+  //   return <ScreenLoader />;
+  // }
 
 
   return (
