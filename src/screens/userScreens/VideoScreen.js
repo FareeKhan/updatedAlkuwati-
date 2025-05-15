@@ -164,7 +164,9 @@ const styles = StyleSheet.create({
         right: 90,
         backgroundColor: '#ffffff50',
         paddingHorizontal: 13,
-        borderRadius: 3,
+        borderRadius: 10,
+        paddingVertical:5,
+
     },
     moreInfoText: {
         fontSize: 16,

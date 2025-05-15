@@ -7,7 +7,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  
+
   TouchableOpacity,
   View,
   PermissionsAndroid,
@@ -205,7 +205,7 @@ const HomeScreen = ({ navigation }) => {
 
     try {
       const result = await getFeaturedData();
-      console.log('ssss',result)
+      console.log('ssss', result)
       if (result?.status) {
         setFeatureData(result?.data)
         // setArrivalData(result?.data);
@@ -328,13 +328,16 @@ const HomeScreen = ({ navigation }) => {
 
   const renderItemNewList = ({ item, index }) => {
     return (
-      <TouchableOpacity 
-      onPress={() => navigation.navigate('SameProduct', {
-        selected: '',
-        subC_ID: item?.parent_id
-      })}
-      style={styles.newCatContainer}>
-        <Image source={{ uri: item?.image }} style={{ width: "100%", height:150 }} />
+      <TouchableOpacity
+        onPress={() => navigation.navigate('SameProduct', {
+          // selected: item?.name,
+          // subC_ID: item?.parent_id
+
+          text: item?.name,
+          subC_ID: item?.id,
+        })}
+        style={styles.newCatContainer}>
+        <Image source={{ uri: item?.image }} style={{ width: "100%", height: 150 }} />
 
         <View style={styles.innerNewCatBox}>
           <Text style={styles.txtNewCat}>{item?.name}</Text>
@@ -518,10 +521,10 @@ const HomeScreen = ({ navigation }) => {
                   </View> */}
 
 
-                  <SliderDots
+                  {/* <SliderDots
                     data={secBanners}
                     imageHeights={imageHeights}
-                  />
+                  /> */}
 
 
 
@@ -547,6 +550,12 @@ const HomeScreen = ({ navigation }) => {
             )
           })
         }
+
+        <SliderDots
+          data={secBanners}
+          imageHeights={imageHeights}
+        />
+
       </ScrollView>
 
       <SearchModal
@@ -721,13 +730,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: "35%",
     bottom: 10,
-    backgroundColor:"#00000050",
-    paddingHorizontal:10,
-    borderRadius:2
+    backgroundColor: "#00000050",
+    paddingHorizontal: 10,
+    borderRadius: 2
   },
   txtNewCat: {
     fontSize: 13,
-    color:color.white,
+    color: color.white,
     fontWeight: "500"
   }
 });
