@@ -473,6 +473,11 @@ const HomeScreen = ({ navigation }) => {
 
         />
 
+<SliderDots
+          data={secBanners}
+          imageHeights={imageHeights}
+        />
+
         {
           arrivalCategories?.map((item, index) => {
             return (
@@ -551,10 +556,7 @@ const HomeScreen = ({ navigation }) => {
           })
         }
 
-        <SliderDots
-          data={secBanners}
-          imageHeights={imageHeights}
-        />
+       
 
       </ScrollView>
 
