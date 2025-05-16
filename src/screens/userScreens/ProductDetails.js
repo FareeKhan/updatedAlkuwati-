@@ -95,14 +95,19 @@ const ProductDetails = ({ navigation, route }) => {
     try {
       const response = await productDetails(id);
       // const response = await productDetails(876);
+      console.log('dasdas', response)
       if (response?.status) {
         setProductData(response);
         setProductObject(response?.data);
         setIsLoader(false);
+      } else {
+        setProductData([]);
       }
     } catch (error) {
       setIsLoader(false);
       console.log(error);
+    } finally {
+      setIsLoader(false);
     }
   };
 
@@ -169,6 +174,8 @@ const ProductDetails = ({ navigation, route }) => {
           onPressShare={() => sharePress(productObject?.name, productObject?.price)}
         />
 
+
+
         <View>
           {
             selectedImage ?
@@ -183,7 +190,7 @@ const ProductDetails = ({ navigation, route }) => {
               //   />
               // </Animated.View>
               <View >
-                <TouchableOpacity style={{position:"absolute",zIndex:100,top:"45%"}} onPress={() => setSelectedImage(null)}>
+                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%" }} onPress={() => setSelectedImage(null)}>
                   <AntDesign name={I18nManager.isRTL ? 'right' : 'left'} size={20} color={'#ececec'} />
                 </TouchableOpacity>
 
@@ -192,7 +199,7 @@ const ProductDetails = ({ navigation, route }) => {
                   source={{ uri: selectedImage }}
                   style={[styles.renderItem1_img, { marginLeft: -15 }]}
                 />
-                <TouchableOpacity style={{position:"absolute",zIndex:100,top:"45%",right:0}} onPress={() => setSelectedImage(null)}>
+                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%", right: 0 }} onPress={() => setSelectedImage(null)}>
                   <AntDesign name={I18nManager.isRTL ? 'left' : 'right'} size={20} color={'#ececec'} />
                 </TouchableOpacity>
 
@@ -344,8 +351,6 @@ const ProductDetails = ({ navigation, route }) => {
           </TouchableOpacity>
         </TouchableOpacity>
       </View>
-
-
 
     </SafeAreaView>
   );

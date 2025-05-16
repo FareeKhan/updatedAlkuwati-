@@ -283,7 +283,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     color: color.theme,
-    marginBottom: 10,
     textAlign:"left"
   },
 
@@ -368,11 +367,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
   },
-  arrivalTxt: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: color.theme,
-  },
+
   viewTxt: {
     fontSize: 12,
     fontWeight: '600',
