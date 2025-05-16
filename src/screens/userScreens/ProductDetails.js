@@ -93,16 +93,21 @@ const ProductDetails = ({ navigation, route }) => {
   const getProductDetail = async () => {
     setIsLoader(true);
     try {
-      const response = await productDetails(id);
-      // const response = await productDetails(876);
+      // const response = await productDetails(id);
+      const response = await productDetails(876);
       if (response?.status) {
         setProductData(response);
         setProductObject(response?.data);
         setIsLoader(false);
+      } else {
+        setProductData([]);
       }
     } catch (error) {
       setIsLoader(false);
       console.log(error);
+    } finally {
+      setIsLoader(false);
+
     }
   };
 
@@ -151,11 +156,15 @@ const ProductDetails = ({ navigation, route }) => {
     }
   };
 
+
+  const filterSizes = productData?.variants?.filter((item, index, self) =>
+    index === self.findIndex(t => t.size === item.size)
+  )
+
   if (isLoader) {
     return <ScreenLoader />;
   }
 
-  console.log('sss', selectedImage)
   return (
     <SafeAreaView style={styles.mainContainer}>
       <ScrollView
@@ -183,7 +192,7 @@ const ProductDetails = ({ navigation, route }) => {
               //   />
               // </Animated.View>
               <View >
-                <TouchableOpacity style={{position:"absolute",zIndex:100,top:"45%"}} onPress={() => setSelectedImage(null)}>
+                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%" }} onPress={() => setSelectedImage(null)}>
                   <AntDesign name={I18nManager.isRTL ? 'right' : 'left'} size={20} color={'#ececec'} />
                 </TouchableOpacity>
 
@@ -192,7 +201,7 @@ const ProductDetails = ({ navigation, route }) => {
                   source={{ uri: selectedImage }}
                   style={[styles.renderItem1_img, { marginLeft: -15 }]}
                 />
-                <TouchableOpacity style={{position:"absolute",zIndex:100,top:"45%",right:0}} onPress={() => setSelectedImage(null)}>
+                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%", right: 0 }} onPress={() => setSelectedImage(null)}>
                   <AntDesign name={I18nManager.isRTL ? 'left' : 'right'} size={20} color={'#ececec'} />
                 </TouchableOpacity>
 
@@ -253,12 +262,12 @@ const ProductDetails = ({ navigation, route }) => {
             {productData?.variants?.length > 0 && (
               <Text style={[styles.productName, { marginTop: 20 }]}>{t('color')}</Text>
             )}
-            <ScrollView horizontal >
+            <ScrollView horizontal contentContainerStyle={{ gap: 10 }} >
               {
                 productData?.variants?.map((item, index) => {
                   return (
-                    <TouchableOpacity onPress={() => setSelectedImage(item?.image)} style={{ marginTop: 15 }}>
-                      <Image source={{ uri: item?.image }} style={{ width: 100, height: 100 }} />
+                    <TouchableOpacity style={{ gap: 10 }} onPress={() => setSelectedImage(item?.image)} style={{ marginTop: 15 }}>
+                      <Image source={{ uri: item?.image }} style={{ width: 100, height: 100, gap: 10 }} />
                     </TouchableOpacity>
                   )
                 })
@@ -275,10 +284,10 @@ const ProductDetails = ({ navigation, route }) => {
             )}
 
             <View style={styles.SizeColorContainer}>
-              <ScrollView horizontal>
+              <ScrollView  contentContainerStyle={{}}>
 
                 <View style={styles.sizeContainer}>
-                  {productData?.variants?.map((item, index) => {
+                  {filterSizes?.map((item, index) => {
                     return (
                       <TouchableOpacity
                         // onPress={() => setSelectedSize(item?.sid)}
@@ -303,8 +312,6 @@ const ProductDetails = ({ navigation, route }) => {
                   })}
                 </View>
               </ScrollView>
-
-
             </View>
 
 
