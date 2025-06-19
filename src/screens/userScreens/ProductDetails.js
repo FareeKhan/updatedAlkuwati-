@@ -156,11 +156,18 @@ const ProductDetails = ({ navigation, route }) => {
     }
   };
 
+
+  const filterSizes = productData?.variants?.filter((item, index, self) =>
+    index === self.findIndex(t => t.size === item.size)
+  )
+
+
+  console.log('productData?.product_images',productData?.product_images)
+
   if (isLoader) {
     return <ScreenLoader />;
   }
 
-  console.log('sss', selectedImage)
   return (
     <SafeAreaView style={styles.mainContainer}>
       <ScrollView
@@ -260,12 +267,12 @@ const ProductDetails = ({ navigation, route }) => {
             {productData?.variants?.length > 0 && (
               <Text style={[styles.productName, { marginTop: 20 }]}>{t('color')}</Text>
             )}
-            <ScrollView horizontal >
+            <ScrollView horizontal contentContainerStyle={{ gap: 10 }} >
               {
                 productData?.variants?.map((item, index) => {
                   return (
-                    <TouchableOpacity onPress={() => setSelectedImage(item?.image)} style={{ marginTop: 15 }}>
-                      <Image source={{ uri: item?.image }} style={{ width: 100, height: 100 }} />
+                    <TouchableOpacity style={{ gap: 10 }} onPress={() => setSelectedImage(item?.image)} style={{ marginTop: 15 }}>
+                      <Image source={{ uri: item?.image }} style={{ width: 100, height: 100, gap: 10 }} />
                     </TouchableOpacity>
                   )
                 })
@@ -282,10 +289,10 @@ const ProductDetails = ({ navigation, route }) => {
             )}
 
             <View style={styles.SizeColorContainer}>
-              <ScrollView horizontal>
+              <ScrollView  contentContainerStyle={{}}>
 
                 <View style={styles.sizeContainer}>
-                  {productData?.variants?.map((item, index) => {
+                  {filterSizes?.map((item, index) => {
                     return (
                       <TouchableOpacity
                         // onPress={() => setSelectedSize(item?.sid)}
@@ -310,8 +317,6 @@ const ProductDetails = ({ navigation, route }) => {
                   })}
                 </View>
               </ScrollView>
-
-
             </View>
 
 
@@ -339,8 +344,8 @@ const ProductDetails = ({ navigation, route }) => {
           alignSelf: 'center',
           bottom: 90,
         }}>
-        <TouchableOpacity disabled={productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomPriceCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}>
-          {/* <TouchableOpacity  onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}> */}
+        {/* <TouchableOpacity disabled={productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomPriceCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}> */}
+          <TouchableOpacity  onPress={addToCart} style={[styles.bottomPriceCartBox,{backgroundColor:productObject?.quantity == 0 ? "#cecece" : color.theme}]}>
           <Text style={styles.productPrice}>KD{productObject?.price}</Text>
 
           <TouchableOpacity disabled={productObject?.quantity == 0} onPress={addToCart} style={[styles.bottomCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}>

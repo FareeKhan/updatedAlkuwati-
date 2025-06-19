@@ -109,8 +109,8 @@
     "cancel":"Cancel",
     "ok":"OK",
     "support":"Support",
-    "paymentSuccess":"Payment Successful!",
-    "paymentSubText":"You have successfully your'\n'Confirm Payment send!",
+    "paymentSuccess":"Order Successful!",
+    "paymentSubText": "Thank you! Your order has been successfully\nplaced.",
     "continueShopping":"Continue Shopping",
 
     "color":"Color",
@@ -161,6 +161,16 @@
      "loading":"Loading",
      "reels":"Reels",
      "MoreInfo":"Order Now",
+
+
+
+       "Al-Asima": "Al Asima",
+  "Hawally": "Hawally",
+  "Mubarak-Al-Kabir": "Mubarak Al Kabir",
+  "Ahmadi": "Ahmadi",
+  "Farwaniya": "Farwaniya",
+  "Jahra": "Jahra",
+  "noDataFound": "No Data Found"
 
      
 

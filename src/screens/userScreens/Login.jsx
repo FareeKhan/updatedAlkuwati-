@@ -18,6 +18,10 @@ import HeaderLogo from '../../components/HeaderLogo'
 import { loginData } from '../../redux/reducer/Auth';
 import CustomDropDown from '../../components/CustomDropDown';
 
+
+
+
+
 const CELL_COUNT = 4;
 const Login = ({ navigation, route }) => {
     const dispatch = useDispatch()
@@ -25,13 +29,84 @@ const Login = ({ navigation, route }) => {
     const { isOrderDetail } = route?.params || {}
 
     const { t } = useTranslation()
+
+    const countries_ar = [
+        {
+            label: 'الكويت',
+            id: 1,
+            code: '+965',
+        },
+        {
+            label: 'المملكة العربية السعودية',
+            id: 2,
+            code: '+966',
+        },
+        {
+            label: 'الإمارات العربية المتحدة',
+            id: 3,
+            code: '+971',
+        },
+        {
+            label: 'البحرين',
+            id: 4,
+            code: '+973',
+        },
+        {
+            label: 'قطر',
+            id: 5,
+            code: '+974',
+        },
+        {
+            label: 'عمان',
+            id: 6,
+            code: '+968',
+        },
+    ];
+
+    const countries_en = [
+        {
+            label: t('Kuwait'),
+            id: 1,
+            code: '+965',
+        },
+        {
+            label: t('Saudi Arabia'),
+            id: 2,
+            code: '+966',
+        },
+        {
+            label: t('United Arab Emirates'),
+            id: 3,
+            code: '+971',
+        },
+        {
+            label: t('Bahrain'),
+            id: 4,
+            code: '+973',
+        },
+        {
+            label: t('Qatar'),
+            id: 5,
+            code: '+974',
+        },
+        {
+            label: t('Oman'),
+            id: 6,
+            code: '+968',
+        },
+    ];
+
+
+
+
+
     const [isLoading, setLoading] = useState(true);
     const userId = useSelector((state) => state.auth)
     const [getOTPCoder, setOTPCoder] = useState();
     const [getTextReSend, setTextReSend] = useState();
     const [phoneNo, setPhoneNo] = useState('')
-    const [country, setCountry] = useState('الكويت');
-  const [countryCodes, setCountryCodes] = useState('+965');
+    const [country, setCountry] = useState(I18nManager.isRTL ? countries_ar[0]?.label : countries_en[0]?.label);
+    const [countryCodes, setCountryCodes] = useState('+965');
 
 
     const [value, setValue] = useState('')
@@ -45,9 +120,6 @@ const Login = ({ navigation, route }) => {
             setFCNToken(fcmToken);
         }
     }
-
-    console.log('sss',FCNToken)
-
 
     const generateOTP = (limit) => {
         var digits = '0123456789';
@@ -146,8 +218,6 @@ const Login = ({ navigation, route }) => {
 
     }
 
-
-
     const isVerifyOtp = async () => {
         try {
             const response = await fetch(`${baseUrl}/customer/verify-otp`, {
@@ -159,7 +229,7 @@ const Login = ({ navigation, route }) => {
                 body: JSON.stringify({
                     phone: phoneNo,
                     otp: value,
-                    token:FCNToken
+                    token: FCNToken
 
                 })
 
@@ -202,13 +272,10 @@ const Login = ({ navigation, route }) => {
             Alert.alert(t('error'), t('inCorrectNo'))
             return
         }
-        if (phoneNo.length > 8) {
-            Alert.alert(t('isNotValid'));
-        } else {
-            let updatedPhoneNumber = phoneNo[0] === '0' ? phoneNo.slice(1) : phoneNo;
-            updatedPhoneNumber = countryCodes + updatedPhoneNumber;
-            sendOTP(updatedPhoneNumber);
-        }
+
+        let updatedPhoneNumber = phoneNo[0] === '0' ? phoneNo.slice(1) : phoneNo;
+        updatedPhoneNumber = countryCodes + updatedPhoneNumber;
+        sendOTP(updatedPhoneNumber);
     }
 
     useEffect(() => {
@@ -233,80 +300,16 @@ const Login = ({ navigation, route }) => {
 
     useEffect(() => {
         const selectedCountry = countries_en.find((item) => item.label === country);
-    
+
         if (selectedCountry) {
-          setCountryCodes(selectedCountry.code);
+            setCountryCodes(selectedCountry.code);
         } else {
-          setCountryCodes(''); // Optional fallback
+            setCountryCodes(''); // Optional fallback
         }
-      }, [country]);
+    }, [country]);
 
 
-    const countries_ar = [
-        {
-          label: 'الكويت',
-          id: 1,
-          code: '+965',
-        },
-        {
-          label: 'المملكة العربية السعودية',
-          id: 2,
-          code: '+966',
-        },
-        {
-          label: 'الإمارات العربية المتحدة',
-          id: 3,
-          code: '+971',
-        },
-        {
-          label: 'البحرين',
-          id: 4,
-          code: '+973',
-        },
-        {
-          label: 'قطر',
-          id: 5,
-          code: '+974',
-        },
-        {
-          label: 'عمان',
-          id: 6,
-          code: '+968',
-        },
-      ];
-    
-      const countries_en = [
-        {
-          label: t('Kuwait'),
-          id: 1,
-          code: '+965',
-        },
-        {
-          label: t('Saudi Arabia'),
-          id: 2,
-          code: '+966',
-        },
-        {
-          label: t('United Arab Emirates'),
-          id: 3,
-          code: '+971',
-        },
-        {
-          label: t('Bahrain'),
-          id: 4,
-          code: '+973',
-        },
-        {
-          label: t('Qatar'),
-          id: 5,
-          code: '+974',
-        },
-        {
-          label: t('Oman'),
-          id: 6,
-          code: '+968',
-        },
-      ];
+
 
     return (
         <View style={styles.mainContainer}>
@@ -381,28 +384,29 @@ const Login = ({ navigation, route }) => {
                     <View style={{}}>
                         <View style={{ marginTop: 20 }}>
 
-                        <CustomDropDown
-          data={I18nManager.isRTL ? countries_ar : countries_en}
-          title={t('Country')}
-          placeholder={t('Country')}
-          setValue={setCountry}
-          value={country}
-        />
+                            <CustomDropDown
+                                data={I18nManager.isRTL ? countries_ar : countries_en}
+                                title={t('Country')}
+                                placeholder={t('Country')}
+                                setValue={setCountry}
+                                value={country}
+                            />
 
 
 
                             <Text
-                                style={{ textAlign: 'left', marginBottom: 10, color: color.theme,marginTop:20 }}>
+                                style={{ textAlign: 'left', marginBottom: 10, color: color.theme, marginTop: 20 }}>
                                 {t('phoneNumber')}
                             </Text>
                             <View
                                 style={{
                                     flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
-                                    justifyContent: I18nManager.isRTL ? 'flex-end' : 'flex-start',
+                                    // justifyContent: I18nManager.isRTL ? 'flex-end' : 'flex-start',
                                     alignItems: 'center',
                                     borderBottomWidth: 1,
                                     borderBottomColor: '#ccc',
                                     paddingBottom: 10,
+                                    gap: 5
 
                                 }}>
                                 <Text style={{ color: "#000" }}>{`\u2066${countryCodes}\u2069`}</Text>

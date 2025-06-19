@@ -202,10 +202,8 @@ const HomeScreen = ({ navigation }) => {
 
 
   const GetFeatured = async () => {
-
     try {
       const result = await getFeaturedData();
-      console.log('ssss', result)
       if (result?.status) {
         setFeatureData(result?.data)
         // setArrivalData(result?.data);
@@ -473,7 +471,7 @@ const HomeScreen = ({ navigation }) => {
 
         />
 
-<SliderDots
+        <SliderDots
           data={secBanners}
           imageHeights={imageHeights}
         />
@@ -556,7 +554,7 @@ const HomeScreen = ({ navigation }) => {
           })
         }
 
-       
+
 
       </ScrollView>
 

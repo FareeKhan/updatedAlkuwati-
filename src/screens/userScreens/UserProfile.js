@@ -36,7 +36,8 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 const UserProfile = ({ navigation }) => {
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.auth?.userId);
-  const ssss = useSelector((state) => state.auth);
+  const userPhone = useSelector((state) => state.auth?.mobile);
+  const userName = useSelector((state) => state.customerAddress?.storeAddress?.fullName);
   const { t } = useTranslation();
   const [userData, setUserData] = useState("");
   const [getName, setName] = useState();
@@ -173,41 +174,44 @@ const UserProfile = ({ navigation }) => {
     }
   });
 
-  useEffect(() => {
-    profileData();
-    orderData();
-  }, []);
+  // useEffect(() => {
+  //   profileData();
+  //   orderData();
+  // }, []);
 
   useEffect(() => {
-    profileData();
+    // profileData();
     orderData();
   }, [userId]);
+  console.log('userIduserIduserId', userId)
 
-  const profileData = async () => {
-    setProfileLoader(true)
-    try {
-      const response = await personalData(userId);
-      console.log('response', response)
-      if (response?.status) {
-        setUserData(response?.data);
-        setImage(response?.data?.name);
-        setSupportURL(response?.supporturl);
-        setProfileLoader(false)
-      }
-    } catch (error) {
-      setProfileLoader(false)
-      console.log(error);
-    }
-  };
+  // const profileData = async () => {
+  //   setProfileLoader(true)
+  //   try {
+  //     const response = await personalData(userId);
+  //     console.log('responsekljjkljklj', response)
+  //     if (response?.status) {
+  //       setUserData(response?.data);
+  //       setImage(response?.data?.name);
+  //       setSupportURL(response?.supporturl);
+  //       setProfileLoader(false)
+  //     }
+  //   } catch (error) {
+  //     setProfileLoader(false)
+  //     console.log(error);
+  //   }finally{
+  //     setProfileLoader(false)
+  //   }
+  // };
 
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      profileData();
-    });
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', () => {
+  //     profileData();
+  //   });
 
-    return unsubscribe;
-  }, [navigation]);
+  //   return unsubscribe;
+  // }, [navigation]);
 
 
   const setImage = (name) => {
@@ -230,18 +234,18 @@ const UserProfile = ({ navigation }) => {
     ]);
 
 
-    const handleEmailPress = () => {
-      const email = 'info@alkwaityalawal.com';
-      const subject = 'Hello';
-      const body = 'I would like to get in touch with you.';
-      
-      const mailUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      
-      Linking.openURL(mailUrl).catch(err => {
-        Alert.alert('Error', 'Could not open mail app.');
-        console.error('Email error:', err);
-      });
-    };
+  const handleEmailPress = () => {
+    const email = 'info@alkwaityalawal.com';
+    const subject = 'Hello';
+    const body = 'I would like to get in touch with you.';
+
+    const mailUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    Linking.openURL(mailUrl).catch(err => {
+      Alert.alert('Error', 'Could not open mail app.');
+      console.error('Email error:', err);
+    });
+  };
 
   return (
     <DrawerSceneWrapper>
@@ -258,144 +262,55 @@ const UserProfile = ({ navigation }) => {
           <HeaderLogo />
           <TouchableOpacity>{/* <ExportSvg.Settings /> */}</TouchableOpacity>
         </View>
+        <View style={styles.profileContainer}>
 
-        {true ? (
-          <>
-            {userId && (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("UserDetails", {
-                    btnText: t("save"),
-                  })
-                }
-              >
-                <View style={styles.profileContainer}>
-                  {
-                    profileLoader ?
-                      <View style={{ flexDirection: "row", alignItems: "center", gap: 20 }}>
-                        {/* <Image
-                          source={require("../../assets/images/userImage.png")}
-                        /> */}
-                        <View style={{ borderWidth: 1, height: 35, width: 35, borderRadius: 50, alignItems: "center", justifyContent: "center" }}>
-                          <AntDesign name={'user'} size={20} color={"#000"} />
-                        </View>
-                        <ActivityIndicator size={'small'} color={color.theme} />
-                      </View>
-                      :
-                      <>
-                        {getName ? (
-                          // <View style={styles.txt}>
-                          //   <Text style={styles.txtTxt}>{getName}</Text>
-                          // </View>
-                          <View style={{ borderWidth: 1, height: 35, width: 35, borderRadius: 50, alignItems: "center", justifyContent: "center" }}>
-                            <AntDesign name={'user'} size={20} color={"#000"} />
-                          </View>
-                        ) : (
-                          // <Image
-                          //   source={require("../../assets/images/userImage.png")}
-                          // />
-                          <View style={{ borderWidth: 1, height: 35, width: 35, borderRadius: 50, alignItems: "center", justifyContent: "center" }}>
-                            <AntDesign name={'user'} size={20} color={"#000"} />
-                          </View>
-                        )}
+          <View style={{ borderWidth: 1, height: 35, width: 35, borderRadius: 50, alignItems: "center", justifyContent: "center" }}>
+            <AntDesign name={'user'} size={20} color={"#000"} />
+          </View>
+          <View style={{ marginLeft: 10, marginTop: 7 }}>
 
-                        <View style={{ marginLeft: 10, marginTop: 7 }}>
+            <Text style={styles.userName}>{userName ? userName : t('noAvailable')}</Text>
+            <Text style={styles.userEmail}>{'\u202A'}{userPhone}{'\u202C'}</Text>
+            
+          </View>
+        </View>
+        <>
 
-                          <Text style={styles.userName}>{userData?.name ? userData?.name : t('noAvailable')}</Text>
-                          {/* <Text style={styles.userEmail}>{'\u202A'}{userData?.phone}{'\u202C'}</Text> */}
-                          {/* <Text style={styles.subTitle}>
-                          </Text> */}
-                        </View>
-                      </>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingBottom: 90,
+              paddingHorizontal: 4,
+            }}
+          >
+            <View style={[styles.Wrapper]}>
+              {userId && (
+                <>
+                  <UserNavigation
+                    SVG={<ExportSvg.MyOrder />}
+                    title={t("my_orders")}
+                    onPress={() => navigation.navigate("TrackOrder")}
+                  />
 
+                  <UserNavigation
+                    SVG={<ExportSvg.MyFavrt />}
+                    title={t("my_favourites")}
+                    onPress={() => navigation.navigate("MyFavorite")}
+                  />
 
-                  }
-
-
-
-
-
-
-                </View>
-              </TouchableOpacity>
-            )}
-
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingBottom: 90,
-                paddingHorizontal: 4,
-              }}
-            >
-              <View style={[styles.Wrapper]}>
-                {userId && (
-                  <>
-                    <UserNavigation
-                      SVG={<ExportSvg.MyOrder />}
-                      title={t("my_orders")}
-                      onPress={() => navigation.navigate("TrackOrder")}
-                    />
-
-                    <UserNavigation
-                      SVG={<ExportSvg.MyFavrt />}
-                      title={t("my_favourites")}
-                      onPress={() => navigation.navigate("MyFavorite")}
-                    />
-
-                    <UserNavigation
-                      SVG={<ExportSvg.ShippingAddress />}
-                      title={t("shipping_address")}
-                      onPress={() =>
-                        navigation.navigate("SavedAddresses", {
-                          isAdd: true
-                        })
-                      }
-                    />
-                    <TouchableOpacity
-                      onPress={() => handleEmailPress()}
-                      style={styles.userContainer}
-                    >
-                      <View
-                        style={{
-                          width: 40,
-                          height: 40,
-                          alignItems: "center",
-                          justifyContent: "center",
-                          backgroundColor: "#cecece90",
-                          borderRadius: 7,
-                        }}
-                      >
-                        <MaterialIcons
-                          name={"support-agent"}
-                          size={25}
-                          color={"#67300f"}
-                          styles={{}}
-                        />
-                      </View>
-                      <Text style={styles.navigationTxt}>{t("support")}</Text>
-                      {I18nManager.isRTL ? (
-                        <View
-                          style={{
-                            marginLeft: "auto",
-                            textAlign: "left",
-                            flexDirection: "row",
-                          }}
-                        >
-                          <Ionicons
-                            name={"chevron-back-outline"}
-                            size={15}
-                            color={"#67300f"}
-                            styles={{}}
-                          />
-                        </View>
-                      ) : (
-                        <ExportSvg.RightArrow style={{ marginLeft: "auto" }} />
-                      )}
-                    </TouchableOpacity>
-                  </>
-                )}
-                <UserNavigation
-                  SVG={
+                  <UserNavigation
+                    SVG={<ExportSvg.ShippingAddress />}
+                    title={t("shipping_address")}
+                    onPress={() =>
+                      navigation.navigate("SavedAddresses", {
+                        isAdd: true
+                      })
+                    }
+                  />
+                  <TouchableOpacity
+                    onPress={() => handleEmailPress()}
+                    style={styles.userContainer}
+                  >
                     <View
                       style={{
                         width: 40,
@@ -406,171 +321,199 @@ const UserProfile = ({ navigation }) => {
                         borderRadius: 7,
                       }}
                     >
-                      <Fontisto
-                        name={"world-o"}
+                      <MaterialIcons
+                        name={"support-agent"}
                         size={25}
                         color={"#67300f"}
                         styles={{}}
                       />
                     </View>
-                  }
-                  title={t("language")}
-                  lng={isSelectedLang}
-                  onPress={() =>
-                    onPressLanguage(isSelectedLang == "en" ? "ar" : "en")
-                  }
-                />
-
-
-
-                {userId && (
-                  <>
-                    <TouchableOpacity
-                      onPress={LogoutPress}
-                      style={styles.userContainer}
-                    >
+                    <Text style={styles.navigationTxt}>{t("support")}</Text>
+                    {I18nManager.isRTL ? (
                       <View
                         style={{
-                          width: 40,
-                          height: 40,
-                          alignItems: "center",
-                          justifyContent: "center",
-                          backgroundColor: "#cecece90",
-                          borderRadius: 7,
+                          marginLeft: "auto",
+                          textAlign: "left",
+                          flexDirection: "row",
                         }}
                       >
                         <Ionicons
-                          name={"log-out-sharp"}
-                          size={25}
+                          name={"chevron-back-outline"}
+                          size={15}
                           color={"#67300f"}
                           styles={{}}
                         />
                       </View>
-                      <Text style={styles.navigationTxt}>{t("logout")}</Text>
+                    ) : (
+                      <ExportSvg.RightArrow style={{ marginLeft: "auto" }} />
+                    )}
+                  </TouchableOpacity>
+                </>
+              )}
+              <UserNavigation
+                SVG={
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "#cecece90",
+                      borderRadius: 7,
+                    }}
+                  >
+                    <Fontisto
+                      name={"world-o"}
+                      size={25}
+                      color={"#67300f"}
+                      styles={{}}
+                    />
+                  </View>
+                }
+                title={t("language")}
+                lng={isSelectedLang}
+                onPress={() =>
+                  onPressLanguage(isSelectedLang == "en" ? "ar" : "en")
+                }
+              />
 
-                      {I18nManager.isRTL ? (
-                        <View
-                          style={{
-                            marginLeft: "auto",
-                            textAlign: "left",
-                            flexDirection: "row",
-                          }}
-                        >
-                          <Ionicons
-                            name={"chevron-back-outline"}
-                            size={15}
-                            color={"#67300f"}
-                            styles={{}}
-                          />
-                        </View>
-                      ) : (
-                        <ExportSvg.RightArrow style={{ marginLeft: "auto" }} />
-                      )}
-                    </TouchableOpacity>
 
-                    <TouchableOpacity
-                      onPress={createTwoButtonAlert}
-                      style={styles.userContainer}
+
+              {userId && (
+                <>
+                  <TouchableOpacity
+                    onPress={LogoutPress}
+                    style={styles.userContainer}
+                  >
+                    <View
+                      style={{
+                        width: 40,
+                        height: 40,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#cecece90",
+                        borderRadius: 7,
+                      }}
                     >
+                      <Ionicons
+                        name={"log-out-sharp"}
+                        size={25}
+                        color={"#67300f"}
+                        styles={{}}
+                      />
+                    </View>
+                    <Text style={styles.navigationTxt}>{t("logout")}</Text>
+
+                    {I18nManager.isRTL ? (
                       <View
                         style={{
-                          width: 40,
-                          height: 40,
-                          alignItems: "center",
-                          justifyContent: "center",
-                          backgroundColor: "#cecece90",
-                          borderRadius: 7,
+                          marginLeft: "auto",
+                          textAlign: "left",
+                          flexDirection: "row",
                         }}
                       >
-                        <ExportSvg.logoutUser />
-                      </View>
-                      <Text style={styles.navigationTxt}>
-                        {t("delete_account")}
-                      </Text>
-                      {I18nManager.isRTL ? (
-                        <View
-                          style={{
-                            marginLeft: "auto",
-                            textAlign: "left",
-                            flexDirection: "row",
-                          }}
-                        >
-                          <Ionicons
-                            name={"chevron-back-outline"}
-                            size={15}
-                            color={"#67300f"}
-                            styles={{}}
-                          />
-                        </View>
-                      ) : (
-                        <ExportSvg.RightArrow style={{ marginLeft: "auto" }} />
-                      )}
-                    </TouchableOpacity>
-                  </>
-                )}
-
-                {!userId && (
-                  <>
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate("Login")}
-                      style={styles.userContainer}
-                    >
-                      <View
-                        style={{
-                          width: 40,
-                          height: 40,
-                          alignItems: "center",
-                          justifyContent: "center",
-                          backgroundColor: "#cecece90",
-                          borderRadius: 7,
-                        }}
-                      >
-                        <FontAwesome
-                          name={"user-circle-o"}
-                          size={25}
+                        <Ionicons
+                          name={"chevron-back-outline"}
+                          size={15}
                           color={"#67300f"}
                           styles={{}}
                         />
                       </View>
-                      <Text style={styles.navigationTxt}>{t("login")}</Text>
-                      {I18nManager.isRTL ? (
-                        <View
-                          style={{
-                            marginLeft: "auto",
-                            textAlign: "left",
-                            flexDirection: "row",
-                          }}
-                        >
-                          <Ionicons
-                            name={"chevron-back-outline"}
-                            size={15}
-                            color={"#67300f"}
-                            styles={{}}
-                          />
-                        </View>
-                      ) : (
-                        <ExportSvg.RightArrow style={{ marginLeft: "auto" }} />
-                      )}
-                    </TouchableOpacity>
-                  </>
-                )}
+                    ) : (
+                      <ExportSvg.RightArrow style={{ marginLeft: "auto" }} />
+                    )}
+                  </TouchableOpacity>
 
-              </View>
-            </ScrollView>
-          </>
-        ) : (
-          <View style={styles.mainContainer}>
-            <Text
-              style={{
-                ...styles.userName,
-                textAlign: "center",
-                justifyContent: "center",
-              }}
-            >
-              {t("no_order")}
-            </Text>
-          </View>
-        )}
+                  <TouchableOpacity
+                    onPress={createTwoButtonAlert}
+                    style={styles.userContainer}
+                  >
+                    <View
+                      style={{
+                        width: 40,
+                        height: 40,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#cecece90",
+                        borderRadius: 7,
+                      }}
+                    >
+                      <ExportSvg.logoutUser />
+                    </View>
+                    <Text style={styles.navigationTxt}>
+                      {t("delete_account")}
+                    </Text>
+                    {I18nManager.isRTL ? (
+                      <View
+                        style={{
+                          marginLeft: "auto",
+                          textAlign: "left",
+                          flexDirection: "row",
+                        }}
+                      >
+                        <Ionicons
+                          name={"chevron-back-outline"}
+                          size={15}
+                          color={"#67300f"}
+                          styles={{}}
+                        />
+                      </View>
+                    ) : (
+                      <ExportSvg.RightArrow style={{ marginLeft: "auto" }} />
+                    )}
+                  </TouchableOpacity>
+                </>
+              )}
+
+              {!userId && (
+                <>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("Login")}
+                    style={styles.userContainer}
+                  >
+                    <View
+                      style={{
+                        width: 40,
+                        height: 40,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "#cecece90",
+                        borderRadius: 7,
+                      }}
+                    >
+                      <FontAwesome
+                        name={"user-circle-o"}
+                        size={25}
+                        color={"#67300f"}
+                        styles={{}}
+                      />
+                    </View>
+                    <Text style={styles.navigationTxt}>{t("login")}</Text>
+                    {I18nManager.isRTL ? (
+                      <View
+                        style={{
+                          marginLeft: "auto",
+                          textAlign: "left",
+                          flexDirection: "row",
+                        }}
+                      >
+                        <Ionicons
+                          name={"chevron-back-outline"}
+                          size={15}
+                          color={"#67300f"}
+                          styles={{}}
+                        />
+                      </View>
+                    ) : (
+                      <ExportSvg.RightArrow style={{ marginLeft: "auto" }} />
+                    )}
+                  </TouchableOpacity>
+                </>
+              )}
+
+            </View>
+          </ScrollView>
+        </>
       </View>
 
       <View>
@@ -615,6 +558,8 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     flexDirection: "row",
+    alignItems: "center",
+
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -625,7 +570,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     elevation: 5,
     padding: 10,
-    paddingHorizontal:15,
+    paddingHorizontal: 15,
     borderRadius: 13,
   },
   userName: {

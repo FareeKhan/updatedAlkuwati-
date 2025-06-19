@@ -1,19 +1,14 @@
-import { ActivityIndicator, Alert, FlatList, I18nManager, Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
-import ExportSvg from '../../constants/ExportSvg'
+import {  Alert, FlatList, I18nManager, Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React, { useCallback, useState } from 'react'
 import { color } from '../../constants/color'
-import { bags } from '../../constants/data'
 import { useDispatch, useSelector } from 'react-redux'
-import { postPromoCoder, promoCodes, userShippingAddress } from '../../services/UserServices'
+import { postPromoCoder, userShippingAddress } from '../../services/UserServices'
 import HeaderLogo from '../../components/HeaderLogo'
-import { decrementCounter, deleteProduct, handlePromo, handleTotalPrice, incrementCounter, selectTotalPrice } from '../../redux/reducer/ProductAddToCart'
+import {  handlePromo, handleTotalPrice } from '../../redux/reducer/ProductAddToCart'
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CustomText from '../../components/CustomText'
-import CustomInput from '../../components/CustomInput'
-import CustomButton from '../../components/CustomButton'
-import LottieView from 'lottie-react-native'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import CircleLoader from '../../components/CircleLoader'
 const OrderDetails = ({ navigation, route }) => {

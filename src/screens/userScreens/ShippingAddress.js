@@ -7,14 +7,11 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Keyboard,
-  FlatList,
   I18nManager,
   Modal,
-  Pressable,
   Dimensions,
 } from 'react-native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { color } from '../../constants/color';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
@@ -22,7 +19,6 @@ import {
   addShippingAddress,
   editAddress,
   editShippingAddress,
-  userShippingAddress,
 } from '../../services/UserServices';
 import CustomLoader from '../../components/CustomLoader';
 import { useDispatch, useSelector } from 'react-redux';
@@ -32,7 +28,6 @@ import HeaderLogo from '../../components/HeaderLogo';
 import { useTranslation } from 'react-i18next';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomDropDown from '../../components/CustomDropDown';
-import ScreenView from '../../components/ScreenView';
 import MapView, { Marker } from 'react-native-maps';
 import Entypo from 'react-native-vector-icons/Entypo'
 import EvilIcons from 'react-native-vector-icons/EvilIcons'
@@ -40,35 +35,36 @@ import { LocationPermission } from '../../components/LocationPermission';
 import Geolocation from '@react-native-community/geolocation';
 const { height } = Dimensions.get('screen')
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6'
+import { CountriesData, governorateData } from '../../constants/data';
+import HeaderBox from '../../components/HeaderBox';
 
 const ShippingAddress = ({ navigation, route }) => {
   const { id, btnText, isMap } = route.params ?? '';
+  const { t } = useTranslation();
+  const governorate_en = governorateData(t)
+  const countries_en = CountriesData(t)
+
   const dispatch = useDispatch();
   const userId = useSelector(state => state.auth.userId);
   const reduxAddress = useSelector((item) => item?.customerAddress?.storeAddress)
   const [modalVisible, setModalVisible] = useState(false);
+
 
   const [userAddress, setUserAddress] = useState(userId ? {} : reduxAddress);
   const displayNumber = userAddress?.phone?.startsWith('+965')
     ? userAddress?.phone.slice(4)
     : userAddress?.phone;
   const [fullName, setFullName] = useState(userAddress?.full_name);
-  const [street, setStreet] = useState(userAddress?.street);
   const [city, setCity] = useState(userAddress?.city);
   const [area, setArea] = useState(userAddress?.area);
   const [phoneNumber, setPhoneNumber] = useState(displayNumber);
   const [piece, setPiece] = useState(userAddress?.piece);
   const [email, setEmail] = useState(userAddress?.email);
   const [villa, setVilla] = useState(userAddress?.email);
-  const [zipCode, setZipCode] = useState(userAddress?.zipCode);
-  const [countryCode, setCountryCode] = useState(userAddress?.countryCode);
-  const [address, setAddress] = useState(userAddress?.address);
-  const [country, setCountry] = useState(userAddress?.country);
+  const [country, setCountry] = useState(countries_en[0]?.label);
   const [isLoader, setIsLoader] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [showCountry, setShowCountry] = useState(false);
   const [countryCodes, setCountryCodes] = useState('+965');
-  const [showGover, setShowGover] = useState(false);
   const [isMapOpened, setIsMapOpened] = useState(false);
   const [panLoader, setPanLoader] = useState(false);
   const [pickupLocation, setPickupLocation] = useState({
@@ -79,9 +75,7 @@ const ShippingAddress = ({ navigation, route }) => {
   });
 
   const mapRef = useRef(null);
-
-
-
+  const hasInteractedRef = useRef(false);
   useEffect(() => {
     const staticLocation = {
       latitude: 25.197741664033977,
@@ -102,33 +96,6 @@ const ShippingAddress = ({ navigation, route }) => {
     }
 
   }, [])
-
-  console.log('dasd', userAddress)
-
-  // useEffect(() => {
-
-  //   if (
-  //     pickupLocation?.latitude &&
-  //     pickupLocation?.longitude &&
-  //     mapRef.current
-  //   ) {
-  //     const location = {
-  //       latitude: pickupLocation?.latitud,
-  //       longitude: pickupLocation?.longitude,
-  //       latitudeDelta: 0.01,
-  //       longitudeDelta: 0.01,
-  //     };
-  //     // setTimeout(() => {
-  //     //   if (mapRef.current) {
-  //     //     mapRef.current.animateToRegion(location, 1000);
-  //     //   }
-  //     // }, 300);
-  //     error => {
-  //       console.log('Location error:', error);
-  //     },
-  //       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-  //   }
-  // }, [pickupLocation]);
 
   const getCurrentLocation = async () => {
     const result = await LocationPermission();
@@ -152,31 +119,11 @@ const ShippingAddress = ({ navigation, route }) => {
               mapRef.current.animateToRegion(location, 1000);
             }
           }, 300);
+
           error => {
             console.log('Location error:', error);
           },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-
-          // if (mapRef.current) {
-          //   mapRef.current.animateToRegion(
-          //     {
-          //       latitude: latitude,
-          //       longitude: longitude,
-          //       latitudeDelta: 0.01,
-          //       longitudeDelta: 0.01,
-          //     },
-          //     100,
-          //   );
-          // }
-
-
-          // showFetchAddress(
-          //   latitude,
-          //   longitude,
-          //   'pickup',
-          // );
-
-
         },
         error => {
           console.log('ss', error);
@@ -188,20 +135,13 @@ const ShippingAddress = ({ navigation, route }) => {
   };
 
 
-  // const userAddress = useSelector(
-  //   state => state?.customerAddress,
-  // );
-  // const userAddress = useSelector((state) => state?.customerAddress?.storeAddress)
-  // const userAddress = {}
-
-  const { t } = useTranslation();
-
   useEffect(() => {
-
     if (userId) {
       handleEdit();
     }
   }, []);
+
+  const handleAreaValue = governorate_en[0]?.label
 
   useEffect(() => {
     const displayNumber = userAddress?.phone?.startsWith('+965')
@@ -209,11 +149,11 @@ const ShippingAddress = ({ navigation, route }) => {
       : userAddress?.phone;
     setFullName(userId ? userAddress?.full_name : userAddress?.fullName);
     setCity(userAddress?.city);
-    setArea(userAddress?.area);
+    setArea(userAddress?.area ? userAddress?.area : handleAreaValue);
     setPhoneNumber(displayNumber);
     setPiece(userAddress?.street);
     setEmail(userAddress?.email);
-    setCountry(userAddress?.country);
+    setCountry(userAddress?.country ? userAddress?.country : countries_en[0]?.label);
     setVilla(userAddress?.address);
   }, [userAddress]);
 
@@ -229,130 +169,6 @@ const ShippingAddress = ({ navigation, route }) => {
       console.log('error', error);
     }
   };
-
-  const countries_ar = [
-    {
-      label: 'الكويت',
-      id: 1,
-      code: '+965',
-    },
-    {
-      label: 'المملكة العربية السعودية',
-      id: 2,
-      code: '+966',
-    },
-    {
-      label: 'الإمارات العربية المتحدة',
-      id: 3,
-      code: '+971',
-    },
-    {
-      label: 'البحرين',
-      id: 4,
-      code: '+973',
-    },
-    {
-      label: 'قطر',
-      id: 5,
-      code: '+974',
-    },
-    {
-      label: 'عمان',
-      id: 6,
-      code: '+968',
-    },
-  ];
-
-  const countries_en = [
-    {
-      label: t('Kuwait'),
-      id: 1,
-      code: '+965',
-    },
-    {
-      label: t('Saudi Arabia'),
-      id: 2,
-      code: '+966',
-    },
-    {
-      label: t('United Arab Emirates'),
-      id: 3,
-      code: '+971',
-    },
-    {
-      label: t('Bahrain'),
-      id: 4,
-      code: '+973',
-    },
-    {
-      label: t('Qatar'),
-      id: 5,
-      code: '+974',
-    },
-    {
-      label: t('Oman'),
-      id: 6,
-      code: '+968',
-    },
-  ];
-
-
-  const governorate_ar = [
-    {
-      label: 'محافظة العاصمة',
-      id: 1,
-    },
-    {
-      label: 'محافظة حولي',
-      id: 2,
-    },
-    {
-      label: 'محافظة الأحمدي',
-      id: 3,
-    },
-    {
-      label: 'محافظة الجهراء',
-      id: 4,
-    },
-    {
-      label: 'محافظة الفروانية',
-      id: 5,
-    },
-    {
-      label: 'محافظة مبارك الكبير',
-      id: 6,
-    },
-  ];
-
-  const governorate_en = [
-    {
-      label: 'Al Asima',
-      id: 1,
-    },
-    {
-      label: 'Hawally',
-      id: 2,
-    },
-    {
-      label: 'Mubarak Al Kabir',
-      id: 3,
-    },
-    {
-      label: 'Ahmadi',
-      id: 4,
-    },
-    {
-      label: 'Farwaniya',
-      id: 5,
-    },
-    {
-      label: 'Jahra',
-      id: 6,
-    },
-  ];
-
-  // useEffect(() => { }, [userAddress]);
-
 
   const saveAddress = () => {
 
@@ -409,8 +225,6 @@ const ShippingAddress = ({ navigation, route }) => {
       );
     }
   }
-
-  console.log('userId', userId)
 
   const handlePress = async () => {
     // console.log(phoneNumber?.slice(1),'phoneNumber')
@@ -527,42 +341,6 @@ const ShippingAddress = ({ navigation, route }) => {
          }*/
   };
 
-  // const getShippingAddress = async () => {
-  //   setLoader(true);
-  //   try {
-  //     const response = await userShippingAddress(userId);
-  //     console.log('response',response)
-  //     if (response) {
-  //       setLoader(false);
-  //       dispatch(
-  //         storeUserAddress(response?.data?.[response?.data?.length - 1]),
-  //       );
-  //     } else {
-  //       alert('something went wrong');
-  //       setLoader(false);
-  //     }
-  //   } catch (error) {
-  //     setLoader(false);
-  //     console.log(error);
-  //   }
-  // };
-
-
-  if (loader) {
-    return <ScreenLoader />;
-  }
-
-  // const handleMapPress = (e) => {
-  //   const { coordinate } = e.nativeEvent;
-  //   setPickupLocation({
-  //     ...coordinate,
-  //     latitudeDelta: 0.01,
-  //     longitudeDelta: 0.01,
-  //   });
-  //   setIsMapOpened(true)
-  // };
-
-
   useEffect(() => {
     const selectedCountry = countries_en.find((item) => item.label === country);
 
@@ -574,70 +352,44 @@ const ShippingAddress = ({ navigation, route }) => {
   }, [country]);
 
   const onRegionChange = () => {
-    setPanLoader(true); // show loader
+    setPanLoader(true); 
   };
 
+
   const onRegionChangeComplete = (newRegion) => {
-    // setRegion(newRegion);
-    // console.log('Center Location:-->', newRegion);
-    // console.log('Center Location:', newRegion.latitude, newRegion.longitude);
+
     setPickupLocation({
       latitude: newRegion.latitude,
       longitude: newRegion.longitude,
       latitudeDelta: newRegion.latitudeDelta,
       longitudeDelta: newRegion.longitudeDelta,
     });
-    setPanLoader(false); // show l
+    setPanLoader(false);
     setIsMapOpened(true)
-
   };
 
+
+  if (loader) {
+    return <ScreenLoader />;
+  }
+
   return (
-    // <View scrollable={true} style={{paddingTop:60}}>
     <View style={{ marginHorizontal: 20, paddingTop: 40 }}>
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 150 }}
         showsVerticalScrollIndicator={false}>
-        <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons
-              size={40}
-              name={
-                I18nManager.isRTL
-                  ? 'chevron-forward-circle'
-                  : 'chevron-back-circle'
-              }
-              color={color.theme}
+            <HeaderBox
+                style={[{ width: "60%"},Platform.OS == 'ios' && {marginTop:30 }]}
+                
             />
-          </TouchableOpacity>
-          {btnText !== undefined && (
-            <View
-              style={{
-                flexDirection: 'row',
-                width: '100%',
-                justifyContent: 'center',
-              }}>
-              <HeaderLogo />
-            </View>
-          )}
-        </View>
-        <View style={{ flexDirection: 'row' }}>
+
+     
+        <View style={{ flexDirection: 'row' ,marginTop:20}}>
           <Text style={[styles.productName]}>{t('shipaddress')}</Text>
         </View>
-        {/* 
-        <CustomInput
-          placeholder={t('email')}
-          title={t('email')}
-          style={{ marginTop: 20 }}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize={false}
-          keyboardType={'email'}
-        /> */}
-
 
         <CustomDropDown
-          data={I18nManager.isRTL ? countries_ar : countries_en}
+          data={countries_en}
           title={t('Country')}
           placeholder={t('Country')}
           setValue={setCountry}
@@ -646,7 +398,7 @@ const ShippingAddress = ({ navigation, route }) => {
 
         {country == t('Kuwait') ? (
           <CustomDropDown
-            data={I18nManager.isRTL ? governorate_ar : governorate_en}
+            data={governorate_en}
             title={t('governorate')}
             placeholder={t('governorate')}
             setValue={setArea}
@@ -699,11 +451,13 @@ const ShippingAddress = ({ navigation, route }) => {
           <View
             style={{
               flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
-              justifyContent: I18nManager.isRTL ? 'flex-end' : 'flex-start',
+              // justifyContent: I18nManager.isRTL ? 'flex-end' : 'flex-start',
               alignItems: 'center',
               borderBottomWidth: 1,
               borderBottomColor: '#ccc',
+              gap: 5,
               // paddingBottom: 10,
+              zIndex:100,
             }}>
             <Text style={{ color: '#000' }}>{`\u2066${countryCodes}\u2069`}</Text>
             <TextInput
@@ -716,7 +470,8 @@ const ShippingAddress = ({ navigation, route }) => {
               style={{
                 color: '#000',
                 textAlign: 'left',
-                writingDirection: 'rtl',
+              height:40
+
               }}
               placeholderTextColor={'#cecece'}
             />
@@ -776,12 +531,6 @@ const ShippingAddress = ({ navigation, route }) => {
                   pitchEnabled={false}
                   showsCompass={false}
                   region={pickupLocation}
-                // initialRegion={{
-                //   latitude: pickupLocation.latitude,
-                //   longitude: pickupLocation.longitude,
-                //   latitudeDelta: 0.01,
-                //   longitudeDelta: 0.01,
-                // }}
                 >
 
                   <Marker coordinate={pickupLocation} />
@@ -844,24 +593,19 @@ const ShippingAddress = ({ navigation, route }) => {
             <MapView
               ref={mapRef}
               style={{ width: "100%", height: height / 1.1 - 50 }}
-              // initialRegion={{
-              //   latitude: 25.197741664033977,
-              //   longitude: 55.27969625835015,
-              //   latitudeDelta: 0.0922,
-              //   longitudeDelta: 0.0421,
-              // }}
-              initialRegion={{
+              region={{
                 latitude: pickupLocation.latitude,
                 longitude: pickupLocation.longitude,
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
               }}
-              onRegionChange={onRegionChange}
+              onPanDrag={onRegionChange}
+              // onRegionChange={onRegionChange}
               onRegionChangeComplete={onRegionChangeComplete}
             />
 
 
-            <View activeOpacity={0.8}  style={{ height: 45, width: 45, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: "50%", left: "50%" }}>
+            <View activeOpacity={0.8} style={{ height: 45, width: 45, borderRadius: 50, alignItems: "center", justifyContent: "center", position: "absolute", zIndex: 1000, bottom: "50%", left: "50%" }}>
               <FontAwesome6 name={'location-dot'} size={40} color={color.theme} />
             </View>
 

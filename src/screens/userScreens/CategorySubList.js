@@ -19,7 +19,6 @@ import { useTranslation } from 'react-i18next';
 
 import withPressAnimated from './hocs/withPressAnimated';
 import registercustomAnimations, { ANIMATIONS } from './animations';
-import { MasonryFlashList } from "@shopify/flash-list";
 
 registercustomAnimations()
 const AnimatedPressButton = withPressAnimated(RNBounceable)
@@ -139,8 +138,6 @@ const CategorySubList = ({ navigation, innetCate }) => {
 
                     <View style={styles.containerBox}>
                         <FlatList
-                        //MasonryFlashList
-                        //style={{direction:'rtl'}}
                             data={storeCat}
                             numColumns={3}
                             key={(item, index) => index?.toString()}

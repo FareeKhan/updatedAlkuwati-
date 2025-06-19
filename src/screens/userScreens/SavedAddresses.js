@@ -1,4 +1,4 @@
-import { Alert, FlatList, I18nManager, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, FlatList, I18nManager, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import ScreenView from '../../components/ScreenView'
 import HeaderBox from '../../components/HeaderBox'
@@ -29,13 +29,9 @@ const SavedAddresses = ({ navigation, route }) => {
 
     const dispatch = useDispatch()
 
-    // useEffect(() => {
-    //     getShippingAddress()
-    // }, [userId])
-
     useFocusEffect(
         useCallback(() => {
-            getShippingAddress(true); // Call the API again when the screen is focused
+            getShippingAddress(true);
         }, [userId])
     );
 
@@ -90,7 +86,6 @@ const SavedAddresses = ({ navigation, route }) => {
         ]);
     }
 
-
     const handleDelete = async (id) => {
 
         try {
@@ -108,33 +103,8 @@ const SavedAddresses = ({ navigation, route }) => {
         navigation.navigate('ShippingAddress', {
             id: id
         })
-        // try {
-        //     const response = await editAddress(id)
-        //     console.log('showMeAEddit', response)
-        //     // if (response?.data == 'deleted') {
-        //     //     getShippingAddress(false)
-        //     // }
-        // } catch (error) {
-        //     console.log('error', error)
-        // }
     }
 
-
-
-
-    // const rightSwipe = (id) => {
-    //     return (
-    //         <View style={styles.rightSwipeContainer}>
-    //             <TouchableOpacity onPress={() => handleDelete(id)} style={styles.deleteButton}>
-    //                 <Text style={{ color: 'red' }}>{t('delete')}</Text>
-    //             </TouchableOpacity>
-
-    //             <TouchableOpacity onPress={() => alert('Edit Pressed')} style={styles.editButton}>
-    //                 <Text style={styles.swipeText}>{t('edit')}</Text>
-    //             </TouchableOpacity>
-    //         </View>
-    //     )
-    // }
 
     const AddressLine = ({ label, value }) => (
         <View style={{
@@ -149,7 +119,6 @@ const SavedAddresses = ({ navigation, route }) => {
 
         </View>
     );
-
 
     const renderItem = ({ item, index }) => {
 
@@ -182,8 +151,6 @@ const SavedAddresses = ({ navigation, route }) => {
         )
     }
 
-
-
     if (loader) {
         return <ScreenLoader />;
     }
@@ -191,13 +158,13 @@ const SavedAddresses = ({ navigation, route }) => {
     return (
         <ScreenView>
             <HeaderBox
-                style={{ width: "75%" }}
+                style={[{ width: "60%"},Platform.OS == 'ios' && {marginTop:30 }]}
             />
 
             {
                 isAdd &&
-                <TouchableOpacity style={{ borderWidth: 1, alignSelf: "baseline", paddingHorizontal: 10, paddingVertical: 2, borderRadius: 5, borderColor: "#cecece" }} onPress={() => navigation.navigate('ShippingAddress',{
-                    isMap:true
+                <TouchableOpacity style={{ borderWidth: 1, alignSelf: "baseline", paddingHorizontal: 10, paddingVertical: 2, borderRadius: 5, borderColor: "#cecece" }} onPress={() => navigation.navigate('ShippingAddress', {
+                    isMap: true
                 })}>
                     <CustomText style={{ fontSize: 16, fontWeight: "600", color: color.theme, textAlign: "left" }}>+ {t('addNew')}</CustomText>
                 </TouchableOpacity>
@@ -215,16 +182,16 @@ const SavedAddresses = ({ navigation, route }) => {
                     renderItem={renderItem}
                 />
             </View>
-{
-    data?.length>0 &&
-    <CustomButton
-    title={t('continue')}
-    style={{marginBottom:20}}
-    onPress={()=>navigation.goBack()}
-/>
+            {
+                data?.length > 0 &&
+                <CustomButton
+                    title={t('continue')}
+                    style={{ marginBottom: 20 }}
+                    onPress={() => navigation.goBack()}
+                />
 
-}
-          
+            }
+
         </ScreenView>
     )
 }

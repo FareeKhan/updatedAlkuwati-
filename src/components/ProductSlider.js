@@ -26,15 +26,19 @@ import YoutubePlayer from 'react-native-youtube-iframe';
 
 
 
-const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setImgUrl, item ,selectedImage}) => {
+const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setImgUrl, item, selectedImage }) => {
 
     // const conCatImages = item?.youtube_urls?.concat(data?.map((item) => item?.image_url))
     // console.log('conCatImagesconCatImagesconCatImages', conCatImages)
+const youtubeUrls = typeof item?.youtube_urls === 'string'
+  ? JSON.parse(item.youtube_urls || '[]')
+  : item?.youtube_urls || [];
 
-    const conCatImages = [
-        ...(item?.youtube_urls || []),
-        ...(data?.map((item) => item?.image_url) || [])
-    ];
+const conCatImages = [
+  ...(youtubeUrls.length > 0 ? youtubeUrls : []),
+  ...(data?.map((item) => item?.image_url) || [])
+];
+
 
     const playerRef = useRef();
     const dispatch = useDispatch()
@@ -49,7 +53,7 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
 
     const images = data?.map((item) => ({ url: item?.image_url }))
     // const images = conCatImages?.map(url => ({ url }));
-    console.log('--->>>',images)
+    console.log('--->>>', images)
 
     const removeHTMLCode = (value) => {
         if (value) {
@@ -66,7 +70,6 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
         setImgUrl(data[index]?.image_url);
     }
     const favoriteProduct = (item) => {
-        console.log('item-->>',data[0]?.image_url)
         if (isFavorite) {
             dispatch(removeFavorite({
                 id: item?.id
@@ -92,6 +95,7 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
 
     const renderItem1 = ({ item: mediaItem, index }) => {
         const isVideo = mediaItem?.includes("youtu") || mediaItem?.endsWith(".mp4") || mediaItem?.endsWith(".mov");
+        console.log("Dasdasd", conCatImages)
         return (
             <View style={styles.renderItem1_container}>
                 {
@@ -100,7 +104,9 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
                         style={[styles.iconCommon, styles.iconLeft]}
                         onPress={() => {
                             if (carouselRef.current) {
-                                const previousIndex = index > 0 ? index - 1 : data.length - 1;
+                                const previousIndex = I18nManager.isRTL
+                                    ? index < data.length - 1 ? index + 1 : 0
+                                    : index > 0 ? index - 1 : data.length - 1;
                                 carouselRef.current.snapToItem(previousIndex);
                             }
                         }}
@@ -116,31 +122,31 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
                         <ActivityIndicator size="large" color={color.theme} style={styles.loader} />
                     </View>
                 }
-       
+
 
                 {
                     isVideo ?
-                        <View style={{ }}  >
+                        <View style={{}}  >
                             <YoutubePlayer
                                 ref={playerRef}
                                 height={250}
                                 play={playing}
                                 videoId={
                                     mediaItem?.includes("v=")
-                                      ? mediaItem?.split("v=")[1]?.split("&")[0]
-                                      : mediaItem?.includes("/embed/")
-                                      ? mediaItem?.split("/embed/")[1]?.split("?")[0]
-                                      : mediaItem
-                                  }
+                                        ? mediaItem?.split("v=")[1]?.split("&")[0]
+                                        : mediaItem?.includes("/embed/")
+                                            ? mediaItem?.split("/embed/")[1]?.split("?")[0]
+                                            : mediaItem
+                                }
                                 onChangeState={onStateChange}
                             />
 
                         </View>
                         :
-                       <TouchableOpacity activeOpacity={1} onPress={() => setModalVisible(true)} style={[ styles.renderItem1_img]}>
-                       {/* <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: item?.image_url }} style={styles.renderItem1_img} /> */}
-                       <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: mediaItem }} style={[styles.renderItem1_img]} />
-                   </TouchableOpacity>
+                        <TouchableOpacity activeOpacity={1} onPress={() => setModalVisible(true)} style={[styles.renderItem1_img]}>
+                            {/* <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: item?.image_url }} style={styles.renderItem1_img} /> */}
+                            <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: mediaItem }} style={[styles.renderItem1_img]} />
+                        </TouchableOpacity>
                 }
 
 
@@ -156,9 +162,12 @@ const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setIm
                         style={[styles.iconCommon, styles.iconRight]}
                         onPress={() => {
                             if (carouselRef.current) {
-                                const nextIndex = index < data.length - 1 ? index + 1 : 0;
+                                const nextIndex = I18nManager.isRTL
+                                    ? index > 0 ? index - 1 : data.length - 1 
+                                    : index < data.length - 1 ? index + 1 : 0; 
                                 carouselRef.current.snapToItem(nextIndex);
                             }
+                            
                         }}
                     >
                         <ExportSvg.Arrow1 style={{ transform: [{ rotate: I18nManager.isRTL ? "180deg" : "0deg" }] }} />
@@ -252,7 +261,7 @@ const styles = StyleSheet.create({
 
 
     renderItem1_container: {
-        flex:1
+        flex: 1
     },
 
 

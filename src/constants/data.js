@@ -38,6 +38,70 @@ export const discountProducts = [
     },
 ]
 
+
+
+export  const governorateData = (t)=>[
+  {
+    label: t('Al-Asima'),
+    id: 1,
+  },
+  {
+    label: t('Hawally'),
+    id: 2,
+  },
+  {
+    label: t('Mubarak-Al-Kabir'),
+    id: 3,
+  },
+  {
+    label: t('Ahmadi'),
+    id: 4,
+  },
+  {
+    label: t('Farwaniya'),
+    id: 5,
+  },
+  {
+    label: t('Jahra'),
+    id: 6,
+  },
+];
+
+export   const CountriesData = (t)=>[
+    {
+      label: t('Kuwait'),
+      id: 1,
+      code: '+965',
+    },
+    {
+      label: t('Saudi Arabia'),
+      id: 2,
+      code: '+966',
+    },
+    {
+      label: t('United Arab Emirates'),
+      id: 3,
+      code: '+971',
+    },
+    {
+      label: t('Bahrain'),
+      id: 4,
+      code: '+973',
+    },
+    {
+      label: t('Qatar'),
+      id: 5,
+      code: '+974',
+    },
+    {
+      label: t('Oman'),
+      id: 6,
+      code: '+968',
+    },
+  ]
+
+
+
 export const newArrival = [
     {
         title: "The Marc Jacobs",

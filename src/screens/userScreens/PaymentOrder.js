@@ -69,7 +69,7 @@ const PaymentOrder = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const [cardInfo, setCardInfo] = useState(null);
-  const [selectedPayment, setSelectedPayment] = useState('');
+  const [selectedPayment, setSelectedPayment] = useState('cash');
   const [isLoading, setIsLoading] = useState(false);
   const [getToken, setToken] = useState({});
   const [address, setAddress] = useState({});

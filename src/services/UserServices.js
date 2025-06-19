@@ -271,7 +271,7 @@ export const orderConfirmed = async (productNo, address, totalPrice, data, email
 
             body: JSON.stringify({
                 "order_detail": {
-                    "email": address?.email ? address?.email : email,
+                    "email": 'order@gmail.com',
                     "products": productNo,
                     "address": address?.city + "," + address?.area + "," + address?.country,
                     "full_name": address?.fullName,
@@ -298,7 +298,7 @@ export const orderConfirmed = async (productNo, address, totalPrice, data, email
         });
 
         const result = await response.json();
-        //console.error(result,"sdddsd");
+        console.error(result,"sdddsd");
         return result;
 
     } catch (e) {
@@ -359,9 +359,6 @@ export const editAddress = async (id) => {
 };
 
 
-
-
-
 export const dummyCategories = async (id) => {
     try {
         const response = await fetch(`https://fakestoreapi.com/products`, {
@@ -412,6 +409,7 @@ export const getReels = async (id) => {
 //   };
 
 export const personalData = async (id) => {
+    console.log('tobah',id)
     try {
         const response = await fetch(`${baseUrl}/getAppUsersById/${id}`, {
             method: 'GET',

@@ -12,6 +12,7 @@ import HeaderLogo from '../../components/HeaderLogo'
 import { useTranslation } from 'react-i18next';
 import * as Animatable from 'react-native-animatable';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import EmptyScreen from '../../components/EmptyScreen'
 
 const TrackOrder = ({ navigation }) => {
 
@@ -97,7 +98,6 @@ const TrackOrder = ({ navigation }) => {
             console.log(error)
         }
     }
-
 
     const onOrderPress = (item) => {
         setSingleOrder(item)
@@ -221,7 +221,7 @@ const TrackOrder = ({ navigation }) => {
                                             return (
                                                 <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderStyle: 'solid', borderColor: '#eee', paddingBottom: 5, paddingTop: 5 }}>
                                                     <Image source={{ uri: item.image }} style={{ width: 40, height: 40 }} />
-                                                    <Text>{item.name}</Text>
+                                                    <Text style={{ width: "30%" }} numberOfLines={2}>{item.name}</Text>
                                                     <Text>Qty:{item.quantity} KWD{item.price}</Text>
                                                 </View>
                                             )
@@ -288,19 +288,33 @@ const TrackOrder = ({ navigation }) => {
                     <RefreshControl refreshing={isRefresh} onRefresh={onRefresh} />
                 }
             >
-                <View style={{ flexDirection: 'row' }}>
-                    <Text style={styles.TitleTracking}>{t("tracking")}</Text>
-                </View>
-                <FlatList
-                    data={storeOrder}
-                    refreshing={isRefresh}
-                    onRefresh={onRefresh}
-                    keyExtractor={(item, index) => index?.toString()}
-                    renderItem={renderItemCurrent}
-                    contentContainerStyle={{ paddingHorizontal: 5, paddingBottom: 0 }}
-                    showsVerticalScrollIndicator={false}
 
-                />
+                {
+                    storeOrder?.length > 0 ?
+
+                        <>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.TitleTracking}>{t("tracking")}</Text>
+                            </View>
+                            <FlatList
+                                data={storeOrder}
+                                refreshing={isRefresh}
+                                onRefresh={onRefresh}
+                                keyExtractor={(item, index) => index?.toString()}
+                                renderItem={renderItemCurrent}
+                                ListEmptyComponent={<EmptyScreen />}
+                                contentContainerStyle={{ paddingHorizontal: 5, paddingBottom: 0 }}
+                                showsVerticalScrollIndicator={false}
+
+                            />
+                        </>
+                        :
+
+                        <EmptyScreen />
+
+
+                }
+
 
                 {/*  <View style={styles.TrackingNumberBox}>
                 <ExportSvg.CurveIcon style={{ marginTop: 4 }} />
@@ -325,7 +339,7 @@ const TrackOrder = ({ navigation }) => {
                     <Text style={styles.trackingNo}>Hawali-Kuwait</Text>
                 </TouchableOpacity>
             </View> */}
-
+                {/* 
                 <View style={{ flexDirection: 'row' }}>
                     <Text style={styles.TitleTracking}>{t("history")}</Text>
                 </View>
@@ -339,7 +353,7 @@ const TrackOrder = ({ navigation }) => {
                     contentContainerStyle={{ paddingHorizontal: 5, paddingBottom: 100 }}
                     showsVerticalScrollIndicator={false}
 
-                />
+                /> */}
             </ScrollView>
 
             {/* <TrackingBox
