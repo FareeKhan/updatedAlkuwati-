@@ -47,22 +47,10 @@ const PaymentOrder = ({ navigation, route }) => {
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const userId = useSelector(state => state.auth?.userId);
   const reduxAddress = useSelector((item) => item?.customerAddress?.storeAddress)
-
   const { totalPrice } = useSelector(state => state.cartProducts);
 
-  const userAuth = useSelector(state => state.auth);
   const refRBSheet = useRef(null);
   const { t } = useTranslation();
-
-  // const calculateTotalPrice = items => {
-  //   return items
-  //     .reduce((total, item) => {
-  //       return total + item.counter * parseFloat(item.price);
-  //     }, 0)
-  //     .toFixed(2);
-  // };
-
-  // const totalPrice = calculateTotalPrice(data);
 
   const getSummaryAmount = totalPrice;
 

@@ -20,6 +20,9 @@ import notifee, {
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { ToastProvider } from 'react-native-toast-notifications'
+import { color } from './src/constants/color'
+import { fonts } from './src/constants/fonts'
+import FlashMessage from 'react-native-flash-message'
 
 
 const App = () => {
@@ -55,7 +58,7 @@ const App = () => {
 
 
 
-  async function onDisplayNotification(title,body) {
+  async function onDisplayNotification(title, body) {
     // Android 13+ requires explicit permission
     if (Platform.OS === 'android' && Platform.Version >= 33) {
       const granted = await PermissionsAndroid.request(
@@ -77,7 +80,7 @@ const App = () => {
     const channelId = await notifee.createChannel({
       id: 'kuwaitiClient',
       name: 'Alkuwaity Alawal',
-      
+
       importance: AndroidImportance.HIGH,
       visibility: AndroidVisibility.PUBLIC,
       vibration: true,
@@ -105,7 +108,7 @@ const App = () => {
     });
   }
 
- 
+
 
   const linking = {
     prefixes: Platform.select({
@@ -145,6 +148,15 @@ const App = () => {
         </ToastProvider>
 
       </PersistGate>
+      <FlashMessage position='top' floating={true}
+        textProps={{
+          style: {
+            color: color.white,
+            fontFamily: fonts.regular,
+
+          },
+        }}
+      />
     </Provider>
   )
 }

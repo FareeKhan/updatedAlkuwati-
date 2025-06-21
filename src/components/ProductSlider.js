@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert, Animated as Anim, Dimensions, FlatList, I18nManager, Image, Modal, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Alert, Animated as Anim, Dimensions, FlatList, I18nManager, Image, Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useRef, useState } from 'react'
 import Carousel from 'react-native-snap-carousel';
 import { color } from '../constants/color';
@@ -13,47 +13,33 @@ const { width, height } = Dimensions.get('screen')
 import ImageViewer from 'react-native-image-zoom-viewer';
 import Video from 'react-native-video';
 import YoutubePlayer from 'react-native-youtube-iframe';
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 
+const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentIndex, data, setImgUrl, item, setSelectedImage, selectedImage }) => {
+    const youtubeUrls = typeof item?.youtube_urls === 'string'
+        ? JSON.parse(item.youtube_urls || '[]')
+        : item?.youtube_urls || [];
 
-
-// const images = [{
-//     // Simplest usage.
-//     url: 'https://avatars2.githubusercontent.com/u/7970947?v=3&s=460',
-
-
-// },]
-
-
-
-const ProductSlider = ({ carouselRef, currentIndex, setCurrentIndex, data, setImgUrl, item, selectedImage }) => {
-
-    // const conCatImages = item?.youtube_urls?.concat(data?.map((item) => item?.image_url))
-    // console.log('conCatImagesconCatImagesconCatImages', conCatImages)
-const youtubeUrls = typeof item?.youtube_urls === 'string'
-  ? JSON.parse(item.youtube_urls || '[]')
-  : item?.youtube_urls || [];
-
-const conCatImages = [
-  ...(youtubeUrls.length > 0 ? youtubeUrls : []),
-  ...(data?.map((item) => item?.image_url) || [])
-];
+    const conCatImages = [
+        ...(youtubeUrls.length > 0 ? youtubeUrls : []),
+        ...(data?.map((item) => item?.image_url) || [])
+    ];
 
 
     const playerRef = useRef();
     const dispatch = useDispatch()
     const [modalVisible, setModalVisible] = useState(false);
     const [loader, setLoader] = useState(true);
+    const [smallImagesLoader, setSmallImagesLoader] = useState(true);
     const [paused, setPaused] = useState(false);
     const [playing, setPlaying] = useState(false);
 
-    const favoriteList = useSelector((state) => state?.favorite?.AddInFavorite)
-    const isFavorite = favoriteList.some(favorite => favorite.pid === item.id);
 
+    const favoriteList = useSelector((state) => state?.favorite?.AddInFavorite)
+    const isFavorite = favoriteList.some(favorite => favorite.id === item.id);
 
     const images = data?.map((item) => ({ url: item?.image_url }))
-    // const images = conCatImages?.map(url => ({ url }));
-    console.log('--->>>', images)
 
     const removeHTMLCode = (value) => {
         if (value) {
@@ -67,8 +53,11 @@ const conCatImages = [
 
     const handleSnapToItem = (index) => {
         setCurrentIndex(index)
-        setImgUrl(data[index]?.image_url);
+        // setImgUrl(data[index]?.image_url);
+        setSelectedImage(null)
     }
+
+    console.log('ssdsd===', currentIndex)
     const favoriteProduct = (item) => {
         if (isFavorite) {
             dispatch(removeFavorite({
@@ -77,7 +66,7 @@ const conCatImages = [
         } else {
             dispatch(productFavorite({
                 price: item?.price,
-                pid: item?.id,
+                id: item?.id,
                 productName: item?.name,
                 description: removeHTMLCode(item?.description),
                 // image: item?.image_url
@@ -95,27 +84,8 @@ const conCatImages = [
 
     const renderItem1 = ({ item: mediaItem, index }) => {
         const isVideo = mediaItem?.includes("youtu") || mediaItem?.endsWith(".mp4") || mediaItem?.endsWith(".mov");
-        console.log("Dasdasd", conCatImages)
         return (
             <View style={styles.renderItem1_container}>
-                {
-                    conCatImages?.length > 1 &&
-                    <TouchableOpacity
-                        style={[styles.iconCommon, styles.iconLeft]}
-                        onPress={() => {
-                            if (carouselRef.current) {
-                                const previousIndex = I18nManager.isRTL
-                                    ? index < data.length - 1 ? index + 1 : 0
-                                    : index > 0 ? index - 1 : data.length - 1;
-                                carouselRef.current.snapToItem(previousIndex);
-                            }
-                        }}
-                    >
-                        <ExportSvg.Arrow2 style={{ transform: [{ rotate: I18nManager.isRTL ? "180deg" : "0deg" }] }} />
-                    </TouchableOpacity>
-
-                }
-
                 {
                     loader &&
                     <View style={[styles.renderItem1_img, { marginBottom: 10, borderColor: "#cecece", marginRight: 5, alignItems: "center", justifyContent: "center", borderRadius: 20, position: "absolute", zIndex: 100 }]} >
@@ -143,38 +113,13 @@ const conCatImages = [
 
                         </View>
                         :
+
                         <TouchableOpacity activeOpacity={1} onPress={() => setModalVisible(true)} style={[styles.renderItem1_img]}>
                             {/* <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: item?.image_url }} style={styles.renderItem1_img} /> */}
-                            <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: mediaItem }} style={[styles.renderItem1_img]} />
+                            <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: selectedImage ? selectedImage : mediaItem }} style={[styles.renderItem1_img]} />
+                            {/* <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: mediaItem }} style={[styles.renderItem1_img]} /> */}
                         </TouchableOpacity>
                 }
-
-
-
-
-
-
-
-
-                {
-                    conCatImages?.length > 1 &&
-                    <TouchableOpacity
-                        style={[styles.iconCommon, styles.iconRight]}
-                        onPress={() => {
-                            if (carouselRef.current) {
-                                const nextIndex = I18nManager.isRTL
-                                    ? index > 0 ? index - 1 : data.length - 1 
-                                    : index < data.length - 1 ? index + 1 : 0; 
-                                carouselRef.current.snapToItem(nextIndex);
-                            }
-                            
-                        }}
-                    >
-                        <ExportSvg.Arrow1 style={{ transform: [{ rotate: I18nManager.isRTL ? "180deg" : "0deg" }] }} />
-                    </TouchableOpacity>
-
-                }
-
             </View>
         );
     };
@@ -197,40 +142,103 @@ const conCatImages = [
                     pagingEnabled={true}
                     horizontal={true}
                     useScrollView={true}
-                    // onSnapToItem={handleSnapToItem}
+                    onSnapToItem={handleSnapToItem}
                     enableMomentum={true}
-                // onSnapToItem={handleSnapToItem}
 
                 />
 
+                {
+                    conCatImages?.length > 1 &&
+                    <TouchableOpacity
+                        style={[styles.iconCommon, styles.iconLeft]}
+                        onPress={() => {
+                            if (carouselRef.current) {
+                                const previousIndex = I18nManager.isRTL
+                                    ? currentIndex < conCatImages.length - 1 ? currentIndex + 1 : 0
+                                    : currentIndex > 0 ? currentIndex - 1 : conCatImages.length - 1;
+
+                                carouselRef.current.snapToItem(previousIndex);
+                                setSelectedImage(null);
+                            }
+                        }}
+                    >
+                        <Ionicons name={'arrow-back-circle-outline'} style={{ transform: [{ rotate: I18nManager.isRTL ? "180deg" : "0deg" }] }} size={25} color={"#cecece"} />
+                    </TouchableOpacity>
+                }
 
 
+                {
+                    conCatImages?.length > 1 &&
+                    <TouchableOpacity
+                        style={[styles.iconCommon, styles.iconRight]}
+
+                        onPress={() => {
+                            if (carouselRef.current) {
+                                const nextIndex = I18nManager.isRTL
+                                    ? currentIndex > 0 ? currentIndex - 1 : conCatImages.length - 1
+                                    : currentIndex < conCatImages.length - 1 ? currentIndex + 1 : 0;
+
+                                carouselRef.current.snapToItem(nextIndex);
+                                console.log('Next Index:', nextIndex);
+                                setSelectedImage(null);
+
+                            }
+                        }}
+                    >
+                        <Ionicons name={'arrow-back-circle-outline'} style={{ transform: [{ rotate: I18nManager.isRTL ? "0deg" : "180deg" }] }} size={25} color={"#cecece"} />
+
+                    </TouchableOpacity>
+                }
+
+                {/* Favorite Icon */}
+                <TouchableOpacity onPress={() => favoriteProduct(item)} style={{ right: 15, position: "absolute", bottom: 20 }}>
+                    {
+                        isFavorite ?
+                            <ExportSvg.LoveColorFav />
+                            :
+                            <ExportSvg.LoveFav />
+                    }
+                </TouchableOpacity>
+
+                {/* Dots Style */}
+                <View style={{ flexDirection: "row", justifyContent: "center", top: -30 }}>
+                    {
+                        data?.length > 1 &&
+                        data?.map((item, index) => {
+                            return (
+                                <View key={index} style={{ marginRight: 10 }}>
+                                    <View style={{ width: currentIndex == index ? 20 : 7, height: 7, backgroundColor: currentIndex == index ? color.theme : '#CCCCCC', borderRadius: 50 }} />
+                                </View >
+
+                            )
+                        })
+                    }
+                </View>
             </View>
 
-
-
-            <View style={{ flexDirection: "row", justifyContent: "center", top: -30 }}>
-                {
-                    data?.length > 1 &&
-                    data?.map((item, index) => {
-                        return (
-                            <View key={index} style={{ marginRight: 10 }}>
-                                <View style={{ width: currentIndex == index ? 20 : 7, height: 7, backgroundColor: currentIndex == index ? color.theme : '#CCCCCC', borderRadius: 50 }} />
-                            </View >
-
-                        )
-                    })
-                }
-            </View>
-
-            <TouchableOpacity onPress={() => favoriteProduct(item)} style={{ right: 15, position: "absolute", bottom: 20 }}>
-                {
-                    isFavorite ?
-                        <ExportSvg.LoveColorFav />
-                        :
-                        <ExportSvg.LoveFav />
-                }
-            </TouchableOpacity>
+            {
+                conCatImages?.length > 0 &&
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }} >
+                    {
+                        conCatImages?.map((item, index) => {
+                            return (
+                                <TouchableOpacity onPress={() => {
+                                    setSelectedImage(item),
+                                        carouselRef.current?.snapToItem(index);
+                                }} style={{ alignItems: "center", justifyContent: "center", marginBottom: 10, gap: 10, width: 70, height: 70, backgroundColor: "#cecece", borderRadius: 10 }}>
+                                    {/* <Image borderRadius={10} onLoadEnd={() => setSmallImagesLoader(false)} source={{ uri: item?.image }} style={[{ width: 70, height: 70, gap: 10, }, selectedImage == item?.image && { borderWidth: 1, borderColor: color.theme }]} /> */}
+                                    <Image borderRadius={10} onLoadEnd={() => setSmallImagesLoader(false)} source={{ uri: item }} style={[{ width: 70, height: 70, gap: 10, }, currentIndex == index && { borderWidth: 1, borderColor: color.theme }]} />
+                                    {
+                                        smallImagesLoader && <View style={{ position: "absolute" }}>
+                                            <ActivityIndicator size={'small'} color={color.theme} />
+                                        </View>
+                                    }
+                                </TouchableOpacity>
+                            )
+                        })
+                    }
+                </ScrollView>
+            }
 
 
             <Modal
@@ -258,44 +266,32 @@ const conCatImages = [
 export default ProductSlider
 
 const styles = StyleSheet.create({
-
-
     renderItem1_container: {
-        flex: 1
+        flex: 1,
     },
-
-
     renderItem1_img: {
         width: Dimensions.get('screen').width,
         height: Dimensions.get('screen').height / 2 - 20,
     },
-
     carouselContainer: {
         alignItems: "center",
-        // padding: 20,
-        marginVertical: 10
+        marginTop: 10
     },
 
     iconLeft: {
-        left: -15,
-
+        left: -30,
     },
     iconRight: {
-        right: -15,
+        right: -30,
     },
     iconCommon: {
         position: 'absolute',
-        top: '42%',
+        top: '40%',
         transform: [{ translateY: -12 }],
         padding: 20,
         paddingHorizontal: 30,
         zIndex: 1,
-
     },
-
-
-
-
     centeredView: {
         flex: 1,
         justifyContent: 'center',
@@ -334,9 +330,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     video: {
-        // height: '100%',
-        // width: '100%',
-
         width: Dimensions.get('screen').width,
         height: Dimensions.get('screen').height / 3,
     },

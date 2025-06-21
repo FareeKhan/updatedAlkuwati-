@@ -41,7 +41,7 @@ const HeaderBox = ({ isDrawer, catName, share, onPressShare, cartIcon, bagIcon,s
 
             {
                 catName ?
-                    <Text style={{ color: color.theme, fontSize: 15, fontFamily: "500" }}>{catName}</Text>
+                    <Text style={{ color: color.theme, fontSize: 15, fontFamily: "500" }} >{catName?.length > 30 ? catName?.slice(0,30)+'...' : catName}</Text>
                     :
                     <HeaderLogo />
             }

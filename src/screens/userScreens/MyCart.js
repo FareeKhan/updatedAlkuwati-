@@ -32,23 +32,15 @@ import { useTranslation } from 'react-i18next';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HeaderBox from '../../components/HeaderBox';
+import SmallImageLoader from '../../components/SmallImageLoader';
 
 
 const MyCart = ({ navigation }) => {
   const dispatch = useDispatch();
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const { t } = useTranslation();
-  const {totalPrice} =useSelector(state => state.cartProducts);
+  const { totalPrice } = useSelector(state => state.cartProducts);
 
-  // const calculateTotalPrice = items => {
-  //   return items
-  //     .reduce((total, item) => {
-  //       return total + item.counter * parseFloat(item.price);
-  //     }, 0)
-  //     .toFixed(2);
-  // };
-
-  // const totalPrice = calculateTotalPrice(data);
 
   const incrementProduct = id => {
     dispatch(incrementCounter(id));
@@ -65,24 +57,20 @@ const MyCart = ({ navigation }) => {
   const renderItem = ({ item, index }) => {
     return (
       <View style={styles.productContainer}>
-        <View style={{ width: "25%" }}>
-          <Image
-            borderRadius={5}
-            source={{ uri: item?.image }}
-            style={{ width: 80, height: 80 }}
-          />
-        </View>
-
+      
+<SmallImageLoader
+imagePath={item?.image}
+/>
         <View style={{ marginLeft: 10, width: "40%" }}>
           <Text style={styles.productTitle}>{item?.productName}</Text>
           <Text style={styles.subTitle}>{item?.subText}</Text>
           {/* <Text style={styles.productPrice}>KD{item?.price?.toFixed(2)}</Text> */}
-          <Text style={styles.productPrice}>KD{item?.price}</Text>
+          <Text style={styles.productPrice}>KD {item?.price}</Text>
         </View>
 
         <View style={styles.counterMainContainer}>
           <TouchableOpacity
-            style={{height:25,width:25,alignItems:"center",justifyContent:"center"}}
+            style={{ height: 25, width: 25, alignItems: "center", justifyContent: "center" }}
             onPress={() => productDelete(item?.id)}>
             <ExportSvg.deletes />
           </TouchableOpacity>
@@ -128,9 +116,9 @@ const MyCart = ({ navigation }) => {
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <View style={styles.mainContainer}>
-      <HeaderBox
-        bagIcon={true}
-      />
+        <HeaderBox
+          bagIcon={true}
+        />
         {/* <View style={styles.headerContainer}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons
@@ -161,7 +149,7 @@ const MyCart = ({ navigation }) => {
             flexGrow: 1,
             marginBottom: 60,
             marginTop: 10,
-            paddingBottom:data?.length>=3 ? 100 :20
+            paddingBottom: data?.length >= 3 ? 100 : 20
           }}>
           <View>
             <FlatList
@@ -278,7 +266,7 @@ const styles = StyleSheet.create({
   },
   counterMainContainer: {
     marginLeft: 'auto',
-    alignItems:"flex-end",
+    alignItems: "flex-end",
     alignSelf: 'center',
     gap: 20,
     width: '30%',

@@ -159,7 +159,8 @@
      "outOfStock":"Out of Stock",
      "confirm":"Confirm",
      "loading":"Loading",
-     "reels":"Reels",
+    //  "reels":"Reels",
+     "reels":"Videos",
      "MoreInfo":"Order Now",
 
 

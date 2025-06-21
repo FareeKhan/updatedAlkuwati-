@@ -30,6 +30,7 @@ import { useNavigation } from '@react-navigation/native';
 import SavedAddresses from '../screens/userScreens/SavedAddresses';
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import VideoScreen from '../screens/userScreens/VideoScreen';
+import { fonts } from '../constants/fonts';
 
 const Tab = createBottomTabNavigator();
 
@@ -257,6 +258,7 @@ const styles = StyleSheet.create({
         paddingRight: 10,
         color: "#000",
         width: 70,
-        fontSize: 12
+        fontSize: 12,
+        fontFamily:fonts.medium
     }
 })

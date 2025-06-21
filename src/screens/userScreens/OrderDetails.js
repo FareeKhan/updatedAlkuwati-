@@ -1,4 +1,4 @@
-import {  Alert, FlatList, I18nManager, Image, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import {  Alert, FlatList, I18nManager, Image, Platform, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useState } from 'react'
 import { color } from '../../constants/color'
 import { useDispatch, useSelector } from 'react-redux'
@@ -11,6 +11,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import CustomText from '../../components/CustomText'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import CircleLoader from '../../components/CircleLoader'
+import Text from '../../components/CustomText'
+import { fonts } from '../../constants/fonts'
+import { showMessage } from 'react-native-flash-message'
 const OrderDetails = ({ navigation, route }) => {
     //const { totalPrice } = route?.params
     const dispatch = useDispatch()
@@ -38,9 +41,10 @@ const OrderDetails = ({ navigation, route }) => {
 
     const applyCode = async () => {
         if (!promoCode) {
-            Alert.alert('', t('PleasePromo'), [
-                { text: t('ok'), onPress: () => console.log('OK pressed') }
-            ]);
+            showMessage({
+                type:"danger",
+                message:t('PleasePromo')
+            })
             return;
         }
         setPromoLoader(true)
@@ -131,17 +135,16 @@ const OrderDetails = ({ navigation, route }) => {
 
 
     const renderItem = ({ item, index }) => {
-        console.log('----', item)
         return (
             <View style={styles.productContainer}>
                 <Image borderRadius={5} source={{ uri: item?.image }} style={{ width: 60, height: 60 }} />
 
-                <View style={{ marginLeft: 10, }}>
-                    <Text style={{ ...styles.productTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>{item?.productName}</Text>
+                <View style={{ marginLeft: 10, width:"80%"}}>
+                    <Text numberOfLines={1} style={{ ...styles.productTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>{item?.productName}</Text>
                     <Text style={{ ...styles.subTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>{item?.subText}</Text>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }} >
-                        <Text style={{ ...styles.productPrice, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>{item?.price}</Text>
-                        <CustomText style={{ color: color.theme, fontWeight: '500' }}>{item?.counter}x</CustomText>
+                        <Text style={{ ...styles.productPrice, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>KD {item?.price}</Text>
+                        <CustomText style={{ color: color.theme, fontWeight: '500' }}>x{item?.counter}</CustomText>
                     </View>
                 </View>
             </View>
@@ -153,29 +156,8 @@ const OrderDetails = ({ navigation, route }) => {
         navigation.navigate("ShippingAddress",{
             isMap:true
         })
-        // if (userId) {
-        //     navigation.navigate("ShippingAddress")
-        // } else {
-        //     Alert.alert(
-        //         t(''),
-        //         t('addressSaved'),
-        //         [
-        //             {
-        //                 text: t('ok'), onPress: () => navigation.navigate('StackNavigations', {
-        //                     screen: "Login",
-        //                     params: { isOrderDetail: true }
-        //                 }
-        //                 )
-        //             }
-        //         ],
-        //         {
-        //             textAlign: I18nManager.isRTL ? 'right' : 'left'  // Align title based on language direction
-        //         }
-        //     );
-        // }
 
     }
-    console.log('shumaila', address?.length)
 
     return (
         <View style={styles.mainContainer}>
@@ -205,7 +187,7 @@ const OrderDetails = ({ navigation, route }) => {
                             <View style={styles.addCardPlusBox}>
                                 <Text style={styles.plusIcon}>+</Text>
                             </View>
-                            <Text style={{ fontSize: 16, fontFamily: "Montserrat-Medium", color: color.theme }}>{t('add_delivery_address')}</Text>
+                            <Text style={{ fontSize: 16,  color: color.theme }}>{t('add_delivery_address')}</Text>
                         </TouchableOpacity>
                         :
                         <View>
@@ -242,7 +224,7 @@ const OrderDetails = ({ navigation, route }) => {
                         <TextInput
                             placeholder={t('enderPromo')}
                             placeholderTextColor={'#cecece'}
-                            style={{ color: "#000", textAlign: I18nManager.isRTL ? 'right' : 'left', height: 38 ,width:"85%"}}
+                            style={{ fontFamily:fonts.semiBold,color: "#000", textAlign: I18nManager.isRTL ? 'right' : 'left', height: 38 ,width:"85%"}}
                             value={promoCode}
                             onChangeText={setPromoCode}
                             maxLength={8}
@@ -275,12 +257,10 @@ const OrderDetails = ({ navigation, route }) => {
                             <Text style={styles.bottomPrice}>KD{totalPrice}</Text>
                         </View>
 
-                        {
                             <TouchableOpacity
                                 style={{ ...styles.bottomPlaceOrderBox, backgroundColor:  color.theme  }} onPress={handleOnPress}>
                                 <Text style={styles.orderTxt}>{t("continue")}</Text>
                             </TouchableOpacity>
-                        }
                     </View>
                 </View>
             </ScrollView>
@@ -316,7 +296,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "600",
         color: color.theme,
-        fontFamily: "Montserrat-Bold",
+        fontFamily: "Cairo-Medium",
         textAlign: "left"
 
     },
@@ -352,7 +332,6 @@ const styles = StyleSheet.create({
     value: {
         color: color.grayShade,
         fontWeight: "400",
-        fontFamily: "Montserrat-Regular",
         textAlign: 'left',
 
 
@@ -383,12 +362,11 @@ const styles = StyleSheet.create({
     },
     productTitle: {
         color: color.theme,
-        fontFamily: "Montserrat-SemiBold"
+        fontFamily: "Cairo-SemiBold"
     },
     subTitle: {
         fontWeight: '400',
         color: color.gray,
-        fontFamily: "Montserrat-Regular",
         fontSize: 12,
         marginVertical: Platform.OS == 'ios' ? 2 : 1
 
@@ -396,7 +374,7 @@ const styles = StyleSheet.create({
     productPrice: {
         fontWeight: "600",
         color: color.theme,
-        fontFamily: "Montserrat-SemiBold"
+        fontFamily: "Cairo-SemiBold"
 
 
     },
@@ -433,7 +411,7 @@ const styles = StyleSheet.create({
     },
     orderTxt: {
         fontSize: 16,
-        fontFamily: "Montserrat-SemiBold",
+        fontFamily: fonts.semiBold,
         color: "#fff",
         fontWeight: "600"
     },

@@ -25,10 +25,10 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const favoriteList = useSelector((state) => state?.favorite?.AddInFavorite)
 
-  const isCheck = data?.some((value) => value?.id == item?.pid)
+  const isCheck = data?.some((value) => value?.id == item?.id)
 
 
-  const isFavorite = favoriteList.some(favorite => favorite.pid === item.pid);
+  const isFavorite = favoriteList.some(favorite => favorite.id === item.id);
 
   const animation = 'fadeInUp';
   const durationInner = 1000;
@@ -40,19 +40,12 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
 
     if (isFavorite) {
       dispatch(removeFavorite({
-        id: item?.pid
+        id: item?.id
       }))
       ReactNativeHapticFeedback.trigger('impactLight');
     } else {
       ReactNativeHapticFeedback.trigger('notificationError');
-      dispatch(productFavorite({
-        price: item?.price,
-        pid: item?.pid,
-        productName: item?.name,
-        description: removeHTMLCode(item?.description),
-        image: item?.image
-
-      }))
+      dispatch(productFavorite(item))
     }
 }
 
@@ -80,7 +73,7 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
   const getProductDetail = async () => {
 
     try {
-      const response = await productDetails(item?.pid);
+      const response = await productDetails(item?.id);
       if (response?.status) {
         setIsColor(response?.color_variants?.length > 0)
         setIsSize(response?.size_variants?.length > 0)
@@ -117,7 +110,7 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
         }).start(() => {
           dispatch(
             addProductToCart({
-              id: item?.pid,
+              id: item?.id,
               productName: item?.name,
               price: item?.price,
               size: 'M',
@@ -143,7 +136,7 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
     // end
     // dispatch(
     //   addProductToCart({
-    //     id: item?.pid,
+    //     id: item?.id,
     //     productName: item?.name,
     //     price: item?.price,
     //     size: 'M',
@@ -157,6 +150,7 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
     // ReactNativeHapticFeedback.trigger('impactLight');
   };
 
+  console.log('itemitemitem')
 
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],

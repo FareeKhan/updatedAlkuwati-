@@ -29,6 +29,7 @@ import {
   categoriesListSub,
   dummyCategories,
   getFeaturedData,
+  newArrivalsData,
 } from '../../services/UserServices';
 import Text from '../../components/CustomText'
 
@@ -50,6 +51,7 @@ import { useSelector } from 'react-redux';
 import HeaderBox from '../../components/HeaderBox';
 import LottieView from "lottie-react-native";
 import SliderDots from '../../components/SliderDots';
+import { fonts } from '../../constants/fonts';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -100,45 +102,10 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     discountHomeBanner();
     funCategories();
-    getSettingOptionShow();
+    // getSettingOptionShow();
     GetFeatured();
+    getNewArrivals();
   }, []);
-
-  const getSettingOptionShow = async () => {
-    setLoader(true);
-    try {
-      const result = await getSettingOption();
-      if (result?.status) {
-        // setSetting(result?.data);
-        let categories = result?.data?.filter((item) => item.name === 'home_category');
-        setArrivalCategories(categories);
-
-        categories?.map((item) => {
-          console.log(item.value);
-          getNewArrivals(item.value);
-        });
-
-        // getNewArrivals(result?.data[20].value);
-        // getNewArrivals(result?.data[21].value);
-        // getNewArrivals(result?.data[22].value);
-        // setOption(result?.data);
-      }
-      // if (result?.status) {
-      //   setLoader(false);
-      //   getNewArrivals(result?.data[20].value);
-      //   getNewArrivalsTwo(result?.data[21].value);
-      //   getNewArrivalsThree(result?.data[22].value);
-      //   setOption(result?.data);
-      // }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-
-
-
-
 
 
 
@@ -147,7 +114,7 @@ const HomeScreen = ({ navigation }) => {
     setLoader(true);
     try {
       const result = await categoriesListSubTwoCategory();
-
+      console.log('=cata==', result?.data)
       if (result?.status) {
         setLoader(false);
         setCategoies(result?.data);
@@ -182,12 +149,9 @@ const HomeScreen = ({ navigation }) => {
   const getNewArrivals = async name => {
 
     try {
-      const result = await newArrivals(name);
-      if (result?.status) {
-        // setIsLoader(false);
-        // setArrivalData(result?.data);
-        setArrivalData(prev => [...prev, result?.data]);
-        // setOptionNameOne(name);
+      const result = await newArrivalsData();
+      if (result?.status == 'success') {
+        setArrivalData(result?.data);
       } else {
         setIsLoader(false);
       }
@@ -233,10 +197,7 @@ const HomeScreen = ({ navigation }) => {
   }, [secBanners]);
 
 
-
-
   const renderItem = ({ item, index }) => {
-
     return (
       <Animatable.View
         animation={animationMain}
@@ -273,10 +234,33 @@ const HomeScreen = ({ navigation }) => {
 
   const renderArrivalItem = ({ item, index }) => {
     return (
-      <SingleProductCard
-        item={item}
-        onPress={() => navigation.navigate('ProductDetails', { id: item?.id })}
-      />
+      <View>
+        <View style={styles.arrivalBox}>
+          <Text style={styles.arrivalTxt}>{item?.category?.name}</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('SameProduct', {
+              selected: item?.category?.name,
+              subC_ID: item?.category?.id
+            })}>
+            <Text style={styles.viewTxt}>{t('view_all')}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {
+            item?.category?.products?.map((innerItem, index) => {
+              return (
+                <SingleProductCard
+                  item={innerItem}
+                  onPress={() => navigation.navigate('ProductDetails', { id: innerItem?.id })}
+                />
+              )
+            })
+          }
+        </ScrollView>
+
+      </View>
+
     );
   };
 
@@ -307,14 +291,10 @@ const HomeScreen = ({ navigation }) => {
             borderRadius={10}></ImageBackground>
           <Text
             style={{
-              fontSize: 10,
+              fontSize: 12,
               marginTop: 5,
               textAlign: 'center',
-              height: 40,
-              paddingHorizontal: 0,
-              flexWrap: 'wrap',
-              flexShrink: 1,
-              color: "#000"
+
             }}>
             {item?.name}
           </Text>
@@ -467,8 +447,6 @@ const HomeScreen = ({ navigation }) => {
           renderItem={renderItemNewList}
           columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 15 }}
           numColumns={2}
-
-
         />
 
         <SliderDots
@@ -476,7 +454,7 @@ const HomeScreen = ({ navigation }) => {
           imageHeights={imageHeights}
         />
 
-        {
+        {/* {
           arrivalCategories?.map((item, index) => {
             return (
               <>
@@ -507,53 +485,27 @@ const HomeScreen = ({ navigation }) => {
                     snapToAlignment="start"
                     decelerationRate="fast"
                   />
-
-
-                  {/* <View style={{ marginHorizontal: -15 }}>
-                    <FlatList
-                      horizontal
-                      data={secBanners}
-                      renderItem={renderListBanner}
-                      keyExtractor={(item, index) => index?.toString()}
-                      showsHorizontalScrollIndicator={false}
-                      pagingEnabled
-                      // snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-                      snapToAlignment="start"
-                      decelerationRate="fast"
-                    />
-                  </View> */}
-
-
-                  {/* <SliderDots
-                    data={secBanners}
-                    imageHeights={imageHeights}
-                  /> */}
-
-
-
-
-
-                  {/* {secBanners?.map((banner) => {
-                    const bannerHeight = imageHeights[banner.id] || 100;
-                    return (
-                      banner.show_after_section_number === (index) && (
-                        <TouchableOpacity onPress={() => {
-                          navigation.navigate('SameProduct', {
-                            text: banner?.link_category,
-                            subC_ID: banner?.id,
-                          });
-                        }} >
-                          <Image source={{ uri: banner.image }} borderRadius={10} style={{ width: "100%", height: bannerHeight, marginVertical: 15 }} />
-                        </TouchableOpacity>
-                      )
-                    )
-                  })} */}
                 </View>
               </>
             )
           })
-        }
+        } */}
 
+
+
+        <View style={{ flex: 1 }}>
+          <FlatList
+            horizontal
+            data={arrivalData}
+            keyExtractor={(item, index) => index?.toString()}
+            renderItem={renderArrivalItem}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
+            snapToAlignment="start"
+            decelerationRate="fast"
+          />
+        </View>
 
 
       </ScrollView>
@@ -647,6 +599,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 0,
     marginBottom: 10,
+    width: "100%"
   },
   arrivalTxt: {
     fontSize: 18,

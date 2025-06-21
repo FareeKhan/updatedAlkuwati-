@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { Dropdown } from 'react-native-element-dropdown';
 import CustomText from './CustomText';
 import { color } from '../constants/color';
+import { fonts } from '../constants/fonts';
 
 const CustomDropDown = ({ data, setValue, value, placeholder, title, dropTitle, maxHeight }) => {
 
@@ -106,7 +107,8 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color:color.black,
         textAlign: 'left',
-        paddingLeft:5
+        paddingLeft:5,
+        fontFamily:fonts.regular
     },
     iconStyle: {
         width: 20,

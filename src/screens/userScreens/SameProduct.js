@@ -4,7 +4,7 @@ import {
   LogBox,
   Platform,
   StyleSheet,
-  Text,
+
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -15,6 +15,7 @@ import { getSameProduct } from '../../services/UserServices';
 import ScreenLoader from '../../components/ScreenLoader';
 import SingleProductCard from '../../components/SingleProductCard';
 import axios from 'axios';
+import Text from '../../components/CustomText'
 
 
 
@@ -43,8 +44,8 @@ const SameProduct = ({ navigation, route }) => {
   const [storeData, setStoreData] = useState();
   const [isLoader, setIsLoader] = useState(false);
   const [productLoader, setProductLoader] = useState(false);
-  const [selectedCat, setSelectedCat] = useState();
-  const [storeCategories, setStoreCategories] = useState();
+  const [selectedCat, setSelectedCat] = useState('');
+  const [storeCategories, setStoreCategories] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
   const { t } = useTranslation();
 
@@ -62,13 +63,10 @@ const SameProduct = ({ navigation, route }) => {
     setIsLoader(true);
     try {
       const response = await categoriesListSub(subC_ID);
-      console.log('---->>>',response,subC_ID)
       if (response?.status) {
         setIsLoader(false);
-        if (response?.data) {
-          funCategories(selected ? selected : response?.data[0].name);
-        }
         setStoreCategories(response?.data);
+        setSelectedCat(response?.data?.subcategories[0]?.id)
       }else{
       setIsLoader(false);
 
@@ -79,76 +77,7 @@ const SameProduct = ({ navigation, route }) => {
     }
   };
 
-  const [categoriesData, setCategoriesData] = useState({});
 
-  const getcategoriesProduct = async value => {
-    if (categoriesData[value]) {
-      setStoreData(categoriesData[value]);
-      return;
-    }
-
-    setProductLoader(true)
-    try {
-      const response = await fetchCategoryProducts(value);
-      // const response = await fetchCategoryProducts(firstName[0]);
-      if (response?.status) {
-        setProductLoader(false);
-        setStoreData(response?.data);
-
-        setCategoriesData(prev => ({
-          ...prev,
-          [value]: response?.data,
-        }));
-      } else {
-        setProductLoader(false);
-      }
-    } catch (error) {
-      setProductLoader(false);
-      console.log(error);
-    } finally {
-      setProductLoader(false)
-    }
-  };
-
-  const funCategories = val => {
-    console.log('ooobhaikyahsow',val)
-    getcategoriesProduct(val);
-    setSelectedCat(val);
-  };
-  useEffect(()=>{
-    checkCatData()
-  },[])
-
-
-  const checkCatData = async ()=> {
-    try {
-      const allResponses = await Promise.all(
-        storeCategories.map((item) => fetchCategoryProducts(item?.name)) // assuming item has an 'id'
-      );
-      setAllProducts(allResponses)
-
-      console.log('isHello',allResponses)
-    } catch (error) {
-
-    }
-
-  };
-
-
-  const isCheckRelatedPRoduct = (value)=>{
-    console.log('shumaila',value)
-    try {
-     const result = allProducts?.filter((item)=>item?.categories == value)
-     console.log('dsds',result[0]?.data)
-    //  setStoreData()
-    } catch (error) {
-      
-    }
-  }
-
-  useEffect(() => {
-    selected && funCategories(selected);
-  }, [selected]);
 
   const renderItem = ({ item, index }) => {
     return (
@@ -159,17 +88,17 @@ const SameProduct = ({ navigation, route }) => {
           isShowPlusIcon={true}
           onPress={() => navigation.navigate('ProductDetails', {
             id: item?.id,
-            selectedCat: selectedCat
-
+            selectedCat: item?.name
           })}
         />
       </>
     );
   };
 
-  // if (isLoader) {
-  //   return <ScreenLoader />;
-  // }
+
+  if (isLoader) {
+    return <ScreenLoader />;
+  }
 
 
   return (
@@ -197,34 +126,34 @@ const SameProduct = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.arrivalTxt}>{text}</Text>
+        <Text style={styles.arrivalTxt}>{storeCategories?.category?.name}</Text>
 
         <View style={styles.catBox}>
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            data={storeCategories}
-            renderItem={(item, index) => {
+            data={storeCategories?.subcategories}
+            renderItem={({item, index}) => {
               return (
                 <Animatable.View
                   animation={animationMain}
                   duration={durationInner}
                   delay={(1 + index) * delayInner}>
                   <TouchableOpacity
-                    onPress={() => funCategories(item.item.name)}
+                    onPress={() =>setSelectedCat(item?.id) }
                     key={index}
                     style={[
                       styles.innerCatBox,
-                      selectedCat == item.item.name && {
+                      selectedCat == item?.id && {
                         backgroundColor: color.theme,
                       },
                     ]}>
                     <Text
                       style={[
                         styles.catTxt,
-                        selectedCat == item.item.name && { color: '#fff' },
+                        selectedCat == item?.id && { color: '#fff' },
                       ]}>
-                      {item.item.name}
+                      {item?.name}
                     </Text>
                   </TouchableOpacity>
                 </Animatable.View>
@@ -241,7 +170,7 @@ const SameProduct = ({ navigation, route }) => {
             </View>
             :
             <FlatList
-              data={storeData}
+              data={storeCategories?.products}
               // keyExtractor={(item, index) => index?.toString()}
               renderItem={renderItem}
               keyExtractor={(item, index) => selectedCat + "_" + index}
@@ -416,8 +345,6 @@ const styles = StyleSheet.create({
   },
   catTxt: {
     color: color.theme,
-    fontFamily: 'Montserrat-SemiBold',
-    // fontWeight: "500"
   },
 
   imgTitle: {

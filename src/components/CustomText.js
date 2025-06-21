@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { color } from '../constants/color'
+import { fonts } from '../constants/fonts'
 
 
 
@@ -14,9 +15,8 @@ export default CustomText
 
 const styles = StyleSheet.create({
     txtStyle:{
-        // fontFamily:fonts.regular,
         color:color.black,
-        textAlign:"left"
-        
+        textAlign:"left",
+        fontFamily:fonts.regular
     }
 })

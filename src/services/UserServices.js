@@ -173,7 +173,6 @@ export const addShippingAddress = async (address,userID) => {
                 "user_id": userID,
                 "full_name": address?.fullName,
                 "phone": address?.phone,
-                "address":address?.address,
                 "emirates": 'emirates'
             })
         });
@@ -244,7 +243,7 @@ export const postPromoCoder = async (value) => {
 
 
 export const orderConfirmed = async (productNo, address, totalPrice, data, email, userID, token_obj) => {
-    //console.log('cccccc',productNo,address,totalPrice,data,userID,token_obj)
+    console.log('cccccc',userID)
     const orderDetails = data?.map((item, index) => ({
         "id": item?.id,
         "image": item?.image,
@@ -380,6 +379,45 @@ export const dummyCategories = async (id) => {
 export const getReels = async (id) => {
     try {
         const response = await fetch(`${baseUrl}/get-reels`, {
+
+        // const response = await fetch(`http://192.168.70.206:8000/api/get-reels`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+        });
+        const result = await response.json();
+        return result;
+
+    } catch (e) {
+        console.log('oo', e)
+    }
+};
+
+
+export const newArrivalsData = async (id) => {
+    try {
+        const response = await fetch(`${baseUrl}/sections`, {
+
+        // const response = await fetch(`http://192.168.70.206:8000/api/get-reels`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+        });
+        const result = await response.json();
+        return result;
+
+    } catch (e) {
+        console.log('oo', e)
+    }
+};
+
+export const fetchArrivalProducts = async (id) => {
+    try {
+        const response = await fetch(`${baseUrl}/sections`, {
 
         // const response = await fetch(`http://192.168.70.206:8000/api/get-reels`, {
             method: 'GET',
@@ -580,9 +618,28 @@ export const categoriesListSubTwoCategory = async () => {
     }
 };
 
+// export const categoriesListSub = async (id) => {
+//     try {
+//         const response = await fetch(`${baseUrl}/getCategories/sub/${id}`, {
+//             method: 'GET',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 Accept: 'application/json',
+//             },
+//         });
+
+//         const result = await response.json();
+//         return result;
+
+//     } catch (e) {
+//         console.log('oo', e)
+//     }
+// };
+
+
 export const categoriesListSub = async (id) => {
     try {
-        const response = await fetch(`${baseUrl}/getCategories/sub/${id}`, {
+        const response = await fetch(`${baseUrl}/category/${id}/products`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -597,7 +654,6 @@ export const categoriesListSub = async (id) => {
         console.log('oo', e)
     }
 };
-
 
 export const getSettingOption = async () => {
     try {

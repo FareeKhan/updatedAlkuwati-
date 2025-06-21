@@ -6,7 +6,7 @@ import {
   Linking,
   ScrollView,
   StyleSheet,
-  Text,
+
   TouchableOpacity,
   View,
   ActivityIndicator,
@@ -26,6 +26,7 @@ import RNRestart from "react-native-restart";
 import { loginData, changeLanguage } from "../../redux/reducer/Auth";
 import { getOrder } from "../../services/UserServices";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Text from '../../components/CustomText'
 
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Fontisto from "react-native-vector-icons/Fontisto";
@@ -610,12 +611,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   navigationTxt: {
-    fontFamily: "Montserrat-SemiBold",
     color: color.theme,
     marginLeft: 10,
   },
   navigationTxtss: {
-    fontFamily: "Montserrat-SemiBold",
     color: color.theme,
     marginLeft: 0,
   },

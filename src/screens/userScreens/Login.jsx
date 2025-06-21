@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View, TextInput, I18nManager, Alert } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, TextInput, I18nManager, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Screen from './Screen'
 import {
@@ -17,6 +17,8 @@ import { baseUrl, OTP_URL } from '../../constants/data';
 import HeaderLogo from '../../components/HeaderLogo'
 import { loginData } from '../../redux/reducer/Auth';
 import CustomDropDown from '../../components/CustomDropDown';
+import Text from '../../components/CustomText'
+import { showMessage } from 'react-native-flash-message';
 
 
 
@@ -263,14 +265,21 @@ const Login = ({ navigation, route }) => {
         } else if (value == 1234) {
             getFunLogin({ phone: phoneNo });
         } else {
-            alert(t('CodeIncorrect'))
+             showMessage({
+                type:"danger",
+                message:t('CodeIncorrect')
+            })
         }
     }
 
     const onPressSend = () => {
         if (phoneNo.length <= 7) {
-            Alert.alert(t('error'), t('inCorrectNo'))
+            showMessage({
+                type:"danger",
+                message:t('inCorrectNo')
+            })
             return
+
         }
 
         let updatedPhoneNumber = phoneNo[0] === '0' ? phoneNo.slice(1) : phoneNo;
@@ -456,7 +465,6 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 18,
-        fontFamily: "OpenSans-Bold",
         marginBottom: 10,
         textAlign: "center",
         marginTop: 90,
@@ -472,7 +480,6 @@ const styles = StyleSheet.create({
     subTitle: {
         fontSize: 13,
         color: "grey",
-        fontFamily: "OpenSans-Regular",
         textAlign: "center"
 
     },
@@ -511,7 +518,6 @@ const styles = StyleSheet.create({
 
     orderTxt: {
         fontSize: 16,
-        fontFamily: "Montserrat-SemiBold",
         color: "#fff",
         fontWeight: "600"
     },

@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { color } from '../constants/color'
 import { discount } from '../constants/data'
+import { fonts } from '../constants/fonts'
 
 const CustomButton = ({title,onPress,style,disabled}) => {
   return (
@@ -24,6 +25,7 @@ const styles = StyleSheet.create({
   innerBtn: {
     color: "#fff",
     fontWeight: "600",
-    fontSize: 17
+    fontSize: 17,
+    fontFamily:fonts.regular
   }
 })

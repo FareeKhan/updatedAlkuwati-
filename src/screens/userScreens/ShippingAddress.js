@@ -4,7 +4,7 @@ import {
   ScrollView,
   TextInput,
   StyleSheet,
-  Text,
+
   TouchableOpacity,
   View,
   I18nManager,
@@ -37,6 +37,9 @@ const { height } = Dimensions.get('screen')
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6'
 import { CountriesData, governorateData } from '../../constants/data';
 import HeaderBox from '../../components/HeaderBox';
+import Text from '../../components/CustomText'
+import { fonts } from '../../constants/fonts';
+import { showMessage } from 'react-native-flash-message';
 
 const ShippingAddress = ({ navigation, route }) => {
   const { id, btnText, isMap } = route.params ?? '';
@@ -131,6 +134,12 @@ const ShippingAddress = ({ navigation, route }) => {
       );
     } else {
       Alert.alert(t('PleaseAllow'));
+      showMessage({
+        type: "warning",
+        message: t('PleaseAllow')
+      })
+
+
     }
   };
 
@@ -173,17 +182,28 @@ const ShippingAddress = ({ navigation, route }) => {
   const saveAddress = () => {
 
     if (!isMapOpened) {
-      alert(t('selectLocation'))
+      showMessage({
+        type: "danger",
+        message: t('selectLocation')
+      })
       return
     }
 
     if (phoneNumber?.length < 8) {
-      Alert.alert(t('fillNo'));
+
+      showMessage({
+        type: "danger",
+        message: t('fillNo')
+      })
       return;
     }
 
     if (!fullName || !villa || !city || !area || !country) {
-      Alert.alert(t('fillAll'));
+
+      showMessage({
+        type: "danger",
+        message: t('fillAll')
+      })
       return;
     }
 
@@ -228,7 +248,6 @@ const ShippingAddress = ({ navigation, route }) => {
 
   const handlePress = async () => {
     // console.log(phoneNumber?.slice(1),'phoneNumber')
-    console.log('trending');
     if (
       fullName == '' ||
       piece == '' ||
@@ -237,12 +256,12 @@ const ShippingAddress = ({ navigation, route }) => {
       area == '' ||
       country == ''
     ) {
-      alert(t('fillAll'));
+      alert(t('filldasdAlssl'));
       return;
     }
     setIsLoader(true);
     try {
-      if (phoneNumber.length == 8) {
+  
         let updatedPhoneNumber =
           phoneNumber[0] === '0' ? phoneNumber.slice(1) : phoneNumber;
         updatedPhoneNumber = countryCodes + updatedPhoneNumber;
@@ -264,8 +283,6 @@ const ShippingAddress = ({ navigation, route }) => {
           : addShippingAddress(addressredux, userId));
 
 
-        console.log('heyareryou', response)
-
         if (response?.data) {
           dispatch(
             storeUserAddress({
@@ -276,74 +293,24 @@ const ShippingAddress = ({ navigation, route }) => {
           setIsLoader(false);
           Alert.alert(
             t(''),
-            t('addressSaved'),
+            t('addressSavssed'),
             [{ text: t('ok'), onPress: () => navigation.goBack() }],
             {
               textAlign: I18nManager.isRTL ? 'right' : 'left', // Align title based on language direction
             },
           );
-        } else {
-          console.log('sss', response);
-        }
-
-        // Alert.alert(
-        //   t(''),
-        //   t('addressSaved'),
-        //   [
-        //     { text: t('ok'), onPress: () => navigation.goBack() }
-        //   ],
-        //   {
-        //     textAlign: I18nManager.isRTL ? 'right' : 'left'  // Align title based on language direction
-        //   }
-        // );
-        // if (userAddress) {
-        //   // navigation.navigate('OrderDetails', {
-        //   //   totalPrice: totalPrice,
-        //   //   userAddressA: userAddress,
-        //   // });
-        // }
-      } else if (phoneNumber.length > 8) {
-        Alert.alert(t('isNotValid'));
-      } else {
-        Alert.alert(t('fillNo'));
-      }
+        } 
+   
     } catch (error) {
       console.log('error', error);
     } finally {
       setIsLoader(false);
     }
 
-
-
-
-    //setIsLoader(true)
-    /* try {
-             const response = await addShippingAddress(fullName, street, city, area, phoneNumber, address, zipCode, countryCode, country, userId)
-             if (response) {
-                 setIsLoader(false)
-                 dispatch(storeUserAddress(response?.data))
-                 if (btnText == 'Save') {
-                     alert('Data saved successfully')
-                 } else {
-                     navigation.navigate('OrderDetails', {
-                         totalPrice: totalPrice
-                     })
-                 }
-   
-             } else {
-                 setIsLoader(false)
-                 alert('Your Data is not Correct')
-   
-             }
-         } catch (error) {
-             setIsLoader(false)
-             console.log(error)
-         }*/
   };
 
   useEffect(() => {
     const selectedCountry = countries_en.find((item) => item.label === country);
-
     if (selectedCountry) {
       setCountryCodes(selectedCountry.code);
     } else {
@@ -352,7 +319,7 @@ const ShippingAddress = ({ navigation, route }) => {
   }, [country]);
 
   const onRegionChange = () => {
-    setPanLoader(true); 
+    setPanLoader(true);
   };
 
 
@@ -378,13 +345,13 @@ const ShippingAddress = ({ navigation, route }) => {
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 150 }}
         showsVerticalScrollIndicator={false}>
-            <HeaderBox
-                style={[{ width: "60%"},Platform.OS == 'ios' && {marginTop:30 }]}
-                
-            />
+        <HeaderBox
+          style={[{ width: "60%" }, Platform.OS == 'ios' && { marginTop: 30 }]}
 
-     
-        <View style={{ flexDirection: 'row' ,marginTop:20}}>
+        />
+
+
+        <View style={{ flexDirection: 'row', marginTop: 20 }}>
           <Text style={[styles.productName]}>{t('shipaddress')}</Text>
         </View>
 
@@ -457,7 +424,7 @@ const ShippingAddress = ({ navigation, route }) => {
               borderBottomColor: '#ccc',
               gap: 5,
               // paddingBottom: 10,
-              zIndex:100,
+              zIndex: 100,
             }}>
             <Text style={{ color: '#000' }}>{`\u2066${countryCodes}\u2069`}</Text>
             <TextInput
@@ -470,7 +437,8 @@ const ShippingAddress = ({ navigation, route }) => {
               style={{
                 color: '#000',
                 textAlign: 'left',
-              height:40
+                height: 40,
+                fontFamily: fonts.regular
 
               }}
               placeholderTextColor={'#cecece'}
@@ -547,7 +515,7 @@ const ShippingAddress = ({ navigation, route }) => {
               <View style={styles.addCardPlusBox}>
                 <Text style={styles.plusIcon}>+</Text>
               </View>
-              <Text style={{ fontSize: 16, fontFamily: "Montserrat-Medium", color: color.theme }}>{t('addLocation')}</Text>
+              <Text style={{ fontSize: 16, color: color.theme }}>{t('addLocation')}</Text>
             </TouchableOpacity>
         }
 
