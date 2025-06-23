@@ -1,4 +1,4 @@
-import {  Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import {  Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import ExportSvg from '../constants/ExportSvg'
 import { color } from '../constants/color'
@@ -9,12 +9,14 @@ import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import { addProductToCart } from '../redux/reducer/ProductAddToCart'
 import { useNavigation } from '@react-navigation/native'
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import Text from './CustomText'
 
 import { useTranslation } from 'react-i18next'
 import { productDetails } from '../services/UserServices'
 import LottieView from 'lottie-react-native'
 const { width } = Dimensions.get('screen')
 import FastImage from 'react-native-fast-image'
+import { fonts } from '../constants/fonts'
 
 const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon }) => {
   const dispatch = useDispatch()
@@ -150,7 +152,6 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
     // ReactNativeHapticFeedback.trigger('impactLight');
   };
 
-  console.log('itemitemitem')
 
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -255,7 +256,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: color.theme,
     marginTop: 5,
-    fontFamily: "Montserrat-SemiBold",
     textAlign: "left"
 
   },
@@ -263,7 +263,6 @@ const styles = StyleSheet.create({
     color: color.gray,
     // fontWeight: "300",
     marginVertical: 2,
-    fontFamily: "Montserrat-Regular",
     fontSize: 12,
     textAlign: "left"
 
@@ -273,8 +272,8 @@ const styles = StyleSheet.create({
   arrivalPrice: {
     color: color.theme,
     // fontWeight: "500",
-    fontFamily: "Montserrat-SemiBold",
-    textAlign: "left"
+    textAlign: "left",
+    fontFamily:fonts.bold
 
 
   },

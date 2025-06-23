@@ -108,13 +108,10 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
 
-
-
   const funCategories = async () => {
     setLoader(true);
     try {
       const result = await categoriesListSubTwoCategory();
-      console.log('=cata==', result?.data)
       if (result?.status) {
         setLoader(false);
         setCategoies(result?.data);
@@ -251,6 +248,7 @@ const HomeScreen = ({ navigation }) => {
             item?.category?.products?.map((innerItem, index) => {
               return (
                 <SingleProductCard
+                  isShowPlusIcon={true}
                   item={innerItem}
                   onPress={() => navigation.navigate('ProductDetails', { id: innerItem?.id })}
                 />

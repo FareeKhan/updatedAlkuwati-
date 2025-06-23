@@ -53,11 +53,9 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
 
     const handleSnapToItem = (index) => {
         setCurrentIndex(index)
-        // setImgUrl(data[index]?.image_url);
         setSelectedImage(null)
     }
 
-    console.log('ssdsd===', currentIndex)
     const favoriteProduct = (item) => {
         if (isFavorite) {
             dispatch(removeFavorite({
@@ -125,14 +123,17 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
     };
 
 
+    const isRTL = I18nManager.isRTL;
+    // const displayImages = isRTL ? [...conCatImages].reverse() : conCatImages;
+    const displayImages = isRTL ? conCatImages : conCatImages;
+
     return (
         <GestureHandlerRootView>
             <View style={styles.carouselContainer}>
                 <Carousel
                     ref={carouselRef}
                     layout={"default"}
-                    // data={data}
-                    data={conCatImages}
+                    data={displayImages}
                     renderItem={renderItem1}
                     sliderWidth={Dimensions.get('screen').width}
                     itemWidth={Dimensions.get('screen').width}
@@ -142,7 +143,10 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
                     pagingEnabled={true}
                     horizontal={true}
                     useScrollView={true}
-                    onSnapToItem={handleSnapToItem}
+                    onSnapToItem={(index) => {
+                        const actualIndex = isRTL ? displayImages.length - 1 - index : index;
+                        handleSnapToItem(actualIndex);
+                    }}
                     enableMomentum={true}
 
                 />
@@ -181,7 +185,6 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
                                 carouselRef.current.snapToItem(nextIndex);
                                 console.log('Next Index:', nextIndex);
                                 setSelectedImage(null);
-
                             }
                         }}
                     >
@@ -218,7 +221,7 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
 
             {
                 conCatImages?.length > 0 &&
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }} >
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{flex:1}} contentContainerStyle={{ flexGrow:1,gap: 10}} >
                     {
                         conCatImages?.map((item, index) => {
                             return (

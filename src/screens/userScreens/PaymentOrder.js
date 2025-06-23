@@ -41,6 +41,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomLoader from '../../components/CustomLoader';
 import { storeUserAddress } from '../../redux/reducer/UserShippingAddress';
+import { fonts } from '../../constants/fonts';
 const PaymentOrder = ({ navigation, route }) => {
   //const { totalPrice } = route?.params
   const dispatch = useDispatch();
@@ -57,7 +58,7 @@ const PaymentOrder = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
   const [cardInfo, setCardInfo] = useState(null);
-  const [selectedPayment, setSelectedPayment] = useState('cash');
+  const [selectedPayment, setSelectedPayment] = useState(2);
   const [isLoading, setIsLoading] = useState(false);
   const [getToken, setToken] = useState({});
   const [address, setAddress] = useState({});
@@ -204,7 +205,7 @@ const PaymentOrder = ({ navigation, route }) => {
 
   const paymentPress = payment => {
     setSelectedPayment(payment);
-    if (payment == 'credit card') {
+    if (payment == 1) {
       // setModalVisible(true)
       refRBSheet.current?.open();
     }
@@ -308,18 +309,18 @@ const PaymentOrder = ({ navigation, route }) => {
           <Text style={[styles.productName]}>{t('payment')}</Text>
         </View>
         <View>
-          {paymentMethodCard?.map((item, index) => {
-            const payment = item?.paymentName?.toLowerCase();
+          {paymentMethodCard(t)?.map((item, index) => {
+         
             return (
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={() => paymentPress(payment)}
+                onPress={() => paymentPress(item?.id)}
                 key={index}
                 style={styles.paymentContainers}>
                 <View
                   style={{
                     backgroundColor:
-                      selectedPayment == payment ? color.theme : '#fff',
+                      selectedPayment == item?.id ? color.theme : '#fff',
                     width: 18,
                     height: 18,
                     borderRadius: 50,
@@ -331,7 +332,7 @@ const PaymentOrder = ({ navigation, route }) => {
                   <ExportSvg.checks />
                 </View>
                 <View style={{ marginHorizontal: 20 }}>{item?.svg}</View>
-                <Text style={{ color: '#000', fontFamily: 'Montserrat-Medium' }}>
+                <Text style={{ color: '#000', fontFamily:fonts.bold,color:color.theme }}>
                   {item?.paymentName}
                 </Text>
               </TouchableOpacity>
@@ -379,7 +380,7 @@ const PaymentOrder = ({ navigation, route }) => {
                     />
                 </View> */}
 
-        {selectedPayment == 'cash' && (
+        {selectedPayment == 2 && (
           cashLoader ?
             <View style={{ marginTop: 25 }}>
               <CustomLoader />

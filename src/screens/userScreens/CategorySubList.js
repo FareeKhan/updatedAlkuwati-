@@ -50,9 +50,9 @@ const CategorySubList = ({ navigation, innetCate }) => {
     const IconColorRed = "red";
     const IconColorSize = 32;
 
-    useEffect(() => {
-        getCatList()
-    }, [])
+    // useEffect(() => {
+    //     getCatList()
+    // }, [])
 
     onClick = (index) => {
         const temp = this.state.data.slice()
@@ -65,26 +65,27 @@ const CategorySubList = ({ navigation, innetCate }) => {
         this.setState({ expanded: !this.state.expanded })
     }
 
-    const getCatList = async () => {
-        setIsLoader(true)
-        try {
-            const response = await categoriesListSub(innetCate)
-            console.log('response', response)
-            if (response?.status) {
-                setIsLoader(false)
-                setStoreCat(response?.data)
-            }
-        } catch (error) {
-            setIsLoader(false)
-            console.log(error)
-        }
-    }
+    // const getCatList = async () => {
+    //     setIsLoader(true)
+    //     try {
+    //         const response = await categoriesListSub(innetCate)
+    //         console.log('response', response)
+    //         if (response?.status) {
+    //             setIsLoader(false)
+    //             setStoreCat(response?.data)
+    //         }
+    //     } catch (error) {
+    //         setIsLoader(false)
+    //         console.log(error)
+    //     }
+    // }
 
 
 
 
     const renderItem = ({ item, index }) => {
         const isTextLeft = index % 2 === 0;
+        console.log('showmerEOraea',innetCate)
         return (
             <>
                 <Animatable.View
@@ -121,7 +122,7 @@ const CategorySubList = ({ navigation, innetCate }) => {
             <ScreenLoader />
         )
     }*/
-
+console.log('storeCatstoreCatstoreCat',innetCate)
     const FlatListItemSeparator = () => <View style={styles.line} />;
 
     return (
@@ -138,7 +139,7 @@ const CategorySubList = ({ navigation, innetCate }) => {
 
                     <View style={styles.containerBox}>
                         <FlatList
-                            data={storeCat}
+                            data={innetCate}
                             numColumns={3}
                             key={(item, index) => index?.toString()}
                             renderItem={renderItem}

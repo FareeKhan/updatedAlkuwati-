@@ -86,6 +86,7 @@ const AllProducts = ({ navigation }) => {
     }
 
     const OnBoxT = (id) => {
+        console.log('showme',id)
         //itemListAnimation
         if (innetCate == id) {
             setInnetCate(0)
@@ -108,7 +109,7 @@ const AllProducts = ({ navigation }) => {
 
     const renderItem = ({ item, index }) => {
         const isTextLeft = index % 2 === 0;
-        console.log('console', item)
+     
         return (
             <>
                 <Animatable.View
@@ -157,12 +158,19 @@ const AllProducts = ({ navigation }) => {
                     </RNBounceable>
                 </Animatable.View>
 
-                {innetCate == item?.id &&
+                {/* {innetCate == item?.id &&
                     <View style={{}}>
                         <CategorySubList innetCate={innetCate} navigation={navigation} />
                     </View>
-                }
+                } */}
 
+              
+
+                    {innetCate == item?.id &&
+                    <View style={{}}>
+                        <CategorySubList innetCate={item?.childrens}  navigation={navigation} />
+                    </View>
+                }
             </>
         )
     }

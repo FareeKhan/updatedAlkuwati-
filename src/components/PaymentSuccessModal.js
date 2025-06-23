@@ -1,8 +1,10 @@
-import { Modal, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Modal, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React from 'react'
 import { color } from '../constants/color';
 import HeaderLogo from './HeaderLogo';
 import { useTranslation } from 'react-i18next';
+import Text from './CustomText'
+import { fonts } from '../constants/fonts';
 
 const PaymentSuccessModal = ({isPaymentSuccess,setIsPaymentSuccess,navigation}) => {
 const {t} = useTranslation()
@@ -85,22 +87,19 @@ const styles = StyleSheet.create({
     textStyle: {
         color: 'white',
         textAlign: 'center',
-        fontFamily: "Montserrat-Bold",
         paddingHorizontal:15,
         paddingVertical:5,
         fontSize: 16,
 
     },
     modalText: {
-        fontWeight: "700",
-        fontFamily: "Montserrat-Bold",
         color: color.theme,
         fontSize: 25,
         marginTop: 25,
-        marginBottom: 10
+        marginBottom: 10,
+        fontFamily:fonts.semiBold
     },
     modalSmallTxt: {
-        fontFamily: "Montserrat-Regular",
         color: color.gray,
         textAlign: "center",
         lineHeight: 20,

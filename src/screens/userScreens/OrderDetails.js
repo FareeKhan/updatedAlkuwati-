@@ -10,6 +10,7 @@ import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import CustomText from '../../components/CustomText'
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons'
 import CircleLoader from '../../components/CircleLoader'
 import Text from '../../components/CustomText'
 import { fonts } from '../../constants/fonts'
@@ -184,9 +185,7 @@ const OrderDetails = ({ navigation, route }) => {
                         ?
                         // <TouchableOpacity onPress={() => navigation.navigate('ShippingAddress')} style={styles.addCardBox}>
                         <TouchableOpacity onPress={() => onPressEmptyAddress()} style={styles.addCardBox}>
-                            <View style={styles.addCardPlusBox}>
-                                <Text style={styles.plusIcon}>+</Text>
-                            </View>
+                        <SimpleLineIcons name={'plus'} color={color.theme} size={20} style={{marginTop:5}} />
                             <Text style={{ fontSize: 16,  color: color.theme }}>{t('add_delivery_address')}</Text>
                         </TouchableOpacity>
                         :
@@ -220,11 +219,10 @@ const OrderDetails = ({ navigation, route }) => {
 
                 <View style={[styles.productContainer, { justifyContent: "space-between" }]}>
                     <View style={{ flexDirection: "row", alignItems: "center" }}>
-
                         <TextInput
                             placeholder={t('enderPromo')}
                             placeholderTextColor={'#cecece'}
-                            style={{ fontFamily:fonts.semiBold,color: "#000", textAlign: I18nManager.isRTL ? 'right' : 'left', height: 38 ,width:"85%"}}
+                            style={{ fontFamily:fonts.semiBold,color: "#000", textAlign: I18nManager.isRTL ? 'right' : 'left',width:"85%"}}
                             value={promoCode}
                             onChangeText={setPromoCode}
                             maxLength={8}
@@ -425,7 +423,8 @@ const styles = StyleSheet.create({
         borderStyle: 'dashed',
         borderColor: "#DDD",
         borderRadius: 13,
-        zIndex: -1
+        zIndex: -1,
+        gap:10
     },
     addCardPlusBox: {
         width: 35,

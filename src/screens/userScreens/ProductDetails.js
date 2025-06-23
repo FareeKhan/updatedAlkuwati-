@@ -21,7 +21,7 @@ import {
   ScrollView,
   Share,
   StyleSheet,
-  Text,
+
   TouchableOpacity,
   View,
   PanResponder
@@ -36,11 +36,14 @@ import { addProductToCart, handleTotalPrice } from '../../redux/reducer/ProductA
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { useTranslation } from 'react-i18next';
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Text from '../../components/CustomText'
 
 import HeaderBox from '../../components/HeaderBox';
 
 import ScreenLoader from '../../components/ScreenLoader';
 import CustomText from '../../components/CustomText';
+import { fonts } from '../../constants/fonts';
 const ProductDetails = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const data = useSelector(state => state.cartProducts?.cartProducts);
@@ -100,7 +103,6 @@ const ProductDetails = ({ navigation, route }) => {
     try {
       const response = await productDetails(id);
       // const response = await productDetails(876);
-      console.log('dasdas', response)
       if (response?.status) {
         setProductData(response);
         setProductObject(response?.data);
@@ -174,10 +176,10 @@ const ProductDetails = ({ navigation, route }) => {
     });
     setSelectedVariant(filteredVariants[0])
   }
+  console.log(selectedVariant)
 
 
-
-  const isCheckQuantity = selectedVariant?.stock_quantity  ? selectedVariant?.stock_quantity == 0:  productObject?.quantity == 0
+  const isCheckQuantity = selectedVariant?.stock_quantity ? selectedVariant?.stock_quantity == 0 : productObject?.quantity == 0
 
 
   if (isLoader) {
@@ -199,18 +201,18 @@ const ProductDetails = ({ navigation, route }) => {
 
         <View>
           {
-          selectedVariant?
+            selectedVariant ?
               <View >
-                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%" }} onPress={() =>{ setSelectedImage(null),setSelectedVariant(null)}}>
+                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%" }} onPress={() => { setSelectedVariant(null),setCurrentIndex(0) }}>
                   <AntDesign name={I18nManager.isRTL ? 'right' : 'left'} size={20} color={'#ececec'} />
                 </TouchableOpacity>
 
                 <Image
                   resizeMode="cover"
-                  source={{ uri:selectedVariant? selectedVariant?.main_image: selectedImage }}
+                  source={{ uri: selectedVariant ? selectedVariant?.main_image : selectedImage }}
                   style={[styles.renderItem1_img, { marginLeft: -15 }]}
                 />
-                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%", right: 0 }} onPress={() =>{ setSelectedImage(null),setSelectedVariant(null)}}>
+                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%", right: 0 }} onPress={() => { setSelectedVariant(null),setCurrentIndex(0) }}>
                   <AntDesign name={I18nManager.isRTL ? 'left' : 'right'} size={20} color={'#ececec'} />
                 </TouchableOpacity>
 
@@ -324,14 +326,20 @@ const ProductDetails = ({ navigation, route }) => {
               productData?.variant_system?.available_attributes &&
               Object.entries(productData?.variant_system?.available_attributes).map(([key, values]) => (
                 <View key={key} style={{ marginBottom: 10, marginTop: 10 }}>
-                  <CustomText style={{ fontWeight: 'bold', fontSize: 16, textTransform: "capitalize" }}>{key}</CustomText>
+                  <CustomText style={styles.productName}>{key}</CustomText>
 
-                  <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 10, marginTop: 10 }}>
-                    {values.map((item, index) => (
-                      <TouchableOpacity onPress={() => handleVariant(key, item)} style={{ borderWidth: 1, paddingHorizontal: 10, paddingVertical: 2, borderColor: "#ececec", borderRadius: 2 }}>
-                        <CustomText key={index}>{item}</CustomText>
-                      </TouchableOpacity>
-                    ))}
+                  <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 10, marginTop: 10, flexGrow:1}}>
+                    {values.map((item, index) => {
+                 
+                         const isSelected = selectedVariant?.attributes_array?.[key] === item;
+                      return (
+                        (
+                          <TouchableOpacity onPress={() => handleVariant(key, item)} style={[{ borderWidth: 1, paddingHorizontal: 10, paddingVertical: 2, borderColor: "#ececec", borderRadius: 2 }, isSelected  && {borderColor:color.theme}]}>
+                            <CustomText key={index}>{item}</CustomText>
+                          </TouchableOpacity>
+                        )
+                      )
+                    })}
                   </ScrollView>
                 </View>
               ))
@@ -362,11 +370,13 @@ const ProductDetails = ({ navigation, route }) => {
           bottom: 90,
         }}>
         <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart} style={[styles.bottomPriceCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}>
-        {/* <TouchableOpacity onPress={addToCart} style={[styles.bottomPriceCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}> */}
-          <Text style={styles.productPrice}>KD {selectedVariant?.price? selectedVariant?.price :productObject?.price}</Text>
+          {/* <TouchableOpacity onPress={addToCart} style={[styles.bottomPriceCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}> */}
+          <Text style={styles.productPrice}>KD {selectedVariant?.price ? selectedVariant?.price : productObject?.price}</Text>
 
           <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart} style={[styles.bottomCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}>
-            <ExportSvg.ShippingCart style={{ marginRight: 10 }} />
+            {/* <ExportSvg.ShippingCart style={{ marginRight: 10 }} /> */}
+            <Ionicons name={'bag-handle-outline'} size={20} color={"#fff"} style={{ marginRight: 10 }} />
+            
             <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart}>
               <Text style={styles.cartTxt}>{t('add_to_cart')}</Text>
             </TouchableOpacity>
@@ -407,7 +417,6 @@ const styles = StyleSheet.create({
   },
   productName: {
     fontSize: 18,
-    fontWeight: '600',
     color: color.theme,
     textAlign: "left"
   },
@@ -503,7 +512,7 @@ const styles = StyleSheet.create({
     textAlign: I18nManager.isRTL ? 'left' : 'left',
   },
   bottomPriceCartBox: {
-    flexDirection: 'row',
+    flexDirection: I18nManager.isRTL ? 'row-reverse':'row',
     justifyContent: 'space-between',
     backgroundColor: color.theme,
     paddingVertical: 12,
@@ -525,8 +534,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Bold',
   },
   cartTxt: {
-    color: color.theme,
-    fontFamily: 'Montserrat-SemiBold',
+     color: '#fff',
+    fontFamily: fonts.bold,
   },
   renderItem1_img: {
     width: Dimensions.get('screen').width,

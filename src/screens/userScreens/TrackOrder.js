@@ -1,4 +1,4 @@
-import { FlatList, I18nManager, Image, Modal, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { FlatList, I18nManager, Image, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import ExportSvg from '../../constants/ExportSvg'
 import SearchInput from '../../components/SearchInput'
@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 import * as Animatable from 'react-native-animatable';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import EmptyScreen from '../../components/EmptyScreen'
+import Text from '../../components/CustomText'
+import { fonts } from '../../constants/fonts'
 
 const TrackOrder = ({ navigation }) => {
 
@@ -283,6 +285,8 @@ const TrackOrder = ({ navigation }) => {
             </View> */}
             <ScrollView
                 showsVerticalScrollIndicator={false}
+                                style={{flex:1}}
+                
                 contentContainerStyle={styles.scrollView}
                 refreshControl={
                     <RefreshControl refreshing={isRefresh} onRefresh={onRefresh} />
@@ -300,6 +304,8 @@ const TrackOrder = ({ navigation }) => {
                                 data={storeOrder}
                                 refreshing={isRefresh}
                                 onRefresh={onRefresh}
+                                style={{flex:1}}
+
                                 keyExtractor={(item, index) => index?.toString()}
                                 renderItem={renderItemCurrent}
                                 ListEmptyComponent={<EmptyScreen />}
@@ -388,7 +394,8 @@ export default TrackOrder
 
 const styles = StyleSheet.create({
     scrollView: {
-        //flex: 1,
+        flexGrow:1,
+        paddingBottom:100
     },
     mainContainer: {
         flex: 1,
@@ -444,11 +451,10 @@ const styles = StyleSheet.create({
         paddingRight: 10
     },
     TitleTracking: {
-        fontWeight: "600",
         fontSize: 15,
-        fontFamily: "Montserrat-Bold",
         color: color.theme,
-        marginTop: 40
+        marginTop: 40,
+        fontFamily:fonts.bold
 
     },
     TrackingStatusBox: {

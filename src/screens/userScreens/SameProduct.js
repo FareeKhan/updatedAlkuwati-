@@ -35,18 +35,19 @@ import { useTranslation } from 'react-i18next';
 
 import HeaderBox from '../../components/HeaderBox';
 import CustomLoader from '../../components/CustomLoader';
+import { fonts } from '../../constants/fonts';
 
 
 
 const SameProduct = ({ navigation, route }) => {
   const { text, subC_ID, selected, navID, } = route?.params;
   const [modalVisible, setModalVisible] = useState(false);
-  const [storeData, setStoreData] = useState();
   const [isLoader, setIsLoader] = useState(false);
   const [productLoader, setProductLoader] = useState(false);
   const [selectedCat, setSelectedCat] = useState('');
   const [storeCategories, setStoreCategories] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
+  const [updateSubCategory, setUpdateSubCategory] = useState(subC_ID);
+
   const { t } = useTranslation();
 
 
@@ -57,16 +58,20 @@ const SameProduct = ({ navigation, route }) => {
   useEffect(() => {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
     getCatList();
-  }, []);
+  }, [updateSubCategory]);
+
 
   const getCatList = async () => {
     setIsLoader(true);
     try {
-      const response = await categoriesListSub(subC_ID);
+      const response = await categoriesListSub(updateSubCategory);
       if (response?.status) {
         setIsLoader(false);
         setStoreCategories(response?.data);
+        if(selectedCat == ''){
         setSelectedCat(response?.data?.subcategories[0]?.id)
+        setUpdateSubCategory(response?.data?.subcategories[0]?.id)
+        }
       }else{
       setIsLoader(false);
 
@@ -76,8 +81,6 @@ const SameProduct = ({ navigation, route }) => {
       console.log(error);
     }
   };
-
-
 
   const renderItem = ({ item, index }) => {
     return (
@@ -94,6 +97,12 @@ const SameProduct = ({ navigation, route }) => {
       </>
     );
   };
+
+
+  const handleSubCategory = (id)=>{
+    setUpdateSubCategory(id)
+    setSelectedCat(id)
+  }
 
 
   if (isLoader) {
@@ -132,6 +141,7 @@ const SameProduct = ({ navigation, route }) => {
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{flexGrow:1}}
             data={storeCategories?.subcategories}
             renderItem={({item, index}) => {
               return (
@@ -140,7 +150,7 @@ const SameProduct = ({ navigation, route }) => {
                   duration={durationInner}
                   delay={(1 + index) * delayInner}>
                   <TouchableOpacity
-                    onPress={() =>setSelectedCat(item?.id) }
+                    onPress={() =>handleSubCategory(item?.id) }
                     key={index}
                     style={[
                       styles.innerCatBox,
@@ -210,16 +220,15 @@ const styles = StyleSheet.create({
   },
   arrivalTxt: {
     fontSize: 17,
-    fontWeight: '700',
     color: color.theme,
-    textAlign:"left"
+    textAlign:"left",
+    fontFamily:fonts.semiBold
   },
 
   arrivalTitle: {
     fontSize: 15,
     color: color.theme,
     marginTop: 5,
-    fontFamily: 'Montserrat-SemiBold',
   },
   arrivalSubTitle: {
     color: color.gray,
@@ -307,19 +316,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: color.theme,
     marginTop: 5,
-    fontFamily: 'Montserrat-SemiBold',
   },
   arrivalSubTitle: {
     color: color.gray,
     // fontWeight: "300",
     marginVertical: 2,
-    fontFamily: 'Montserrat-Regular',
     fontSize: 12,
   },
   arrivalPrice: {
     color: color.theme,
     // fontWeight: "500",
-    fontFamily: 'Montserrat-SemiBold',
   },
 
   item: {
@@ -349,7 +355,6 @@ const styles = StyleSheet.create({
 
   imgTitle: {
     color: color.theme,
-    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600',
   },
   imgSubTitle: {
@@ -357,11 +362,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '300',
     marginVertical: 4,
-    fontFamily: 'Montserrat-Regular',
   },
   imgPriceTitle: {
     color: color.theme,
-    fontFamily: 'Montserrat-SemiBold',
     fontWeight: '600',
   },
   rightIconNumber: {

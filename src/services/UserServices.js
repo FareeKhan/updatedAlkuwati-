@@ -116,7 +116,7 @@ export const productDetails = async (id) => {
 };
 
 
-export const editShippingAddress = async (address,userID,id) => {
+export const editShippingAddress = async (address, userID, id) => {
 
     try {
         const response = await fetch(`${baseUrl}/address/${id}/update`, {
@@ -136,7 +136,7 @@ export const editShippingAddress = async (address,userID,id) => {
                 "user_id": userID,
                 "full_name": address?.fullName,
                 "phone": address?.phone,
-                "address":'address',
+                "address": 'address',
                 "emirates": 'emirates'
             })
         });
@@ -152,8 +152,8 @@ export const editShippingAddress = async (address,userID,id) => {
 
 
 
-export const addShippingAddress = async (address,userID) => {
-    console.log('--',address)
+export const addShippingAddress = async (address, userID) => {
+    console.log('--', address)
 
     try {
         const response = await fetch(`${baseUrl}/address/store`, {
@@ -173,8 +173,13 @@ export const addShippingAddress = async (address,userID) => {
                 "user_id": userID,
                 "full_name": address?.fullName,
                 "phone": address?.phone,
-                "emirates": 'emirates'
+                "emirates": 'emirates',
+                "email": address?.email || null,
+                "pickupLocation": address?.pickupLocation || null,
             })
+
+
+
         });
 
         const result = await response.json();
@@ -223,7 +228,7 @@ export const promoCodes = async (id) => {
 };
 
 export const postPromoCoder = async (value) => {
-   const codeValue = value.toUpperCase();
+    const codeValue = value.toUpperCase();
     try {
         const response = await fetch(`${baseUrl}/getPromoCode?code=${codeValue}`, {
             method: 'GET',
@@ -243,7 +248,7 @@ export const postPromoCoder = async (value) => {
 
 
 export const orderConfirmed = async (productNo, address, totalPrice, data, email, userID, token_obj) => {
-    console.log('cccccc',userID)
+    console.log('cccccc', userID)
     const orderDetails = data?.map((item, index) => ({
         "id": item?.id,
         "image": item?.image,
@@ -289,7 +294,7 @@ export const orderConfirmed = async (productNo, address, totalPrice, data, email
                     "theHome": "demo",
                     "cityTown": address?.city,
                     "region": address?.area,
-                    "countryName": address?.country
+                    "countryName": address?.country,
                 },
 
                 "product_details": orderDetails
@@ -297,7 +302,7 @@ export const orderConfirmed = async (productNo, address, totalPrice, data, email
         });
 
         const result = await response.json();
-        console.error(result,"sdddsd");
+        console.error(result, "sdddsd");
         return result;
 
     } catch (e) {
@@ -380,7 +385,7 @@ export const getReels = async (id) => {
     try {
         const response = await fetch(`${baseUrl}/get-reels`, {
 
-        // const response = await fetch(`http://192.168.70.206:8000/api/get-reels`, {
+            // const response = await fetch(`http://192.168.70.206:8000/api/get-reels`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -400,7 +405,7 @@ export const newArrivalsData = async (id) => {
     try {
         const response = await fetch(`${baseUrl}/sections`, {
 
-        // const response = await fetch(`http://192.168.70.206:8000/api/get-reels`, {
+            // const response = await fetch(`http://192.168.70.206:8000/api/get-reels`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -419,7 +424,7 @@ export const fetchArrivalProducts = async (id) => {
     try {
         const response = await fetch(`${baseUrl}/sections`, {
 
-        // const response = await fetch(`http://192.168.70.206:8000/api/get-reels`, {
+            // const response = await fetch(`http://192.168.70.206:8000/api/get-reels`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -447,7 +452,7 @@ export const fetchArrivalProducts = async (id) => {
 //   };
 
 export const personalData = async (id) => {
-    console.log('tobah',id)
+    console.log('tobah', id)
     try {
         const response = await fetch(`${baseUrl}/getAppUsersById/${id}`, {
             method: 'GET',
@@ -564,9 +569,11 @@ export const searchProductByName = async (productName) => {
     }
 };
 
+
+
 export const categoriesList = async (id) => {
     try {
-        const response = await fetch(`${baseUrl}/getCategories?type=parent`, {
+        const response = await fetch(`${baseUrl}/getAllCatesWithSubWeb`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -195,7 +195,7 @@ const BottomNavigation = () => {
                                 <View style={[styles.iconContainer, focused && { backgroundColor: "#67300F" }]}>
                                     <Entypo name="folder-video" size={15} color={focused ? "#fff" : "#67300F"} style={{ marginBottom: 0 }} />
                                 </View>
-                                {focused && <Text numberOfLines={1} style={[styles.tabTxt, { width: I18nManager.isRTL ? 45 : 70 }]}>{t("reels")}</Text>}
+                                {focused && <Text numberOfLines={1} style={[styles.tabTxt, { width: 70 }]}>{t("reels")}</Text>}
                             </View>
                         )
                     },

@@ -277,11 +277,11 @@ const ShippingAddress = ({ navigation, route }) => {
           address: villa,
           pickupLocation: pickupLocation
         };
-        console.log(addressredux, 'addressredux');
         const response = await (userAddress && id
           ? editShippingAddress(addressredux, userId, id)
           : addShippingAddress(addressredux, userId));
 
+        console.log('addressreduxresponseresponse', response);
 
         if (response?.data) {
           dispatch(
@@ -437,8 +437,8 @@ const ShippingAddress = ({ navigation, route }) => {
               style={{
                 color: '#000',
                 textAlign: 'left',
-                height: 40,
-                fontFamily: fonts.regular
+                fontFamily: fonts.regular,
+                width:"100%"
 
               }}
               placeholderTextColor={'#cecece'}

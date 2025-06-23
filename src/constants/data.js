@@ -477,15 +477,17 @@ export const dressList = [
 ]  
 
 
-export const paymentMethodCard = [
+export const paymentMethodCard = (t)=>[
     {
-        paymentName: "Credit Card",
-        svg: <ExportSvg.CreditCard />
+        paymentName: t('creditCard'),
+        svg: <ExportSvg.CreditCard />,
+        id:1
 
     },
     {
-        paymentName: "Cash",
-        svg: <ExportSvg.Wallet />
+        paymentName: t('cash'),
+        svg: <ExportSvg.Wallet />,
+              id:2
 
     },
 
