@@ -33,6 +33,7 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HeaderBox from '../../components/HeaderBox';
 import SmallImageLoader from '../../components/SmallImageLoader';
+import { fonts } from '../../constants/fonts';
 
 
 const MyCart = ({ navigation }) => {
@@ -181,11 +182,6 @@ imagePath={item?.image}
                     style={styles.bottomCartBox}>
                     <View>
                       <FontAwesome6 name={I18nManager.isRTL ? 'arrow-left' : 'arrow-right'} color={color.theme} size={15} />
-                      {/* {I18nManager.isRTL ? (
-                        <ExportSvg.arrowLeft style={{}} />
-                      ) : (
-                        <ExportSvg.BoldArrow style={{}} />
-                      )} */}
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -218,7 +214,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: color.theme,
     fontWeight: '600',
-    fontFamily: 'Montserrat-Bold',
+    fontFamily:fonts.semiBold,
   },
   emptyScreen: {
     flex: 1,
@@ -246,8 +242,8 @@ const styles = StyleSheet.create({
   productTitle: {
     color: color.theme,
     marginBottom: 5,
-    fontFamily: 'Montserrat-Bold',
     textAlign: 'left',
+    fontFamily:fonts.regular
 
   },
   subTitle: {
@@ -355,6 +351,7 @@ const styles = StyleSheet.create({
   selectedItemTxt: {
     fontWeight: '600',
     color: color.grayShade,
+    fontFamily:fonts.semiBold
   },
   selectedItemPriceTxt: {
     fontWeight: '600',
@@ -381,7 +378,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '500',
     fontSize: 16,
-    fontFamily: 'Montserrat-SemiBold',
+    fontFamily:fonts.bold
   },
   cartTxt: {
     color: color.theme,

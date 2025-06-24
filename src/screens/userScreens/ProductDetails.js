@@ -130,6 +130,7 @@ const ProductDetails = ({ navigation, route }) => {
         size: selectedSize,
         counter: productOrder,
         subText: removeHTMLCode(productObject?.description),
+        productWeight: selectedVariant ? selectedVariant?.weight : productObject?.weight ? productObject?.weight : '00000',
         image:
           imgUrl == '' ? productData?.product_images[0]?.image_url : imgUrl,
       }),
@@ -176,7 +177,6 @@ const ProductDetails = ({ navigation, route }) => {
     });
     setSelectedVariant(filteredVariants[0])
   }
-  console.log(selectedVariant)
 
 
   const isCheckQuantity = selectedVariant?.stock_quantity ? selectedVariant?.stock_quantity == 0 : productObject?.quantity == 0
@@ -203,7 +203,7 @@ const ProductDetails = ({ navigation, route }) => {
           {
             selectedVariant ?
               <View >
-                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%" }} onPress={() => { setSelectedVariant(null),setCurrentIndex(0) }}>
+                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%" }} onPress={() => { setSelectedVariant(null), setCurrentIndex(0) }}>
                   <AntDesign name={I18nManager.isRTL ? 'right' : 'left'} size={20} color={'#ececec'} />
                 </TouchableOpacity>
 
@@ -212,7 +212,7 @@ const ProductDetails = ({ navigation, route }) => {
                   source={{ uri: selectedVariant ? selectedVariant?.main_image : selectedImage }}
                   style={[styles.renderItem1_img, { marginLeft: -15 }]}
                 />
-                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%", right: 0 }} onPress={() => { setSelectedVariant(null),setCurrentIndex(0) }}>
+                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%", right: 0 }} onPress={() => { setSelectedVariant(null), setCurrentIndex(0) }}>
                   <AntDesign name={I18nManager.isRTL ? 'left' : 'right'} size={20} color={'#ececec'} />
                 </TouchableOpacity>
 
@@ -325,16 +325,17 @@ const ProductDetails = ({ navigation, route }) => {
             {
               productData?.variant_system?.available_attributes &&
               Object.entries(productData?.variant_system?.available_attributes).map(([key, values]) => (
+
                 <View key={key} style={{ marginBottom: 10, marginTop: 10 }}>
                   <CustomText style={styles.productName}>{key}</CustomText>
 
-                  <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 10, marginTop: 10, flexGrow:1}}>
+                  <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 10, marginTop: 10, flexGrow: 1 }}>
                     {values.map((item, index) => {
-                 
-                         const isSelected = selectedVariant?.attributes_array?.[key] === item;
+
+                      const isSelected = selectedVariant?.attributes_array?.[key] === item;
                       return (
                         (
-                          <TouchableOpacity onPress={() => handleVariant(key, item)} style={[{ borderWidth: 1, paddingHorizontal: 10, paddingVertical: 2, borderColor: "#ececec", borderRadius: 2 }, isSelected  && {borderColor:color.theme}]}>
+                          <TouchableOpacity onPress={() => handleVariant(key, item)} style={[{ borderWidth: 1, paddingHorizontal: 10, paddingVertical: 2, borderColor: "#ececec", borderRadius: 2 }, isSelected && { borderColor: color.theme }]}>
                             <CustomText key={index}>{item}</CustomText>
                           </TouchableOpacity>
                         )
@@ -350,7 +351,7 @@ const ProductDetails = ({ navigation, route }) => {
 
             <View style={{ flexDirection: 'row' }}>
               <Text
-                style={[styles.productName, { marginTop: colorVariants?.length == 0 && size?.length == 0 ? -20 : 20, marginBottom: 5 }]}>
+                style={[styles.productName, { marginBottom: 5 }]}>
                 {t('p_description')}
               </Text>
             </View>
@@ -376,7 +377,7 @@ const ProductDetails = ({ navigation, route }) => {
           <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart} style={[styles.bottomCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}>
             {/* <ExportSvg.ShippingCart style={{ marginRight: 10 }} /> */}
             <Ionicons name={'bag-handle-outline'} size={20} color={"#fff"} style={{ marginRight: 10 }} />
-            
+
             <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart}>
               <Text style={styles.cartTxt}>{t('add_to_cart')}</Text>
             </TouchableOpacity>
@@ -512,7 +513,7 @@ const styles = StyleSheet.create({
     textAlign: I18nManager.isRTL ? 'left' : 'left',
   },
   bottomPriceCartBox: {
-    flexDirection: I18nManager.isRTL ? 'row-reverse':'row',
+    flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
     justifyContent: 'space-between',
     backgroundColor: color.theme,
     paddingVertical: 12,
@@ -534,7 +535,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat-Bold',
   },
   cartTxt: {
-     color: '#fff',
+    color: '#fff',
     fontFamily: fonts.bold,
   },
   renderItem1_img: {

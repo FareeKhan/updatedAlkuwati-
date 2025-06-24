@@ -26,7 +26,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import PaymentSuccessModal from '../../components/PaymentSuccessModal';
 import {
-  addProductToCart,
+
   clearCart,
 } from '../../redux/reducer/ProductAddToCart';
 import HeaderLogo from '../../components/HeaderLogo';
@@ -42,8 +42,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomLoader from '../../components/CustomLoader';
 import { storeUserAddress } from '../../redux/reducer/UserShippingAddress';
 import { fonts } from '../../constants/fonts';
+import MyFatoorahPayment from '../../components/MyFatoorahPayment';
 const PaymentOrder = ({ navigation, route }) => {
-  //const { totalPrice } = route?.params
+  const { subTotal,delCharges,discount,FinalTotal } = route?.params
+
   const dispatch = useDispatch();
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const userId = useSelector(state => state.auth?.userId);
@@ -64,7 +66,9 @@ const PaymentOrder = ({ navigation, route }) => {
   const [address, setAddress] = useState({});
   const [paymentStatus, setPaymentStatus] = useState();
   const [email, setEmail] = useState();
-  const [cashLoader, setCashLoader] = useState(false);
+  const [cashLoader, setCashLoader] = useState(false);0
+    const [isCardPaymentModal, setIsCardPaymentModal] = useState(false);
+
   const userAddress = useSelector(
     state => state?.customerAddress?.storeAddress,
   );
@@ -207,7 +211,8 @@ const PaymentOrder = ({ navigation, route }) => {
     setSelectedPayment(payment);
     if (payment == 1) {
       // setModalVisible(true)
-      refRBSheet.current?.open();
+      // refRBSheet.current?.open();
+      setIsCardPaymentModal(true)
     }
   };
 
@@ -226,11 +231,13 @@ const PaymentOrder = ({ navigation, route }) => {
       const response = await orderConfirmed(
         productNo,
         userAddress,
-        totalPrice,
         data,
         email,
         getuserId,
         getToken,
+         subTotal,delCharges,discount,
+        FinalTotal,
+
       );
 
       if (response.status == 'success') {
@@ -252,7 +259,7 @@ const PaymentOrder = ({ navigation, route }) => {
 
   const sendTokenPrice = async () => {
     try {
-      const response = await tokenPrice(getToken?.token, totalPrice);
+      const response = await tokenPrice(getToken?.token, FinalTotal);
     } catch (error) {
       console.log(error);
     }
@@ -345,7 +352,7 @@ const PaymentOrder = ({ navigation, route }) => {
           <Text style={{ fontSize: 15, color: '#AAA' }}>
             {t('total_price')}
           </Text>
-          <Text style={styles.bottomPrice}>KD{totalPrice}</Text>
+          <Text style={styles.bottomPrice}>KD{FinalTotal}</Text>
         </View>
 
         {/* <PaymentModal
@@ -400,7 +407,7 @@ const PaymentOrder = ({ navigation, route }) => {
         />
       </ScrollView>
 
-      <RBSheet
+      {/* <RBSheet
         ref={refRBSheet}
         onClose={() => setSelectedPayment('')}
         closeOnDragDown={true}
@@ -460,12 +467,19 @@ const PaymentOrder = ({ navigation, route }) => {
           <View
             style={{ flexGrow: 1, flexDirection: 'row', marginHorizontal: 10 }}>
             <MFPaymentCyber
-              totalAmount={parseFloat(getSummaryAmount).toFixed(2)}
+              totalAmount={parseFloat(FinalTotal).toFixed(2)}
               onChangeSomeState={onChangeSomeState}
             />
           </View>
         </View>
-      </RBSheet>
+      </RBSheet> */}
+            <MyFatoorahPayment
+            setModalVisible={setIsCardPaymentModal}
+            modalVisible={isCardPaymentModal}
+            confirmOrder={confirmOrder}
+            totalPrice={Number(FinalTotal)}
+            
+            />
 
       {/* <View
         style={{

@@ -1,4 +1,4 @@
-import {  Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import ExportSvg from '../constants/ExportSvg'
 import { color } from '../constants/color'
@@ -49,7 +49,7 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
       ReactNativeHapticFeedback.trigger('notificationError');
       dispatch(productFavorite(item))
     }
-}
+  }
 
 
   // new code 
@@ -115,6 +115,7 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
               id: item?.id,
               productName: item?.name,
               price: item?.price,
+              productWeight: item?.weight ? item?.weight : '00000',
               size: 'M',
               counter: 1,
               subText: removeHTMLCode(item?.description),
@@ -188,7 +189,7 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
             source={require("../assets/loader.json")} // Local JSON file
             autoPlay
             loop
-            style={{ width: 100, height: 100,color:"red" }}
+            style={{ width: 100, height: 100, color: "red" }}
           />
         </View>
       }
@@ -200,7 +201,7 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
           onError={() => setLoading(false)}
           // source={{ uri: item.image }}
           source={{ uri: item.image, priority: FastImage.priority.high }}
-          style={{ width: 170, height: 170, marginRight: 5,borderRadius:20 }} borderRadius={20}>
+          style={{ width: 170, height: 170, marginRight: 5, borderRadius: 20 }} borderRadius={20}>
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", margin: 10 }}>
             {
               isShowPlusIcon &&
@@ -273,7 +274,7 @@ const styles = StyleSheet.create({
     color: color.theme,
     // fontWeight: "500",
     textAlign: "left",
-    fontFamily:fonts.bold
+    fontFamily: fonts.bold
 
 
   },

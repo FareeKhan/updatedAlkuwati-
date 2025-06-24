@@ -12,8 +12,8 @@ export const productAddToCart = createSlice({
     reducers: {
         addProductToCart: (state, action) => {
 
-            const { productName, price, size, counter, id, image, subText } = action.payload;
-            const newProductAddedToCart = { productName, price, size, counter, id, image, subText }
+            const { productName, price, size, counter, id, image, subText,productWeight } = action.payload;
+            const newProductAddedToCart = { productName, price, size, counter, id, image, subText ,productWeight}
 
             const existId = state.cartProducts?.find((item) => item?.id == id)
             if (!existId) {

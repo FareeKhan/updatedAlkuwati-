@@ -88,6 +88,7 @@ const TrackOrder = ({ navigation }) => {
         setIsLoader(true)
         try {
             const response = await getOrder(userId)
+            console.log('response', response)
             if (response?.status == 'success') {
                 setIsLoader(false)
                 setStoreOrder(response?.data)
@@ -127,6 +128,7 @@ const TrackOrder = ({ navigation }) => {
         return t('Confirmed');
     }
 
+    const currencyType = "KD"
 
     const renderItem = ({ item, index }) => {
         const text = item?.order_status.charAt(0).toUpperCase() + item?.order_status.slice(1).toLowerCase();
@@ -219,12 +221,35 @@ const TrackOrder = ({ navigation }) => {
                                 >
                                     <View style={{ ...styles.TrackingStatusBoxTwo, display: 'flex' }}>
 
-                                        {item.products?.map((item, index) => {
+                                        {item.products?.map((itm, index) => {
                                             return (
-                                                <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderStyle: 'solid', borderColor: '#eee', paddingBottom: 5, paddingTop: 5 }}>
-                                                    <Image source={{ uri: item.image }} style={{ width: 40, height: 40 }} />
-                                                    <Text style={{ width: "30%" }} numberOfLines={2}>{item.name}</Text>
-                                                    <Text>Qty:{item.quantity} KWD{item.price}</Text>
+                                                <View>
+                                                    <View style={{ flex: 1, flexDirection: 'row', gap: 10, borderStyle: 'solid', borderColor: '#eee', paddingBottom: 5, paddingTop: 5 }}>
+                                                        <Image source={{ uri: itm.image }} style={{ width: 40, height: 40 }} />
+                                                        <View style={{ flexDirection: "row", alignItems: "center", width: "70%" }}>
+                                                            <Text style={{ textAlign: "left" }} numberOfLines={2}>{itm.name} </Text>
+                                                            <Text style={{}} numberOfLines={2}> {itm.quantity}x</Text>
+
+                                                        </View>
+
+                                                        {/* <Text>Qty:{item.quantity} KWD{item.price}</Text> */}
+                                                    </View>
+                                                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
+                                                        <Text style={{}} numberOfLines={2}>{t('subTotal')}</Text>
+                                                        <Text style={{}} numberOfLines={2}>{currencyType} {item.subtotal_price}</Text>
+                                                    </View>
+                                                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
+                                                        <Text style={{}} numberOfLines={2}>{t('delivery')}</Text>
+                                                        <Text style={{}} numberOfLines={2}>{currencyType} {item.delivery_price}</Text>
+                                                    </View>
+                                                     <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
+                                                        <Text style={{}} numberOfLines={2}>{t('discount')}</Text>
+                                                        <Text style={{}} numberOfLines={2}>{currencyType} {item.discount}</Text>
+                                                    </View>
+                                                     <View style={{ flex: 1,borderTopWidth:1,borderColor:"#ececec", flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
+                                                        <Text style={{}} numberOfLines={2}>{t('total')}</Text>
+                                                        <Text style={{}} numberOfLines={2}>{currencyType} {item.total_price}</Text>
+                                                    </View>
                                                 </View>
                                             )
                                         })
@@ -285,8 +310,8 @@ const TrackOrder = ({ navigation }) => {
             </View> */}
             <ScrollView
                 showsVerticalScrollIndicator={false}
-                                style={{flex:1}}
-                
+                style={{ flex: 1 }}
+
                 contentContainerStyle={styles.scrollView}
                 refreshControl={
                     <RefreshControl refreshing={isRefresh} onRefresh={onRefresh} />
@@ -304,7 +329,7 @@ const TrackOrder = ({ navigation }) => {
                                 data={storeOrder}
                                 refreshing={isRefresh}
                                 onRefresh={onRefresh}
-                                style={{flex:1}}
+                                style={{ flex: 1 }}
 
                                 keyExtractor={(item, index) => index?.toString()}
                                 renderItem={renderItemCurrent}
@@ -394,8 +419,8 @@ export default TrackOrder
 
 const styles = StyleSheet.create({
     scrollView: {
-        flexGrow:1,
-        paddingBottom:100
+        flexGrow: 1,
+        paddingBottom: 100
     },
     mainContainer: {
         flex: 1,
@@ -454,7 +479,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: color.theme,
         marginTop: 40,
-        fontFamily:fonts.bold
+        fontFamily: fonts.bold
 
     },
     TrackingStatusBox: {

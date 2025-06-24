@@ -232,7 +232,10 @@ const HomeScreen = ({ navigation }) => {
   const renderArrivalItem = ({ item, index }) => {
     return (
       <View>
-        <View style={styles.arrivalBox}>
+        {
+          item?.category?.products?.length > 0 && 
+          <>
+           <View style={styles.arrivalBox}>
           <Text style={styles.arrivalTxt}>{item?.category?.name}</Text>
           <TouchableOpacity
             onPress={() => navigation.navigate('SameProduct', {
@@ -256,6 +259,9 @@ const HomeScreen = ({ navigation }) => {
             })
           }
         </ScrollView>
+          </>
+        }
+       
 
       </View>
 
@@ -485,7 +491,7 @@ const HomeScreen = ({ navigation }) => {
                   />
                 </View>
               </>
-            )
+          )
           })
         } */}
 
@@ -493,7 +499,7 @@ const HomeScreen = ({ navigation }) => {
 
         <View style={{ flex: 1 }}>
           <FlatList
-            horizontal
+            // horizontal
             data={arrivalData}
             keyExtractor={(item, index) => index?.toString()}
             renderItem={renderArrivalItem}

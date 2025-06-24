@@ -6,6 +6,7 @@ import { searchProductByName } from '../services/UserServices';
 import { color } from '../constants/color';
 const { height } = Dimensions.get('screen')
 import { useTranslation } from 'react-i18next';
+import { fonts } from '../constants/fonts';
 
 const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
     const [search, setSearch] = useState('')
@@ -66,7 +67,7 @@ const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
                                 placeholder={t("search_here")}
                                 value={search}
                                 onChangeText={setSearch}
-                                style={{ textAlign: I18nManager.isRTL ? 'right' : 'left', marginLeft: 10, color: "#000", paddingVertical: 15, width: '80%' }}
+                                style={{ textAlign: I18nManager.isRTL ? 'right' : 'left', marginLeft: 10, color: "#000", paddingVertical: 15, width: '80%',fontFamily:fonts.regular }}
                                 placeholderTextColor={"#00000080"}
                             />
                             <TouchableOpacity onPress={searchProduct} style={styles.rightIconSearch}>
@@ -84,7 +85,7 @@ const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
                                 ListEmptyComponent={() => {
                                     return (
                                         <View style={{ alignItems: "center", justifyContent: "center", flex: 1, height: height / 1.5 }}>
-                                            <Text style={{ color: "#000" }}>{t("no_product_found")}</Text>
+                                            <Text style={{ color: "#000" ,fontFamily:fonts.semiBold}}>{t("no_product_found")}</Text>
                                         </View>
 
                                     )
@@ -141,7 +142,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         height: 50,
         borderRadius: 30,
-        marginBottom: 15
+        marginBottom: 15,
+        marginTop:40
     },
     rightIconSearch: {
         marginLeft: "auto",

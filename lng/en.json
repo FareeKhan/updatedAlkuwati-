@@ -173,7 +173,10 @@
   "Jahra": "Jahra",
   "noDataFound": "No Data Found",
   "creditCard": "Credit Card",
-  "cash": "Cash"
+  "cash": "Cash",
+  "subTotal":"Sub Total",
+  "delivery":"Delivery",
+
 
      
 

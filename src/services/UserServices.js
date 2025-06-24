@@ -115,6 +115,24 @@ export const productDetails = async (id) => {
     }
 };
 
+export const deliveryCharges = async (id) => {
+    try {
+        const response = await fetch(`${baseUrl}/deliveryCharges_admin`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+        });
+
+        const result = await response.json();
+        return result;
+
+    } catch (e) {
+        console.log('oo', e)
+    }
+};
+
 
 export const editShippingAddress = async (address, userID, id) => {
 
@@ -247,8 +265,7 @@ export const postPromoCoder = async (value) => {
 };
 
 
-export const orderConfirmed = async (productNo, address, totalPrice, data, email, userID, token_obj) => {
-    console.log('cccccc', userID)
+export const orderConfirmed = async (productNo, address,  data, email, userID, token_obj, subTotal,delCharges,discount,finalPrice) => {
     const orderDetails = data?.map((item, index) => ({
         "id": item?.id,
         "image": item?.image,
@@ -284,10 +301,10 @@ export const orderConfirmed = async (productNo, address, totalPrice, data, email
                     "order_status": "confirmed",
                     "payment_status": "pending",
                     "paymentType": token_obj,
-                    "total_price": totalPrice,
-                    "subtotal_price": totalPrice,
-                    "discount": 0,
-                    "delivery_price": 0,
+                    "total_price": finalPrice,
+                    "subtotal_price": subTotal,
+                    "discount": discount || 0,
+                    "delivery_price":delCharges || 0,
                     "Avenue": "demo",
                     "theStreet": address?.street,
                     "token": token_obj,

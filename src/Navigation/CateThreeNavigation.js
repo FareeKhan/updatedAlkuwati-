@@ -78,6 +78,7 @@ const CateThreeNavigation = ({ subCates, isactive, cate, cateID ,navigation,setS
     // };
 
 
+
     const onPressCat = (selectedValue)=>{
         setStateValue([])
         navigation.navigate('StackNavigations', {
