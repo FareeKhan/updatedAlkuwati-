@@ -46,7 +46,24 @@ const OrderDetails = ({ navigation, route }) => {
 
 
     const getDeliveryCharges = () => {
-        const countryRules = deliveryChargesData.filter(rule => rule.country === userAddress?.country);
+
+        var updatCountry = userAddress?.country
+        if (userAddress?.country == "الكويت") {
+            updatCountry = 'Kuwait'
+        } else if (userAddress?.country == "المملكة العربية السعودية") {
+            updatCountry = 'Saudi Arabia'
+        } else if (userAddress?.country == "الإمارات العربية المتحدة") {
+            updatCountry = 'United Arab Emirates'
+        } else if (userAddress?.country == "البحرين") {
+            updatCountry = 'Bahrain'
+        } else if (userAddress?.country == "قطر") {
+            updatCountry = 'Qatar'
+        } else if (userAddress?.country =="عُمان") {
+            updatCountry = 'Oman'
+        }
+
+
+        const countryRules = deliveryChargesData.filter(rule => rule.country === updatCountry);
         // Find matching range
         const matchedRule = countryRules.find(rule =>
             totalWeight >= rule.delivery_weight_range_start &&
@@ -54,13 +71,13 @@ const OrderDetails = ({ navigation, route }) => {
         );
 
 
-        if (!matchedRule) return null;
+        if (!matchedRule) return 2;
         // return totalWeight * matchedRule.per_kg_price;
         return matchedRule.per_kg_price;
     }
     const totalDeliveryCharges = getDeliveryCharges()
     const FinalTotal = Number(totalDeliveryCharges) + Number(totalPrice) - Number(promoCodeValue)
-    console.log('FinalTotal', promoCodeValue)
+    console.log('FinalTotal', totalDeliveryCharges)
 
     useEffect(() => {
         DeliveryCharges()
@@ -166,13 +183,16 @@ const OrderDetails = ({ navigation, route }) => {
         if (userId) {
             navigation.navigate('PaymentOrder', {
                 FinalTotal: FinalTotal,
-                subTotal:totalPrice,
-                discount:promoCodeValue,
-                delCharges:totalDeliveryCharges
+                subTotal: totalPrice,
+                discount: promoCodeValue,
+                delCharges: totalDeliveryCharges
             })
         } else if (userAddress !== undefined) {
             navigation.navigate('VerifyCode', {
-                totalPrice: totalPrice,
+             FinalTotal: FinalTotal,
+                subTotal: totalPrice,
+                discount: promoCodeValue,
+                delCharges: totalDeliveryCharges,
                 phoneNo: userAddress?.phone
             })
         }
@@ -297,7 +317,7 @@ const OrderDetails = ({ navigation, route }) => {
                         <Text style={{ fontSize: 10, color: "#AAA" }}>{t("total_price")}</Text>
                         <Text style={styles.bottomPrice}>KD{totalPrice}</Text>
                     </View> */}
-                   
+
                     <View style={styles.bottomContent}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                             <CustomText>{t('subTotal')}</CustomText>

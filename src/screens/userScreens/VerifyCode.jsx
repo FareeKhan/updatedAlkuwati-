@@ -32,7 +32,8 @@ const VerifyCode = ({ navigation, route }) => {
     const [getOTPCoder, setOTPCoder] = useState();
     const [getTextReSend, setTextReSend] = useState();
     const [isModal, setIsModal] = useState(true)
-    const { phoneNo, totalPrice, address } = route.params
+    const { phoneNo, FinalTotal, subTotal ,discount,delCharges} = route.params
+
     const [FCNToken, setFCNToken] = useState();
 
     const [value, setValue] = useState('')
@@ -232,9 +233,12 @@ const VerifyCode = ({ navigation, route }) => {
             }))
 
             navigation.navigate('PaymentOrder', {
-                totalPrice: totalPrice
+                   FinalTotal: FinalTotal,
+                subTotal: subTotal,
+                discount: discount,
+                delCharges: delCharges,
             })
-
+ 
 
 
         } catch (error) {
@@ -380,7 +384,6 @@ const styles = StyleSheet.create({
     innerContainer: {
         paddingHorizontal: 20,
         marginTop: 90,
-        direction: "ltr"
     },
     phoneTxt: {
         color: "grey",
@@ -417,11 +420,9 @@ const styles = StyleSheet.create({
     },
 
     codeFieldRoot: {
-        marginBottom: 30,
-        width: "85%",
-        alignSelf: "center",
-        direction: "ltr",
-        flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row'
+       marginTop: 20,
+        marginBottom: 10,
+        flexDirection:I18nManager.isRTL?  "row-reverse" :"row"
     },
     cell: {
         width: 45,
