@@ -479,7 +479,7 @@ const ProductDetails = ({ navigation, route }) => {
                             isSelected && { borderColor: color.primary }
                           ]}
                         >
-                          <CustomText style={{ color: inStock ? color.black : color.gray, marginBottom: Platform.OS == 'ios' ? 0 : I18nManager.isRTL ? 5 : 0, }}>
+                          <CustomText style={{ color: inStock ? color.black : color.gray,  }}>
                             {item}
                           </CustomText>
                         </TouchableOpacity>

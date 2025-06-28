@@ -1,4 +1,4 @@
-import { Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import ExportSvg from '../constants/ExportSvg'
 import { color } from '../constants/color'
@@ -17,18 +17,20 @@ import LottieView from 'lottie-react-native'
 const { width } = Dimensions.get('screen')
 import FastImage from 'react-native-fast-image'
 import { fonts } from '../constants/fonts'
+import { showMessage } from 'react-native-flash-message'
 
 const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon, setModalVisible }) => {
   const dispatch = useDispatch()
   const navigation = useNavigation()
   const [loading, setLoading] = useState(true)
+  const [isCartLoader, setIsCartLaoder] = useState(false)
 
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const favoriteList = useSelector((state) => state?.favorite?.AddInFavorite)
 
   const isCheck = data?.some((value) => value?.id == item?.id)
 
-
+  console.log('vsss', isCheck)
   const isFavorite = favoriteList.some(favorite => favorite.id === item.id);
 
   const animation = 'fadeInUp';
@@ -91,22 +93,32 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
 
   const getProductDetail = async (item) => {
     console.log('ss', item?.id)
+    setIsCartLaoder(true)
     try {
       const response = await productDetails(item?.id);
       if (response?.status) {
+
         if (response?.data?.quantity > 0) {
+          console.log('Object.keys(response?.variant_system?.available_attributes || {}).length > 0', Object.keys(response?.variant_system?.available_attributes || {}).length > 0)
           if (Object.keys(response?.variant_system?.available_attributes || {}).length > 0) {
-            setModalVisible(false)
             navigation.navigate('ProductDetails', { id: item?.id })
           } else {
             addToCart()
           }
+        } else {
+          showMessage({
+            type: "danger",
+            message: t('outOfStocks')
+          })
         }
       } else {
       }
     } catch (error) {
+      setIsCartLaoder(false)
 
     } finally {
+      setIsCartLaoder(false)
+
     }
   };
 
@@ -114,45 +126,58 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
 
     // newcodeAddres
 
+    if (isCheck) {
+      showMessage({
+        type: "warning",
+        message: t('alreadyAdded')
+      })
+    } else {
+      animatedValue.setValue(0);
+      shadowOpacity.setValue(1);
 
+      Animated.timing(animatedValue, {
+        toValue: 1,
+        duration: 700,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start(() => {
+        dispatch(
+          addProductToCart({
+            id: item?.id,
+            productName: item?.name,
+            price: item?.price,
+            productWeight: item?.weight ? item?.weight : '00000',
+            size: 'M',
+            counter: 1,
+            subText: removeHTMLCode(item?.description),
+            image: item?.image,
+          }),
+        );
+
+        showMessage({
+          type: "success",
+          message: t('productAdded')
+        })
+
+        // CustomToast(t('productAdded'), "success")
+
+        // navigation.navigate('MyCart');
+        ReactNativeHapticFeedback.trigger('impactLight');
+        Animated.timing(shadowOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      });
+      // Add the product to cart here
+    }
 
     // if(item?.variants?.length>0){
     //   alert('ss')
     //   return
     // }
 
-    animatedValue.setValue(0);
-    shadowOpacity.setValue(1);
 
-    Animated.timing(animatedValue, {
-      toValue: 1,
-      duration: 700,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: true,
-    }).start(() => {
-      dispatch(
-        addProductToCart({
-          id: item?.id,
-          productName: item?.name,
-          price: item?.price,
-          productWeight: item?.weight ? item?.weight : '00000',
-          size: 'M',
-          counter: 1,
-          subText: removeHTMLCode(item?.description),
-          image: item?.image,
-        }),
-      );
-
-      // CustomToast(t('productAdded'), "success")
-
-      // navigation.navigate('MyCart');
-      ReactNativeHapticFeedback.trigger('impactLight');
-      Animated.timing(shadowOpacity, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
-    });
 
     // end
     // dispatch(
@@ -224,7 +249,13 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
             {
               isShowPlusIcon &&
               <TouchableOpacity onPress={() => getProductDetail(item)} style={{}}>
-                <AntDesign name="pluscircle" size={20} color="#67300f" style={{ marginBottom: 0 }} />
+                {
+                  isCartLoader ?
+                    <ActivityIndicator size={'small'} color={color.theme} />
+                    :
+                    <AntDesign name="pluscircle" size={20} color="#67300f" style={{ marginBottom: 0 }} />
+
+                }
               </TouchableOpacity>
             }
 
