@@ -1822,7 +1822,7 @@ SPEC CHECKSUMS:
   RNFBMessaging: f0760e86d85a314e39281301b4ea3e337ef12d96
   RNGestureHandler: 514e542d339e9925349bfcbcb18f264330799715
   RNNotifee: 5e3b271e8ea7456a36eec994085543c9adca9168
-  RNPermissions: 696cf3a18f94d73ef4e32c059d178e538ef3d0c3
+  RNPermissions: c02769d06aa628406acf189ead60a849a853b04c
   RNReactNativeHapticFeedback: 06a14feff1e46f560a65653dade5cf1206bbfe2e
   RNReanimated: 0360fc3e49eed2ee7c42b36a6a36f0e2adb5f114
   RNScreens: 96524fceab80e5a14f59d2747618397e2ec52515

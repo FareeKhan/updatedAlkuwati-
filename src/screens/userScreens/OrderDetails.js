@@ -208,6 +208,17 @@ const OrderDetails = ({ navigation, route }) => {
                 <View style={{ marginLeft: 10, width: "80%" }}>
                     <Text numberOfLines={1} style={{ ...styles.productTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>{item?.productName}</Text>
                     <Text style={{ ...styles.subTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>{item?.subText}</Text>
+                         {
+                    Object.entries(item?.Variants || {}).map(([key, value]) => {
+                        if (key === "undefined" || value === undefined) return null;
+                        return (
+                            <Text style={{ ...styles.subTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }} key={key} numberOfLines={2}>
+                                {key}: {value}
+                            </Text>
+                        );
+                    })
+                }
+
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }} >
                         <Text style={{ ...styles.productPrice, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>KD {item?.price}</Text>
                         <CustomText style={{ color: color.theme, fontWeight: '500' }}>x{item?.counter}</CustomText>

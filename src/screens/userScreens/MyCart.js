@@ -41,10 +41,13 @@ const MyCart = ({ navigation }) => {
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const { t } = useTranslation();
   const { totalPrice } = useSelector(state => state.cartProducts);
+console.log('data',data)
 
-
-  const incrementProduct = id => {
+  const incrementProduct = (stock,id) => {
+    const checkStock = data?.find((item)=>item?.id == id)
+    if(checkStock?.counter <stock){
     dispatch(incrementCounter(id));
+    }
   };
 
   const decrementProduct = id => {
@@ -58,13 +61,24 @@ const MyCart = ({ navigation }) => {
   const renderItem = ({ item, index }) => {
     return (
       <View style={styles.productContainer}>
-      
-<SmallImageLoader
-imagePath={item?.image}
-/>
+
+        <SmallImageLoader
+          imagePath={item?.image}
+        />
         <View style={{ marginLeft: 10, width: "40%" }}>
+
           <Text style={styles.productTitle}>{item?.productName}</Text>
           <Text style={styles.subTitle}>{item?.subText}</Text>
+           {
+                    Object.entries(item?.Variants || {}).map(([key, value]) => {
+                        if (key === "undefined" || value === undefined) return null;
+                        return (
+                            <Text style={styles.subTitle} key={key} numberOfLines={2}>
+                                {key}: {value}
+                            </Text>
+                        );
+                    })
+                }
           {/* <Text style={styles.productPrice}>KD{item?.price?.toFixed(2)}</Text> */}
           <Text style={styles.productPrice}>KD {item?.price}</Text>
         </View>
@@ -84,7 +98,7 @@ imagePath={item?.image}
 
               <Text style={styles.counterNumberTxt}>{item?.counter}</Text>
 
-              <TouchableOpacity onPress={() => incrementProduct(item?.id)}>
+              <TouchableOpacity onPress={() => incrementProduct(item?.Variants_stock,item?.id)}>
                 <Text style={styles.incrementBtnTxt}>+</Text>
               </TouchableOpacity>
             </View>
@@ -214,7 +228,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: color.theme,
     fontWeight: '600',
-    fontFamily:fonts.semiBold,
+    fontFamily: fonts.semiBold,
   },
   emptyScreen: {
     flex: 1,
@@ -243,7 +257,7 @@ const styles = StyleSheet.create({
     color: color.theme,
     marginBottom: 5,
     textAlign: 'left',
-    fontFamily:fonts.regular
+    fontFamily: fonts.regular
 
   },
   subTitle: {
@@ -351,7 +365,7 @@ const styles = StyleSheet.create({
   selectedItemTxt: {
     fontWeight: '600',
     color: color.grayShade,
-    fontFamily:fonts.semiBold
+    fontFamily: fonts.semiBold
   },
   selectedItemPriceTxt: {
     fontWeight: '600',
@@ -378,7 +392,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '500',
     fontSize: 16,
-    fontFamily:fonts.bold
+    fontFamily: fonts.bold
   },
   cartTxt: {
     color: color.theme,

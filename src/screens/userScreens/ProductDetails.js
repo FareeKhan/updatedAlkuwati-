@@ -61,6 +61,7 @@ const ProductDetails = ({ navigation, route }) => {
   const [selectedColorId, setSelectedColorId] = useState('');
   const [selectedImage, setSelectedImage] = useState('');
   const [imgUrl, setImgUrl] = useState('');
+  const [selectedAttributes, setSelectedAttributes] = useState({});
 
 
   const [selectedVariant, setSelectedVariant] = useState('');
@@ -97,6 +98,7 @@ const ProductDetails = ({ navigation, route }) => {
   useEffect(() => {
     getProductDetail();
   }, []);
+  console.log('id', id)
 
   const getProductDetail = async () => {
     setIsLoader(true);
@@ -106,6 +108,18 @@ const ProductDetails = ({ navigation, route }) => {
       if (response?.status) {
         setProductData(response);
         setProductObject(response?.data);
+
+        const availableVariant = response?.variant_system?.optimized_variants?.find(
+          variant => variant?.stock_quantity > 0
+        );
+
+        if (availableVariant) {
+          setSelectedVariant(availableVariant);
+          const firstAttrKey = Object.keys(availableVariant.attributes_array)[0];
+          setSelectedAttributes({
+            [firstAttrKey]: availableVariant.attributes_array[firstAttrKey],
+          });
+        }
         setIsLoader(false);
       } else {
         setProductData([]);
@@ -129,10 +143,14 @@ const ProductDetails = ({ navigation, route }) => {
         price: productObject?.price,
         size: selectedSize,
         counter: productOrder,
+        Variants: selectedAttributes ? selectedAttributes : '',
+        Variants_stock: selectedVariant?.stock_quantity,
         subText: removeHTMLCode(productObject?.description),
         productWeight: selectedVariant ? selectedVariant?.weight : productObject?.weight ? productObject?.weight : '00000',
-        image:
-          imgUrl == '' ? productData?.product_images[0]?.image_url : imgUrl,
+        image: selectedVariant ? selectedVariant?.main_image : selectedImage ? selectedImage : productData?.product_images[0]?.image_url,
+
+        // image:
+        //   imgUrl == '' ? productData?.product_images[0]?.image_url : imgUrl,
       }),
     );
 
@@ -142,11 +160,16 @@ const ProductDetails = ({ navigation, route }) => {
     ReactNativeHapticFeedback.trigger('impactLight');
   };
 
+  console.log('--', selectedVariant?.stock_quantity)
   const quantity = type => {
     if (type == 'de') {
+
       setProductOrder(productOrder > 1 ? productOrder - 1 : 1);
     } else {
-      setProductOrder(productOrder + 1);
+      if (selectedVariant?.stock_quantity > productOrder) {
+        setProductOrder(productOrder + 1);
+
+      }
     }
     ReactNativeHapticFeedback.trigger('impactLight');
   };
@@ -169,14 +192,64 @@ const ProductDetails = ({ navigation, route }) => {
     index === self.findIndex(t => t.size === item.size)
   )
 
+  // const handleVariant = (key, value) => {
+  //   const filteredVariants = productData?.variant_system?.optimized_variants.filter(variant => {
+  //     const attrs = variant?.attributes_array;
+  //     const key = Object.keys(attrs || {})[0];
+  //     return attrs[key] === value;
+  //   });
+  //   setSelectedVariant(filteredVariants[0])
+  //   setSelectedImage(null)
+  // }
+
   const handleVariant = (key, value) => {
-    const filteredVariants = productData?.variant_system?.optimized_variants.filter(variant => {
-      const attrs = variant?.attributes_array;
-      const key = Object.keys(attrs || {})[0];
-      return attrs[key] === value;
+    const updatedAttributes = { ...selectedAttributes, [key]: value };
+    setSelectedAttributes(updatedAttributes);
+
+    const matchedVariant = productData?.variant_system?.optimized_variants.find(variant => {
+      return Object.entries(updatedAttributes).every(([attrKey, attrValue]) => {
+        return variant.attributes_array[attrKey] === attrValue;
+      });
     });
-    setSelectedVariant(filteredVariants[0])
-  }
+
+    if (matchedVariant) {
+      setSelectedVariant(matchedVariant);
+    }
+
+    // 🧠 Dynamically detect and auto-select the next attribute
+    const attributeKeys = Object.keys(productData?.variant_system?.available_attributes || {});
+    const currentAttrIndex = attributeKeys.indexOf(key);
+    const nextAttrKey = attributeKeys[currentAttrIndex + 1];
+
+    if (nextAttrKey) {
+      // Find all available values for the next attribute matching the current selection
+      const nextAttrOptions = productData?.variant_system?.optimized_variants
+        .filter(variant => {
+          return (
+            variant.stock_quantity > 0 &&
+            variant.attributes_array[key] === value // current key-value match
+          );
+        })
+        .map(variant => variant.attributes_array[nextAttrKey]);
+
+      if (nextAttrOptions?.length > 0) {
+        const firstNextValue = nextAttrOptions[0];
+        const autoAttributes = {
+          ...updatedAttributes,
+          [nextAttrKey]: firstNextValue,
+        };
+
+        const autoVariant = productData?.variant_system?.optimized_variants.find(variant =>
+          Object.entries(autoAttributes).every(([attrKey, attrValue]) => {
+            return variant.attributes_array[attrKey] === attrValue;
+          })
+        );
+
+        setSelectedAttributes(autoAttributes);
+        if (autoVariant) setSelectedVariant(autoVariant);
+      }
+    }
+  };
 
 
   const isCheckQuantity = selectedVariant?.stock_quantity ? selectedVariant?.stock_quantity == 0 : productObject?.quantity == 0
@@ -200,7 +273,7 @@ const ProductDetails = ({ navigation, route }) => {
         />
 
         <View>
-          {
+          {/* {
             selectedVariant ?
               <View >
                 <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%" }} onPress={() => { setSelectedVariant(null), setCurrentIndex(0) }}>
@@ -229,7 +302,21 @@ const ProductDetails = ({ navigation, route }) => {
                 productVariants={productData?.variants}
                 selectedImage={selectedImage}
               />
-          }
+          } */}
+
+
+          <ProductSlider
+            currentIndex={currentIndex}
+            carouselRef={carouselRef}
+            setCurrentIndex={setCurrentIndex}
+            data={productData?.product_images}
+            setImgUrl={setImgUrl}
+            item={productObject}
+            setSelectedImage={setSelectedImage}
+            productVariants={productData?.variants}
+            selectedImage={selectedImage}
+            selectedVariant={selectedVariant}
+          />
 
           <View style={styles.productDetailContainer}>
             <View style={styles.productNamePriceBox}>
@@ -322,7 +409,7 @@ const ProductDetails = ({ navigation, route }) => {
                 </View>
               </ScrollView>
             </View> */}
-            {
+            {/* {
               productData?.variant_system?.available_attributes &&
               Object.entries(productData?.variant_system?.available_attributes).map(([key, values]) => (
 
@@ -345,7 +432,63 @@ const ProductDetails = ({ navigation, route }) => {
                 </View>
               ))
 
-            }
+            } */}
+
+            {productData?.variant_system?.available_attributes &&
+              typeof productData?.variant_system?.available_attributes === 'object' &&
+              Object.entries(productData.variant_system.available_attributes).map(([key, values]) => (
+                <View key={key} style={{ marginBottom: 10, marginTop: 10 }}>
+                  <CustomText style={styles.productName}>{key}</CustomText>
+
+                  <ScrollView
+                    showsHorizontalScrollIndicator={false}
+                    horizontal
+                    contentContainerStyle={{ gap: 10, marginTop: 10, flexGrow: 1 }}
+                  >
+                    {values.map((item, index) => {
+                      const isSelected = selectedVariant?.attributes_array?.[key] === item;
+
+                      // Filter variants by selected attributes except current key
+                      const filteredVariants = productData?.variant_system?.optimized_variants?.filter(variant => {
+                        return Object.entries(selectedAttributes).every(([attrKey, attrValue]) => {
+                          return attrKey === key || variant.attributes_array[attrKey] === attrValue;
+                        });
+                      });
+
+                      const matchingVariant = filteredVariants.find(
+                        variant => variant.attributes_array?.[key] === item
+                      );
+
+                      const inStock = matchingVariant?.stock_quantity > 0;
+
+                      return (
+                        <TouchableOpacity
+                          key={index}
+                          onPress={() => { (inStock ? handleVariant(key, item) : null), setSelectedImage(null) }}
+                          activeOpacity={inStock ? 0.8 : 1}
+                          style={[
+                            {
+                              borderWidth: 1,
+                              paddingHorizontal: 10,
+                              paddingVertical: 2,
+                              borderColor: inStock ? '#ccc' : '#00000010',
+                              borderRadius: 4,
+                              paddingTop: 0,
+
+                            },
+                            isSelected && { borderColor: color.primary }
+                          ]}
+                        >
+                          <CustomText style={{ color: inStock ? color.black : color.gray, marginBottom: Platform.OS == 'ios' ? 0 : I18nManager.isRTL ? 5 : 0, }}>
+                            {item}
+                          </CustomText>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              ))}
+
 
 
 

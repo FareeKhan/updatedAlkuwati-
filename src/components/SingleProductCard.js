@@ -18,12 +18,11 @@ const { width } = Dimensions.get('screen')
 import FastImage from 'react-native-fast-image'
 import { fonts } from '../constants/fonts'
 
-const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon }) => {
+const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon, setModalVisible }) => {
   const dispatch = useDispatch()
   const navigation = useNavigation()
   const [loading, setLoading] = useState(true)
-  const [isColor, setIsColor] = useState(false)
-  const [isSize, setIsSize] = useState(false)
+
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const favoriteList = useSelector((state) => state?.favorite?.AddInFavorite)
 
@@ -67,75 +66,94 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
 
 
 
-  // end of new code
+  // // end of new code
   useEffect(() => {
     getProductDetail()
   }, [])
 
-  const getProductDetail = async () => {
+  // const getProductDetail = async () => {
 
+  //   try {
+  //     const response = await productDetails(item?.id);
+  //     if (response?.status) {
+  //       setIsColor(response?.color_variants?.length > 0)
+  //       setIsSize(response?.size_variants?.length > 0)
+  //       // setProductData(response);
+  //       // setProductObject(response?.data[0]);
+
+  //     }
+  //   } catch (error) {
+
+  //     console.log(error);
+  //   }
+  // };
+
+
+  const getProductDetail = async (item) => {
+    console.log('ss', item?.id)
     try {
       const response = await productDetails(item?.id);
       if (response?.status) {
-        setIsColor(response?.color_variants?.length > 0)
-        setIsSize(response?.size_variants?.length > 0)
-        // setProductData(response);
-        // setProductObject(response?.data[0]);
-
+        if (response?.data?.quantity > 0) {
+          if (Object.keys(response?.variant_system?.available_attributes || {}).length > 0) {
+            setModalVisible(false)
+            navigation.navigate('ProductDetails', { id: item?.id })
+          } else {
+            addToCart()
+          }
+        }
+      } else {
       }
     } catch (error) {
 
-      console.log(error);
+    } finally {
     }
   };
-
 
   const addToCart = () => {
 
     // newcodeAddres
 
-    if (isColor || isSize) {
-      onPress()
-    } else {
-      if (isCheck) {
-        // alert(t('alreadyAdded'))
-        // CustomToast(t('alreadyAdded'), "danger")
-      } else {
-        animatedValue.setValue(0);
-        shadowOpacity.setValue(1);
 
-        Animated.timing(animatedValue, {
-          toValue: 1,
-          duration: 700,
-          easing: Easing.out(Easing.ease),
-          useNativeDriver: true,
-        }).start(() => {
-          dispatch(
-            addProductToCart({
-              id: item?.id,
-              productName: item?.name,
-              price: item?.price,
-              productWeight: item?.weight ? item?.weight : '00000',
-              size: 'M',
-              counter: 1,
-              subText: removeHTMLCode(item?.description),
-              image: item?.image,
-            }),
-          );
 
-          // CustomToast(t('productAdded'), "success")
+    // if(item?.variants?.length>0){
+    //   alert('ss')
+    //   return
+    // }
 
-          // navigation.navigate('MyCart');
-          ReactNativeHapticFeedback.trigger('impactLight');
-          Animated.timing(shadowOpacity, {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }).start();
-        });
-      }
+    animatedValue.setValue(0);
+    shadowOpacity.setValue(1);
 
-    }
+    Animated.timing(animatedValue, {
+      toValue: 1,
+      duration: 700,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start(() => {
+      dispatch(
+        addProductToCart({
+          id: item?.id,
+          productName: item?.name,
+          price: item?.price,
+          productWeight: item?.weight ? item?.weight : '00000',
+          size: 'M',
+          counter: 1,
+          subText: removeHTMLCode(item?.description),
+          image: item?.image,
+        }),
+      );
+
+      // CustomToast(t('productAdded'), "success")
+
+      // navigation.navigate('MyCart');
+      ReactNativeHapticFeedback.trigger('impactLight');
+      Animated.timing(shadowOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    });
+
     // end
     // dispatch(
     //   addProductToCart({
@@ -205,7 +223,7 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", margin: 10 }}>
             {
               isShowPlusIcon &&
-              <TouchableOpacity onPress={() => addToCart(item)} style={{}}>
+              <TouchableOpacity onPress={() => getProductDetail(item)} style={{}}>
                 <AntDesign name="pluscircle" size={20} color="#67300f" style={{ marginBottom: 0 }} />
               </TouchableOpacity>
             }

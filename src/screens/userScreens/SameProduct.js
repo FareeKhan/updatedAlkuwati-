@@ -44,9 +44,8 @@ const SameProduct = ({ navigation, route }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoader, setIsLoader] = useState(false);
   const [productLoader, setProductLoader] = useState(false);
-  const [selectedCat, setSelectedCat] = useState('');
+  const [selectedCat, setSelectedCat] = useState(subC_ID);
   const [storeCategories, setStoreCategories] = useState([]);
-  const [updateSubCategory, setUpdateSubCategory] = useState(subC_ID);
 
   const { t } = useTranslation();
 
@@ -58,27 +57,28 @@ const SameProduct = ({ navigation, route }) => {
   useEffect(() => {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
     getCatList();
-  }, [updateSubCategory]);
+  }, [storeCategories]);
 
+  useEffect(() => {
+    setTimeout(() => { setIsLoader(false) }, 2000)
+  }, [])
 
   const getCatList = async () => {
-    setIsLoader(true);
     try {
-      const response = await categoriesListSub(updateSubCategory);
+      const response = await categoriesListSub(selectedCat);
       if (response?.status) {
         setIsLoader(false);
         setStoreCategories(response?.data);
-        if(selectedCat == ''){
-        setSelectedCat(response?.data?.subcategories[0]?.id)
-        setUpdateSubCategory(response?.data?.subcategories[0]?.id)
-        }
-      }else{
-      setIsLoader(false);
+      } else {
+        setIsLoader(false);
 
       }
     } catch (error) {
       setIsLoader(false);
       console.log(error);
+    } finally {
+      setProductLoader(false)
+
     }
   };
 
@@ -99,8 +99,8 @@ const SameProduct = ({ navigation, route }) => {
   };
 
 
-  const handleSubCategory = (id)=>{
-    setUpdateSubCategory(id)
+  const handleSubCategory = (id) => {
+    setProductLoader(true)
     setSelectedCat(id)
   }
 
@@ -141,16 +141,16 @@ const SameProduct = ({ navigation, route }) => {
           <FlatList
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{flexGrow:1}}
+            contentContainerStyle={{ flexGrow: 1 }}
             data={storeCategories?.subcategories}
-            renderItem={({item, index}) => {
+            renderItem={({ item, index }) => {
               return (
                 <Animatable.View
                   animation={animationMain}
                   duration={durationInner}
                   delay={(1 + index) * delayInner}>
                   <TouchableOpacity
-                    onPress={() =>handleSubCategory(item?.id) }
+                    onPress={() => handleSubCategory(item?.id)}
                     key={index}
                     style={[
                       styles.innerCatBox,
@@ -221,8 +221,8 @@ const styles = StyleSheet.create({
   arrivalTxt: {
     fontSize: 17,
     color: color.theme,
-    textAlign:"left",
-    fontFamily:fonts.semiBold
+    textAlign: "left",
+    fontFamily: fonts.semiBold
   },
 
   arrivalTitle: {

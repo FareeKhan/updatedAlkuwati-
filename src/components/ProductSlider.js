@@ -14,9 +14,10 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import Video from 'react-native-video';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import FastImage from 'react-native-fast-image';
 
 
-const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentIndex, data, setImgUrl, item, setSelectedImage, selectedImage }) => {
+const ProductSlider = ({ carouselRef, currentIndex, selectedVariant, setCurrentIndex, data, setImgUrl, item, setSelectedImage, selectedImage }) => {
     const youtubeUrls = typeof item?.youtube_urls === 'string'
         ? JSON.parse(item.youtube_urls || '[]')
         : item?.youtube_urls || [];
@@ -51,10 +52,10 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
         return "";
     }
 
-    const handleSnapToItem = (index) => {
-        setCurrentIndex(index)
-        setSelectedImage(null)
-    }
+    // const handleSnapToItem = (index) => {
+    //     setCurrentIndex(index)
+    //     setSelectedImage(null)
+    // }
 
     const favoriteProduct = (item) => {
         if (isFavorite) {
@@ -113,15 +114,24 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
                         :
 
                         <TouchableOpacity activeOpacity={1} onPress={() => setModalVisible(true)} style={[styles.renderItem1_img]}>
-                            {/* <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: item?.image_url }} style={styles.renderItem1_img} /> */}
-                            <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: selectedImage ? selectedImage : mediaItem }} style={[styles.renderItem1_img]} />
-                            {/* <Image onLoad={() => setLoader(false)} onError={() => setLoader(false)} resizeMode='cover' source={{ uri: mediaItem }} style={[styles.renderItem1_img]} /> */}
+
+                            <FastImage
+                                onLoadEnd={() => setLoader(false)}
+                                source={{
+                                    uri: selectedImage ? selectedImage : selectedVariant ? selectedVariant?.main_image : mediaItem,
+                                    priority: FastImage.priority.normal,
+                                }}
+                                style={{ width: width, height: width, borderRadius: 10 }}
+                                resizeMode={FastImage.resizeMode.contain}
+                            />
+
                         </TouchableOpacity>
                 }
             </View>
         );
     };
 
+    console.log('==', currentIndex)
 
     const isRTL = I18nManager.isRTL;
     // const displayImages = isRTL ? [...conCatImages].reverse() : conCatImages;
@@ -143,15 +153,16 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
                     pagingEnabled={true}
                     horizontal={true}
                     useScrollView={true}
-                    onSnapToItem={(index) => {
-                        const actualIndex = isRTL ? displayImages.length - 1 - index : index;
-                        handleSnapToItem(actualIndex);
-                    }}
+                    scrollEnabled={false} 
+                    // onSnapToItem={(index) => {
+                    //     const actualIndex = isRTL ? displayImages.length - 1 - index : index;
+                    //     handleSnapToItem(actualIndex);
+                    // }}
                     enableMomentum={true}
 
                 />
 
-                {
+                {/* {
                     conCatImages?.length > 1 &&
                     <TouchableOpacity
                         style={[styles.iconCommon, styles.iconLeft]}
@@ -168,10 +179,10 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
                     >
                         <Ionicons name={'arrow-back-circle-outline'} style={{ transform: [{ rotate: I18nManager.isRTL ? "180deg" : "0deg" }] }} size={25} color={"#cecece"} />
                     </TouchableOpacity>
-                }
+                } */}
 
 
-                {
+                {/* {
                     conCatImages?.length > 1 &&
                     <TouchableOpacity
                         style={[styles.iconCommon, styles.iconRight]}
@@ -191,7 +202,7 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
                         <Ionicons name={'arrow-back-circle-outline'} style={{ transform: [{ rotate: I18nManager.isRTL ? "0deg" : "180deg" }] }} size={25} color={"#cecece"} />
 
                     </TouchableOpacity>
-                }
+                } */}
 
                 {/* Favorite Icon */}
                 <TouchableOpacity onPress={() => favoriteProduct(item)} style={{ right: 15, position: "absolute", bottom: 20 }}>
@@ -204,7 +215,7 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
                 </TouchableOpacity>
 
                 {/* Dots Style */}
-                <View style={{ flexDirection: "row", justifyContent: "center", top: -30 }}>
+                {/* <View style={{ flexDirection: "row", justifyContent: "center", top: -30 }}>
                     {
                         data?.length > 1 &&
                         data?.map((item, index) => {
@@ -216,21 +227,23 @@ const ProductSlider = ({ carouselRef, currentIndex, productVariants, setCurrentI
                             )
                         })
                     }
-                </View>
+                </View> */}
             </View>
 
             {
                 conCatImages?.length > 0 &&
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{flex:1}} contentContainerStyle={{ flexGrow:1,gap: 10}} >
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1, gap: 10 }} >
                     {
                         conCatImages?.map((item, index) => {
                             return (
                                 <TouchableOpacity onPress={() => {
                                     setSelectedImage(item),
-                                        carouselRef.current?.snapToItem(index);
+                                        setCurrentIndex(item)
+
+                                    // carouselRef.current?.snapToItem(index);
                                 }} style={{ alignItems: "center", justifyContent: "center", marginBottom: 10, gap: 10, width: 70, height: 70, backgroundColor: "#cecece", borderRadius: 10 }}>
                                     {/* <Image borderRadius={10} onLoadEnd={() => setSmallImagesLoader(false)} source={{ uri: item?.image }} style={[{ width: 70, height: 70, gap: 10, }, selectedImage == item?.image && { borderWidth: 1, borderColor: color.theme }]} /> */}
-                                    <Image borderRadius={10} onLoadEnd={() => setSmallImagesLoader(false)} source={{ uri: item }} style={[{ width: 70, height: 70, gap: 10, }, currentIndex == index && { borderWidth: 1, borderColor: color.theme }]} />
+                                    <Image borderRadius={10} onLoadEnd={() => setSmallImagesLoader(false)} source={{ uri: item }} style={[{ width: 70, height: 70, gap: 10, }, currentIndex == item && { borderWidth: 1, borderColor: color.theme }]} />
                                     {
                                         smallImagesLoader && <View style={{ position: "absolute" }}>
                                             <ActivityIndicator size={'small'} color={color.theme} />

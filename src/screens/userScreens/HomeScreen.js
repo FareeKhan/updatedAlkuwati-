@@ -361,6 +361,7 @@ const HomeScreen = ({ navigation }) => {
       </TouchableOpacity>
     )
   }
+  console.log('arrivalDataarrivalData',arrivalData)
 
 
   // if (loader) {
