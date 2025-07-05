@@ -23,11 +23,18 @@ import { ToastProvider } from 'react-native-toast-notifications'
 import { color } from './src/constants/color'
 import { fonts } from './src/constants/fonts'
 import FlashMessage from 'react-native-flash-message'
+import FastImage from 'react-native-fast-image'
 
 
 const App = () => {
   //     id: 'kuwaitiApp2024',
   //     name: 'Kuwaiti App',
+
+
+    useEffect(() => {
+    FastImage.clearMemoryCache();
+    FastImage.clearDiskCache();
+  }, []);
 
 
   useEffect(() => {

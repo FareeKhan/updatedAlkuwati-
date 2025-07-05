@@ -17,7 +17,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import FastImage from 'react-native-fast-image';
 
 
-const ProductSlider = ({ carouselRef, currentIndex, selectedVariant, setCurrentIndex, data, setImgUrl, item, setSelectedImage, selectedImage }) => {
+const ProductSlider = ({ variantArray, carouselRef, currentIndex, setSelectedVariant, selectedVariant, setCurrentIndex, data, setImgUrl, item, setSelectedImage, selectedImage }) => {
     const youtubeUrls = typeof item?.youtube_urls === 'string'
         ? JSON.parse(item.youtube_urls || '[]')
         : item?.youtube_urls || [];
@@ -131,7 +131,16 @@ const ProductSlider = ({ carouselRef, currentIndex, selectedVariant, setCurrentI
         );
     };
 
-    console.log('==', currentIndex)
+
+    const handleImageSelection = (item) => {
+        console.log('itemitemitem', item)
+        setSelectedImage(item)
+        setCurrentIndex(item)
+        const handleVariantImage = variantArray?.find((i) => i?.main_image == item)
+        setSelectedVariant(handleVariantImage)
+    }
+
+
 
     const isRTL = I18nManager.isRTL;
     // const displayImages = isRTL ? [...conCatImages].reverse() : conCatImages;
@@ -153,7 +162,7 @@ const ProductSlider = ({ carouselRef, currentIndex, selectedVariant, setCurrentI
                     pagingEnabled={true}
                     horizontal={true}
                     useScrollView={true}
-                    scrollEnabled={false} 
+                    scrollEnabled={false}
                     // onSnapToItem={(index) => {
                     //     const actualIndex = isRTL ? displayImages.length - 1 - index : index;
                     //     handleSnapToItem(actualIndex);
@@ -236,12 +245,12 @@ const ProductSlider = ({ carouselRef, currentIndex, selectedVariant, setCurrentI
                     {
                         conCatImages?.map((item, index) => {
                             return (
-                                <TouchableOpacity onPress={() => {
-                                    setSelectedImage(item),
-                                        setCurrentIndex(item)
 
-                                    // carouselRef.current?.snapToItem(index);
-                                }} style={{ alignItems: "center", justifyContent: "center", marginBottom: 10, gap: 10, width: 70, height: 70, backgroundColor: "#cecece", borderRadius: 10 }}>
+                                <TouchableOpacity
+                                    key={index}
+                                    onPress={() => handleImageSelection(item)}
+
+                                    style={{ alignItems: "center", justifyContent: "center", marginBottom: 10, gap: 10, width: 70, height: 70, backgroundColor: "#cecece", borderRadius: 10 }}>
                                     {/* <Image borderRadius={10} onLoadEnd={() => setSmallImagesLoader(false)} source={{ uri: item?.image }} style={[{ width: 70, height: 70, gap: 10, }, selectedImage == item?.image && { borderWidth: 1, borderColor: color.theme }]} /> */}
                                     <Image borderRadius={10} onLoadEnd={() => setSmallImagesLoader(false)} source={{ uri: item }} style={[{ width: 70, height: 70, gap: 10, }, currentIndex == item && { borderWidth: 1, borderColor: color.theme }]} />
                                     {

@@ -98,7 +98,7 @@ const ProductDetails = ({ navigation, route }) => {
   useEffect(() => {
     getProductDetail();
   }, []);
-  console.log('id', id)
+
 
   const getProductDetail = async () => {
     setIsLoader(true);
@@ -114,11 +114,20 @@ const ProductDetails = ({ navigation, route }) => {
         );
 
         if (availableVariant) {
-          setSelectedVariant(availableVariant);
+
+          setSelectedVariant(availableVariant?.main_image);
+          setSelectedImage(availableVariant?.main_image)
+
+          setCurrentIndex(availableVariant?.main_image);
           const firstAttrKey = Object.keys(availableVariant.attributes_array)[0];
           setSelectedAttributes({
             [firstAttrKey]: availableVariant.attributes_array[firstAttrKey],
           });
+        } else {
+         
+          // setCurrentIndex(productData?.product_images[0]?.main_image);
+          // setSelectedImage(productData?.product_images[0]?.main_image);
+          console.log('comecomecome',productData?.product_images[0]);
         }
         setIsLoader(false);
       } else {
@@ -132,8 +141,14 @@ const ProductDetails = ({ navigation, route }) => {
     }
   };
 
-  const size = productData ? productData?.size_variants : '';
-  const colorVariants = productData ? productData?.color_variants : '';
+    useEffect(() => {
+
+    if (selectedVariant) {
+      setSelectedImage(selectedVariant?.main_image ? selectedVariant?.main_image : productData?.product_images[0]?.image_url)
+      setCurrentIndex(selectedVariant?.main_image ? selectedVariant?.main_image : productData?.product_images[0]?.image_url)
+    }
+
+  }, [selectedVariant])
 
   const addToCart = () => {
     dispatch(
@@ -160,7 +175,6 @@ const ProductDetails = ({ navigation, route }) => {
     ReactNativeHapticFeedback.trigger('impactLight');
   };
 
-  console.log('--', selectedVariant?.stock_quantity)
   const quantity = type => {
     if (type == 'de') {
 
@@ -186,21 +200,6 @@ const ProductDetails = ({ navigation, route }) => {
       console.error('Error sharing product:', error);
     }
   };
-
-
-  const filterSizes = productData?.variants?.filter((item, index, self) =>
-    index === self.findIndex(t => t.size === item.size)
-  )
-
-  // const handleVariant = (key, value) => {
-  //   const filteredVariants = productData?.variant_system?.optimized_variants.filter(variant => {
-  //     const attrs = variant?.attributes_array;
-  //     const key = Object.keys(attrs || {})[0];
-  //     return attrs[key] === value;
-  //   });
-  //   setSelectedVariant(filteredVariants[0])
-  //   setSelectedImage(null)
-  // }
 
   const handleVariant = (key, value) => {
     const updatedAttributes = { ...selectedAttributes, [key]: value };
@@ -250,9 +249,13 @@ const ProductDetails = ({ navigation, route }) => {
       }
     }
   };
+  const isOutOfStock =
+    productData?.variant_system?.has_variants &&
+    productData?.variant_system?.optimized_variants?.every(
+      variant => variant.stock_quantity === 0
+    );
 
-
-  const isCheckQuantity = selectedVariant?.stock_quantity ? selectedVariant?.stock_quantity == 0 : productObject?.quantity == 0
+  const isCheckQuantity = productObject?.quantity == 0 || isOutOfStock || (selectedVariant && selectedVariant?.stock_quantity == 0 || selectedVariant == undefined)
 
 
   if (isLoader) {
@@ -307,6 +310,7 @@ const ProductDetails = ({ navigation, route }) => {
 
           <ProductSlider
             currentIndex={currentIndex}
+            variantArray={productData?.variant_system?.optimized_variants}
             carouselRef={carouselRef}
             setCurrentIndex={setCurrentIndex}
             data={productData?.product_images}
@@ -316,6 +320,8 @@ const ProductDetails = ({ navigation, route }) => {
             productVariants={productData?.variants}
             selectedImage={selectedImage}
             selectedVariant={selectedVariant}
+            setSelectedVariant={setSelectedVariant}
+
           />
 
           <View style={styles.productDetailContainer}>
@@ -464,7 +470,7 @@ const ProductDetails = ({ navigation, route }) => {
                       return (
                         <TouchableOpacity
                           key={index}
-                          onPress={() => { (inStock ? handleVariant(key, item) : null), setSelectedImage(null) }}
+                          onPress={() => { (inStock ? handleVariant(key, item) : null) }}
                           activeOpacity={inStock ? 0.8 : 1}
                           style={[
                             {
@@ -479,7 +485,7 @@ const ProductDetails = ({ navigation, route }) => {
                             isSelected && { borderColor: color.primary }
                           ]}
                         >
-                          <CustomText style={{ color: inStock ? color.black : color.gray,  }}>
+                          <CustomText style={{ color: inStock ? color.black : color.gray, }}>
                             {item}
                           </CustomText>
                         </TouchableOpacity>
@@ -513,18 +519,16 @@ const ProductDetails = ({ navigation, route }) => {
           alignSelf: 'center',
           bottom: 90,
         }}>
-        <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart} style={[styles.bottomPriceCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}>
+        <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart} style={[styles.bottomPriceCartBox, isCheckQuantity && { backgroundColor: "#ccc" }]}>
           {/* <TouchableOpacity onPress={addToCart} style={[styles.bottomPriceCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}> */}
           <Text style={styles.productPrice}>KD {selectedVariant?.price ? selectedVariant?.price : productObject?.price}</Text>
 
-          <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart} style={[styles.bottomCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}>
+          <View style={[styles.bottomCartBox,]}>
             {/* <ExportSvg.ShippingCart style={{ marginRight: 10 }} /> */}
             <Ionicons name={'bag-handle-outline'} size={20} color={"#fff"} style={{ marginRight: 10 }} />
 
-            <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart}>
-              <Text style={styles.cartTxt}>{t('add_to_cart')}</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
+            <Text style={styles.cartTxt}>{t('add_to_cart')}</Text>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -668,7 +672,6 @@ const styles = StyleSheet.create({
   bottomCartBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
     paddingHorizontal: 10,
     paddingVertical: 7,
     borderRadius: 5,
