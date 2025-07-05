@@ -24,6 +24,7 @@ import withPressAnimated from './hocs/withPressAnimated';
 import registercustomAnimations, { ANIMATIONS } from './animations';
 import CategorySubList from './CategorySubList'
 import DrawerSceneWrapper from '../../Navigation/DrawerSceneWrapper'
+import HeaderBox from '../../components/HeaderBox'
 
 
 registercustomAnimations()
@@ -239,7 +240,7 @@ const AllProducts = ({ navigation }) => {
                 style={{ flex: 1 }}
             >
                 <View style={styles.mainContainer}>
-                    <View style={styles.headerContainer}>
+                    {/* <View style={styles.headerContainer}>
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Ionicons size={40} name={I18nManager.isRTL ? 'chevron-forward-circle' : 'chevron-back-circle'} color={color.theme} />
                         </TouchableOpacity>
@@ -256,12 +257,17 @@ const AllProducts = ({ navigation }) => {
                             }} />
                             <Text style={{ color: "#00000080" }}>{t("search_here")}</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
+                    <HeaderBox 
+                    cartIcon={true}
+                    style={{paddingHorizontal:20}}
+                    
+                    />
 
                     <Animatable.View
                         ref={viewRef}
                         easing={'ease-in-out'}
-                        style={{ marginTop: -10, paddingHorizontal: 15 }}
+                        style={{ paddingHorizontal: 15 ,marginTop:30}}
                         duration={durationMain}>
                         <FlatList
                             data={storeCat}
@@ -324,7 +330,7 @@ const styles = StyleSheet.create({
     textBox: { fontSize: 12, fontWeight: '500', marginTop: 8, color: color.theme },
     mainContainer: {
         flex: 1,
-        paddingTop: Platform.OS == 'ios' ? 40 : 20,
+        paddingTop: Platform.OS == 'ios' ? 70 : 20,
         paddingHorizontal: 0,
         backgroundColor: "#fff",
 

@@ -529,7 +529,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    paddingTop: Platform.OS == 'ios' ? 40 : 20,
+    paddingTop: Platform.OS == 'ios' ? 70 : 20,
     paddingHorizontal: 15,
     backgroundColor: '#fff',
   },

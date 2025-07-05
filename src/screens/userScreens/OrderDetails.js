@@ -15,6 +15,7 @@ import CircleLoader from '../../components/CircleLoader'
 import Text from '../../components/CustomText'
 import { fonts } from '../../constants/fonts'
 import { showMessage } from 'react-native-flash-message'
+import SmallImageLoader from '../../components/SmallImageLoader'
 const OrderDetails = ({ navigation, route }) => {
     //const { totalPrice } = route?.params
     const dispatch = useDispatch()
@@ -58,7 +59,7 @@ const OrderDetails = ({ navigation, route }) => {
             updatCountry = 'Bahrain'
         } else if (userAddress?.country == "قطر") {
             updatCountry = 'Qatar'
-        } else if (userAddress?.country =="عُمان") {
+        } else if (userAddress?.country == "عُمان") {
             updatCountry = 'Oman'
         }
 
@@ -189,7 +190,7 @@ const OrderDetails = ({ navigation, route }) => {
             })
         } else if (userAddress !== undefined) {
             navigation.navigate('VerifyCode', {
-             FinalTotal: FinalTotal,
+                FinalTotal: FinalTotal,
                 subTotal: totalPrice,
                 discount: promoCodeValue,
                 delCharges: totalDeliveryCharges,
@@ -203,21 +204,22 @@ const OrderDetails = ({ navigation, route }) => {
     const renderItem = ({ item, index }) => {
         return (
             <View style={styles.productContainer}>
-                <Image borderRadius={5} source={{ uri: item?.image }} style={{ width: 60, height: 60 }} />
+                <SmallImageLoader imagePath={item?.image} />
+
 
                 <View style={{ marginLeft: 10, width: "80%" }}>
                     <Text numberOfLines={1} style={{ ...styles.productTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>{item?.productName}</Text>
                     <Text style={{ ...styles.subTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>{item?.subText}</Text>
-                         {
-                    Object.entries(item?.Variants || {}).map(([key, value]) => {
-                        if (key === "undefined" || value === undefined) return null;
-                        return (
-                            <Text style={{ ...styles.subTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }} key={key} numberOfLines={2}>
-                                {key}: {value}
-                            </Text>
-                        );
-                    })
-                }
+                    {
+                        Object.entries(item?.Variants || {}).map(([key, value]) => {
+                            if (key === "undefined" || value === undefined) return null;
+                            return (
+                                <Text style={{ ...styles.subTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }} key={key} numberOfLines={2}>
+                                    {key}: {value}
+                                </Text>
+                            );
+                        })
+                    }
 
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }} >
                         <Text style={{ ...styles.productPrice, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>KD {item?.price}</Text>

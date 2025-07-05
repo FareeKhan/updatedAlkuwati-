@@ -10,7 +10,6 @@ export const userAddress = createSlice({
     reducers: {
         storeUserAddress :(state,action)=>{
             state.storeAddress= action.payload
-            console.log('testignADdress',state.storeAddress)
         }
 
     }

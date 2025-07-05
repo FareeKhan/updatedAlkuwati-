@@ -106,13 +106,16 @@ const ProductDetails = ({ navigation, route }) => {
           variant => variant?.stock_quantity > 0
         );
         if (availableVariant) {
-          setSelectedVariant(availableVariant?.main_image);
+          setSelectedVariant(availableVariant);
           setSelectedImage(availableVariant?.main_image);
           setCurrentIndex(availableVariant?.main_image);
           const firstAttrKey = Object.keys(availableVariant.attributes_array)[0];
           setSelectedAttributes({
             [firstAttrKey]: availableVariant.attributes_array[firstAttrKey],
           });
+        } else {
+          setSelectedImage(response?.product_images[0]?.image_url)
+          setCurrentIndex(response?.product_images[0]?.image_url)
         }
         const allImages = extractProductImages(response?.data?.product_images || []);
         if (allImages.length > 0) {
@@ -150,12 +153,7 @@ const ProductDetails = ({ navigation, route }) => {
     }
   };
 
-  useEffect(() => {
-    if (selectedVariant) {
-      setSelectedImage(selectedVariant?.main_image ? selectedVariant?.main_image : productData?.product_images[0]?.image_url);
-      setCurrentIndex(selectedVariant?.main_image ? selectedVariant?.main_image : productData?.product_images[0]?.image_url);
-    }
-  }, [selectedVariant]);
+
 
   const addToCart = () => {
     dispatch(
@@ -212,6 +210,8 @@ const ProductDetails = ({ navigation, route }) => {
     });
     if (matchedVariant) {
       setSelectedVariant(matchedVariant);
+      setSelectedImage(matchedVariant?.main_image);
+      setCurrentIndex(matchedVariant?.main_image);
     }
     const attributeKeys = Object.keys(productData?.variant_system?.available_attributes || {});
     const currentAttrIndex = attributeKeys.indexOf(key);

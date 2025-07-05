@@ -18,7 +18,7 @@ import FastImage from 'react-native-fast-image'
 import { fonts } from '../constants/fonts'
 import { showMessage } from 'react-native-flash-message'
 
-const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon, setModalVisible, isPreloaded = false }) => {
+const SingleProductCard = ({ item, index, isDot = true, onPress, countList = 1, isShowPlusIcon, setModalVisible, isPreloaded = false }) => {
   const dispatch = useDispatch()
   const navigation = useNavigation()
   const [loading, setLoading] = useState(!isPreloaded) // Don't show loader if image is preloaded
@@ -53,11 +53,11 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
   const animatedValue = useRef(new Animated.Value(0)).current;
   const shadowOpacity = useRef(new Animated.Value(1)).current;
 
-  const startX = 150; 
-  const startY = 500; 
+  const startX = 150;
+  const startY = 500;
 
-  const endX = -150; 
-  const endY = 50; 
+  const endX = -150;
+  const endY = 50;
 
   useEffect(() => {
     if (isPreloaded && item.image) {
@@ -178,12 +178,12 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
         <FastImage
           onLoad={() => setLoading(false)}
           onError={() => setLoading(false)}
-          source={{ 
-            uri: item.image, 
+          source={{
+            uri: item.image,
             priority: FastImage.priority.high,
             cache: FastImage.cacheControl.immutable
           }}
-          style={{ width: 170, height: 170, marginRight: 5, borderRadius: 20 }} 
+          style={{ width: 170, height: 170, marginRight: 5, borderRadius: 20 }}
           borderRadius={20}
         >
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", margin: 10 }}>
@@ -213,12 +213,15 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
 
         </FastImage>
 
-        <Animated.View
-          style={[
-            styles.shadow,
-            { transform: [{ translateX }, { translateY }], opacity: shadowOpacity },
-          ]}
-        />
+        {
+          isDot &&
+          <Animated.View
+            style={[
+              styles.shadow,
+              { transform: [{ translateX }, { translateY }], opacity: shadowOpacity },
+            ]}
+          />
+        }
 
         <View style={{ width: width / 2.5 }}>
           <Text numberOfLines={1} style={styles.arrivalTitle}>{item?.name}</Text>

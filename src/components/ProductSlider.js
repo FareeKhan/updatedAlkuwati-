@@ -251,8 +251,19 @@ const ProductSlider = ({ variantArray, carouselRef, currentIndex, setSelectedVar
                                     onPress={() => handleImageSelection(item)}
 
                                     style={{ alignItems: "center", justifyContent: "center", marginBottom: 10, gap: 10, width: 70, height: 70, backgroundColor: "#cecece", borderRadius: 10 }}>
-                                    {/* <Image borderRadius={10} onLoadEnd={() => setSmallImagesLoader(false)} source={{ uri: item?.image }} style={[{ width: 70, height: 70, gap: 10, }, selectedImage == item?.image && { borderWidth: 1, borderColor: color.theme }]} /> */}
-                                    <Image borderRadius={10} onLoadEnd={() => setSmallImagesLoader(false)} source={{ uri: item }} style={[{ width: 70, height: 70, gap: 10, }, currentIndex == item && { borderWidth: 1, borderColor: color.theme }]} />
+
+                                    <FastImage
+                                        onLoadEnd={() => setSmallImagesLoader(false)}
+                                        source={{
+                                            uri: item,
+                                            priority: FastImage.priority.high,
+                                        }}
+                                        //    style={[{ width: 70, height: 70, gap: 10, }]}
+                                        style={[{ width: 70, height: 70, gap: 10,borderRadius:10 }, currentIndex == item && { borderWidth: 1, borderColor: color.theme }]}
+
+                                        resizeMode={FastImage.resizeMode.contain}
+                                    />
+
                                     {
                                         smallImagesLoader && <View style={{ position: "absolute" }}>
                                             <ActivityIndicator size={'small'} color={color.theme} />

@@ -21,10 +21,13 @@ import ExportSvg from '../../constants/ExportSvg'
 import HeaderLogo from '../../components/HeaderLogo'
 import { loginData } from '../../redux/reducer/Auth';
 import messaging, { firebase } from '@react-native-firebase/messaging';
+import { addShippingAddress } from '../../services/UserServices';
+import { storeUserAddress } from '../../redux/reducer/UserShippingAddress';
 
 const CELL_COUNT = 4;
 const VerifyCode = ({ navigation, route }) => {
     const dispatch = useDispatch()
+    const reduxAddress = useSelector((item) => item?.customerAddress?.storeAddress)
 
     const { t } = useTranslation()
     const [isLoading, setLoading] = useState(true);
@@ -32,7 +35,9 @@ const VerifyCode = ({ navigation, route }) => {
     const [getOTPCoder, setOTPCoder] = useState();
     const [getTextReSend, setTextReSend] = useState();
     const [isModal, setIsModal] = useState(true)
-    const { phoneNo, FinalTotal, subTotal ,discount,delCharges} = route.params
+    const { phoneNo, FinalTotal, subTotal, discount, delCharges } = route.params
+
+
 
     const [FCNToken, setFCNToken] = useState();
 
@@ -100,50 +105,7 @@ const VerifyCode = ({ navigation, route }) => {
             { text: t('login'), onPress: () => navigation.navigate('Login') },
         ]);
 
-    // const getFunRegister = async (data) => {
-    //     setLoading(true);
 
-    //     let bodyData = JSON.stringify({
-    //         "password": '12345678',
-    //         "name": '',
-    //         "phone": data.phone,
-    //         "ftoken": FCNToken
-    //     });
-
-    //     const url = `${baseUrl}/register`;
-
-    //     let config = {
-    //         method: 'post',
-    //         maxBodyLength: Infinity,
-    //         url: url,
-    //         headers: {
-    //             'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L21yLXRhYmxlLWFwaS8iLCJpYXQiOjE3MDIzMTUxMjYsImV4cCI6MTcwNDkwNzEyNiwiZGF0YSI6IjcifQ.Ai3W5TsMnGi7H0amVTL0wW8O1ACB6olOMy08dHj-yew',
-    //             'Content-Type': 'application/json'
-    //         },
-    //         data: bodyData
-    //     };
-    //     console.log('faConfig',config);
-    //     axios.request(config)
-    //         .then((response) => {
-
-    //             dispatch(loginData({
-    //                 token: "abc",
-    //                 userName: response?.data?.data.name,
-    //                 mobile: response?.data?.data.phone,
-    //                 userId: response?.data?.data.id,
-    //             }))
-    //             // response.data?.data.id
-    //             navigation.navigate('PaymentOrder', {
-    //                 totalPrice: totalPrice
-    //             })
-    //             setLoading(false);
-    //         })
-    //         .catch((error) => {
-    //             console.log(error);
-    //             createTwoButtonAlert();
-    //         });
-
-    // }
     const getFunRegister = async (data) => {
 
         setLoading(true);
@@ -215,7 +177,7 @@ const VerifyCode = ({ navigation, route }) => {
                 body: JSON.stringify({
                     phone: phoneNo,
                     otp: value,
-                    token:FCNToken
+                    token: FCNToken
 
                 })
 
@@ -226,27 +188,45 @@ const VerifyCode = ({ navigation, route }) => {
             console.log('helloResult', result)
 
             dispatch(loginData({
-                token:FCNToken,
+                token: FCNToken,
                 userName: result?.data?.name,
                 mobile: result?.data?.phone,
                 userId: result?.data?.id,
             }))
+            handlePress(result?.data?.id)
 
-            navigation.navigate('PaymentOrder', {
-                   FinalTotal: FinalTotal,
-                subTotal: subTotal,
-                discount: discount,
-                delCharges: delCharges,
-            })
- 
-
+        console.log('daddddd',result?.data?.id)
 
         } catch (error) {
             console.log('error', error)
         }
     }
 
+    const handlePress = async (id) => {
+        const response = await addShippingAddress(reduxAddress, id)
+        console.log('------>>',response)
+        try {
+            if (response?.data) {
+                dispatch(
+                    storeUserAddress({
+                        ...reduxAddress,
+                        addressId: response.data.id,
+                    }),
+                );
 
+                    navigation.navigate('PaymentOrder', {
+                FinalTotal: FinalTotal,
+                subTotal: subTotal,
+                discount: discount,
+                delCharges: delCharges,
+            })
+
+
+            }
+        } catch (error) {
+            console.log('naswaar', error)
+        }
+    }
 
     const onPressLogin = () => {
         pushNotification()
@@ -420,9 +400,9 @@ const styles = StyleSheet.create({
     },
 
     codeFieldRoot: {
-       marginTop: 20,
+        marginTop: 20,
         marginBottom: 10,
-        flexDirection:I18nManager.isRTL?  "row-reverse" :"row"
+        flexDirection: I18nManager.isRTL ? "row-reverse" : "row"
     },
     cell: {
         width: 45,

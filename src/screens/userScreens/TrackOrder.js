@@ -1,4 +1,4 @@
-import { FlatList, I18nManager, Image, Modal, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { FlatList, I18nManager, Image, Modal, Platform, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import ExportSvg from '../../constants/ExportSvg'
 import SearchInput from '../../components/SearchInput'
@@ -15,6 +15,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import EmptyScreen from '../../components/EmptyScreen'
 import Text from '../../components/CustomText'
 import { fonts } from '../../constants/fonts'
+import SmallImageLoader from '../../components/SmallImageLoader'
+import HeaderBox from '../../components/HeaderBox'
 
 const TrackOrder = ({ navigation }) => {
 
@@ -219,13 +221,20 @@ const TrackOrder = ({ navigation }) => {
                                     delay={100}
                                     style={{ flex: 1 }}
                                 >
-                                    <View style={{ ...styles.TrackingStatusBoxTwo, display: 'flex' }}>
+                                    <View style={{ ...styles.TrackingStatusBoxTwo, }}>
 
                                         {item.products?.map((itm, index) => {
                                             return (
                                                 <View>
                                                     <View style={{ flex: 1, flexDirection: 'row', gap: 10, borderStyle: 'solid', borderColor: '#eee', paddingBottom: 5, paddingTop: 5 }}>
-                                                        <Image source={{ uri: itm.image }} style={{ width: 40, height: 40 }} />
+                                                        {/* <Image source={{ uri: itm.image }} style={{ width: 40, height: 40 }} /> */}
+                                                        <SmallImageLoader
+                                                            container={{ width: "12%" }}
+                                                            imagePath={itm.image}
+                                                            imgStyle={{ width: 40, height: 40, borderRadius: 5 }}
+                                                        />
+
+
                                                         <View style={{ flexDirection: "row", alignItems: "center", width: "70%" }}>
                                                             <Text style={{ textAlign: "left" }} numberOfLines={2}>{itm.name} </Text>
                                                             <Text style={{}} numberOfLines={2}> {itm.quantity}x</Text>
@@ -234,28 +243,29 @@ const TrackOrder = ({ navigation }) => {
 
                                                         {/* <Text>Qty:{item.quantity} KWD{item.price}</Text> */}
                                                     </View>
-                                                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
-                                                        <Text style={{}} numberOfLines={2}>{t('subTotal')}</Text>
-                                                        <Text style={{}} numberOfLines={2}>{currencyType} {item.subtotal_price}</Text>
-                                                    </View>
-                                                    <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
-                                                        <Text style={{}} numberOfLines={2}>{t('delivery')}</Text>
-                                                        <Text style={{}} numberOfLines={2}>{currencyType} {item.delivery_price}</Text>
-                                                    </View>
-                                                     <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
-                                                        <Text style={{}} numberOfLines={2}>{t('discount')}</Text>
-                                                        <Text style={{}} numberOfLines={2}>{currencyType} {item.discount}</Text>
-                                                    </View>
-                                                     <View style={{ flex: 1,borderTopWidth:1,borderColor:"#ececec", flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
-                                                        <Text style={{}} numberOfLines={2}>{t('total')}</Text>
-                                                        <Text style={{}} numberOfLines={2}>{currencyType} {item.total_price}</Text>
-                                                    </View>
+
                                                 </View>
                                             )
                                         })
                                         }
-
+                                        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
+                                            <Text style={{}} numberOfLines={2}>{t('subTotal')}</Text>
+                                            <Text style={{}} numberOfLines={2}>{currencyType} {item.subtotal_price}</Text>
+                                        </View>
+                                        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
+                                            <Text style={{}} numberOfLines={2}>{t('delivery')}</Text>
+                                            <Text style={{}} numberOfLines={2}>{currencyType} {item.delivery_price}</Text>
+                                        </View>
+                                        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
+                                            <Text style={{}} numberOfLines={2}>{t('discount')}</Text>
+                                            <Text style={{}} numberOfLines={2}>{currencyType} {item.discount}</Text>
+                                        </View>
+                                        <View style={{ flex: 1, borderTopWidth: 1, borderColor: "#ececec", flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 5, paddingTop: 5 }}>
+                                            <Text style={{}} numberOfLines={2}>{t('total')}</Text>
+                                            <Text style={{}} numberOfLines={2}>{currencyType} {item.total_price}</Text>
+                                        </View>
                                     </View>
+
                                 </Animatable.View>
                             )
                         }
@@ -293,12 +303,16 @@ const TrackOrder = ({ navigation }) => {
 
     return (
         <View style={styles.mainContainer}>
-            <View style={styles.headerContainer}>
+            {/* <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Ionicons size={40} name={I18nManager.isRTL ? 'chevron-forward-circle' : 'chevron-back-circle'} color={color.theme} />
                 </TouchableOpacity>
                 <HeaderLogo />
-            </View>
+            </View> */}
+            <HeaderBox 
+            cartIcon={true}
+            
+            />
 
             {/* <View style={styles.searchContainer}>
                 <View style={{ width: "82%" }}>
@@ -424,11 +438,10 @@ const styles = StyleSheet.create({
     },
     mainContainer: {
         flex: 1,
-        paddingTop: 40,
+        paddingTop:Platform.OS == 'ios'? 60:20,
         paddingHorizontal: 15,
         // marginHorizontal: 15,
         backgroundColor: "#fff",
-        marginTop: 15
 
     },
     headerContainer: {
@@ -508,7 +521,8 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.20,
         shadowRadius: 1.41,
-        elevation: 2,
+        elevation: 3,
+        marginBottom:10,
         backgroundColor: "#fff",
         padding: 10,
         borderRadius: 13

@@ -128,6 +128,7 @@ const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
                                     renderItem={({ item }) => {
                                         return (
                                             <SingleProductCard
+                                                isDot={false}
                                                 item={item}
                                                 setModalVisible={setModalVisible}
                                                 onPress={() => onPressSearch(item?.id)}

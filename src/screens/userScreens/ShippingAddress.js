@@ -293,7 +293,7 @@ const ShippingAddress = ({ navigation, route }) => {
           setIsLoader(false);
           Alert.alert(
             t(''),
-            t('addressSavssed'),
+            t('addressSaved'),
             [{ text: t('ok'), onPress: () => navigation.goBack() }],
             {
               textAlign: I18nManager.isRTL ? 'right' : 'left', // Align title based on language direction

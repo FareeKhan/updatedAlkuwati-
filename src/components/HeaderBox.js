@@ -100,8 +100,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 5,
-        marginTop: 15,
         paddingHorizontal: 0,
     },
     rightIconNumber: {

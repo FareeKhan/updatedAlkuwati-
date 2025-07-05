@@ -44,7 +44,7 @@ import { storeUserAddress } from '../../redux/reducer/UserShippingAddress';
 import { fonts } from '../../constants/fonts';
 import MyFatoorahPayment from '../../components/MyFatoorahPayment';
 const PaymentOrder = ({ navigation, route }) => {
-  const { subTotal,delCharges,discount,FinalTotal } = route?.params
+  const { subTotal, delCharges, discount, FinalTotal } = route?.params
 
   const dispatch = useDispatch();
   const data = useSelector(state => state.cartProducts?.cartProducts);
@@ -66,15 +66,13 @@ const PaymentOrder = ({ navigation, route }) => {
   const [address, setAddress] = useState({});
   const [paymentStatus, setPaymentStatus] = useState();
   const [email, setEmail] = useState();
-  const [cashLoader, setCashLoader] = useState(false);0
-    const [isCardPaymentModal, setIsCardPaymentModal] = useState(false);
+  const [cashLoader, setCashLoader] = useState(false); 0
+  const [isCardPaymentModal, setIsCardPaymentModal] = useState(false);
 
   const userAddress = useSelector(
     state => state?.customerAddress?.storeAddress,
   );
-  const onChangeSomeState = newSomeState => {
-    setPaymentStatus(newSomeState);
-  };
+
   const [SupportURL, setSupportURL] = useState();
 
   const profileData = async () => {
@@ -156,7 +154,7 @@ const PaymentOrder = ({ navigation, route }) => {
     try {
       const response = await userShippingAddress(userId);
       if (response) {
-        setAddress(response?.data?.[response?.data?.length - 1]);
+        setAddress(response?.data);
       } else {
         alert('something went wrong');
       }
@@ -165,47 +163,7 @@ const PaymentOrder = ({ navigation, route }) => {
     }
   };
 
-  const sharePress = async (name, price) => {
-    try {
-      const result = await Share.share({
-        message: 'Check out this awesome product! ' + name + ' Price:' + price,
-      });
 
-      if (result.action === Share.sharedAction) {
-        console.log('Content shared successfully!');
-      } else if (result.action === Share.dismissedAction) {
-        console.log('Share dismissed');
-      }
-    } catch (error) {
-      console.error('Error sharing content:', error.message);
-    }
-  };
-
-  const renderItem = ({ item, index }) => {
-    return (
-      <View style={styles.productContainer}>
-        <Image
-          borderRadius={5}
-          source={{ uri: item?.image }}
-          style={{ width: 60, height: 60 }}
-        />
-
-        <View style={{ marginLeft: 10 }}>
-          <Text style={styles.productTitle}>{item?.productName}</Text>
-          <Text style={styles.subTitle}>{item?.subText}</Text>
-          <TouchableOpacity
-            onPress={() => sharePress(item?.productName, item?.price)}>
-            <View style={styles.sendWithIcon}>
-              <ExportSvg.ArrowCurve />
-              <Text style={styles.sendTxt}>{t('send')}</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.productPrice}>KD{item?.price}</Text>
-      </View>
-    );
-  };
 
   const paymentPress = payment => {
     setSelectedPayment(payment);
@@ -235,7 +193,7 @@ const PaymentOrder = ({ navigation, route }) => {
         email,
         getuserId,
         getToken,
-         subTotal,delCharges,discount,
+        subTotal, delCharges, discount,
         FinalTotal,
 
       );
@@ -265,13 +223,15 @@ const PaymentOrder = ({ navigation, route }) => {
     }
   };
 
-  useEffect(() => {
-    handlePress()
-  }, [])
+  // useEffect(() => {
+  //   if(address?.length == 0){
+  //   handlePress()
+  //   console.log('=-=--=-=')
+  //   }
+  // }, [])
 
   const handlePress = async () => {
     const response = await addShippingAddress(reduxAddress, userId)
-    console.log('charsss',response)
     try {
       if (response?.data) {
         dispatch(
@@ -317,7 +277,7 @@ const PaymentOrder = ({ navigation, route }) => {
         </View>
         <View>
           {paymentMethodCard(t)?.map((item, index) => {
-         
+
             return (
               <TouchableOpacity
                 activeOpacity={0.7}
@@ -339,7 +299,7 @@ const PaymentOrder = ({ navigation, route }) => {
                   <ExportSvg.checks />
                 </View>
                 <View style={{ marginHorizontal: 20 }}>{item?.svg}</View>
-                <Text style={{ color: '#000', fontFamily:fonts.bold,color:color.theme }}>
+                <Text style={{ color: '#000', fontFamily: fonts.bold, color: color.theme }}>
                   {item?.paymentName}
                 </Text>
               </TouchableOpacity>
@@ -355,37 +315,6 @@ const PaymentOrder = ({ navigation, route }) => {
           <Text style={styles.bottomPrice}>KD{FinalTotal}</Text>
         </View>
 
-        {/* <PaymentModal
-          modalVisible={modalVisible}
-          setModalVisible={setModalVisible}
-          cardInfo={cardInfo}
-          setCardInfo={setCardInfo}
-          setToken={setToken}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-        /> */}
-
-        {/* <TouchableOpacity style={styles.addCardBox} onPress={() => navigation.navigate('TrackOrder')}> */}
-        {/* <TouchableOpacity style={styles.addCardBox} onPress={() => confirmOrder()}> */}
-        {/* <TouchableOpacity style={styles.addCardBox}>
-                    <View style={styles.addCardPlusBox}>
-                        <Text style={styles.plusIcon}>+</Text>
-                    </View>
-                    <Text style={styles.paymentTxt}>Add Card</Text>
-                </TouchableOpacity> */}
-
-        {/* <View style={{ flexDirection: 'row' }}>
-                    <Text style={[styles.productName, { marginVertical: 20 }]}>{t("history")}</Text>
-                </View>
-                <View style={{ marginBottom: 10, marginTop: -10, flex: 1, zIndex: -1 }}>
-                    <FlatList
-                        // data={bags?.slice(1)}
-                        data={data}
-                        keyExtractor={(item, index) => index?.toString()}
-                        renderItem={renderItem}
-                        showsVerticalScrollIndicator={false}
-                    />
-                </View> */}
 
         {selectedPayment == 2 && (
           cashLoader ?
@@ -407,100 +336,15 @@ const PaymentOrder = ({ navigation, route }) => {
         />
       </ScrollView>
 
-      {/* <RBSheet
-        ref={refRBSheet}
-        onClose={() => setSelectedPayment('')}
-        closeOnDragDown={true}
-        closeOnPressMask={true}
-        dragFromTopOnly={true}
-        height={650}
-        keyboardAvoidingViewEnabled={true}
-        customStyles={{
-          wrapper: {
-            backgroundColor: 'transparent',
-          },
-          draggableIcon: {
-            backgroundColor: 'grey',
-          },
-          container: {
-            backgroundColor: '#eee',
-            borderRadius: 30,
-            elevation: 6,
-            shadowColor: 'grey',
-            shadowOpacity: 0.5,
-            shadowOffset: 6,
-          },
-        }}>
-        <View>
-          <TouchableOpacity onPress={() => OpenURLButton(SupportURL)}>
-            <Text
-              style={{
-                marginVertical: 5,
-                flexDirection: 'row',
-                zIndex: 8888,
-                textAlign: 'left',
-                paddingHorizontal: 15,
-              }}>
-              <MaterialIcons
-                name={'support-agent'}
-                size={25}
-                color={'#67300f'}
-                styles={{}}
-              />
-            </Text>
-          </TouchableOpacity>
-          <View>
-            <Text
-              style={{
-                color: '#000',
-                fontSize: 22,
-                marginBottom: 10,
-                fontFamily: I18nManager.isRTL
-                  ? 'Cairo-Regular'
-                  : 'Metrophobic-Regular',
-                textAlign: 'center',
-              }}>
-              {t('payment')}
-            </Text>
-          </View>
 
-          <View
-            style={{ flexGrow: 1, flexDirection: 'row', marginHorizontal: 10 }}>
-            <MFPaymentCyber
-              totalAmount={parseFloat(FinalTotal).toFixed(2)}
-              onChangeSomeState={onChangeSomeState}
-            />
-          </View>
-        </View>
-      </RBSheet> */}
-            <MyFatoorahPayment
-            setModalVisible={setIsCardPaymentModal}
-            modalVisible={isCardPaymentModal}
-            confirmOrder={confirmOrder}
-            totalPrice={Number(FinalTotal)}
-            
-            />
+      <MyFatoorahPayment
+        setModalVisible={setIsCardPaymentModal}
+        modalVisible={isCardPaymentModal}
+        confirmOrder={confirmOrder}
+        totalPrice={Number(FinalTotal)}
 
-      {/* <View
-        style={{
-        //   position: 'absolute',
-        //   bottom: 50,
-        //   backgroundColor: 'white',
-        // //   flex: 1,
-        //   width: '100%',
-        //   paddingHorizontal: 20,
-        //   paddingVertical: 20,
-        //   marginVertical: 30,
-        }}>
-        <View style={styles.bottomContent}>
-          <View>
-            <Text style={{fontSize: 10, color: '#AAA', textAlign: 'left'}}>
-              {t('total_price')}
-            </Text>
-            <Text style={styles.bottomPrice}>KD{totalPrice}</Text>
-          </View>
-        </View>
-      </View> */}
+      />
+
     </View>
   );
 };

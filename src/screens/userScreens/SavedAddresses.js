@@ -161,14 +161,20 @@ const SavedAddresses = ({ navigation, route }) => {
                 style={[{ width: "60%"},Platform.OS == 'ios' && {marginTop:30 }]}
             />
 
-            {
+            {/* {
                 isAdd &&
                 <TouchableOpacity style={{ borderWidth: 1, alignSelf: "baseline", paddingHorizontal: 10, paddingVertical: 2, borderRadius: 5, borderColor: "#cecece" }} onPress={() => navigation.navigate('ShippingAddress', {
                     isMap: true
                 })}>
                     <CustomText style={{ fontSize: 16, fontWeight: "600", color: color.theme, textAlign: "left" }}>+ {t('addNew')}</CustomText>
                 </TouchableOpacity>
-            }
+            } */}
+
+             <TouchableOpacity style={{ borderWidth: 1, alignSelf: "baseline", paddingHorizontal: 10, paddingVertical: 2, borderRadius: 5, borderColor: "#cecece" }} onPress={() => navigation.navigate('ShippingAddress', {
+                    isMap: true
+                })}>
+                    <CustomText style={{ fontSize: 16, fontWeight: "600", color: color.theme, textAlign: "left" }}>+ {t('addNew')}</CustomText>
+                </TouchableOpacity>
 
             <View style={{ flex: 1, marginTop: 30 }}>
                 <FlatList

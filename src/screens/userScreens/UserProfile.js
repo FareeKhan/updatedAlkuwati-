@@ -33,6 +33,7 @@ import Fontisto from "react-native-vector-icons/Fontisto";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import HeaderBox from "../../components/HeaderBox";
 
 const UserProfile = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -251,18 +252,13 @@ const UserProfile = ({ navigation }) => {
   return (
     <DrawerSceneWrapper>
       <View style={styles.mainContainer}>
-        <View style={styles.headerContainer}>
-          {/* <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <ExportSvg.ClickMenuBar />
-                </TouchableOpacity> */}
-          <TouchableOpacity
-            onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-          >
-            <ExportSvg.MenuBar />
-          </TouchableOpacity>
-          <HeaderLogo />
-          <TouchableOpacity>{/* <ExportSvg.Settings /> */}</TouchableOpacity>
-        </View>
+
+        <HeaderBox
+          isDrawer={true}
+          cartIcon={true}
+        />
+
+
         <View style={styles.profileContainer}>
 
           <View style={{ borderWidth: 1, height: 35, width: 35, borderRadius: 50, alignItems: "center", justifyContent: "center" }}>
@@ -272,7 +268,7 @@ const UserProfile = ({ navigation }) => {
 
             <Text style={styles.userName}>{userName ? userName : t('noAvailable')}</Text>
             <Text style={styles.userEmail}>{'\u202A'}{userPhone}{'\u202C'}</Text>
-            
+
           </View>
         </View>
         <>
@@ -529,7 +525,7 @@ export default UserProfile;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    paddingTop: 40,
+    paddingTop:Platform.OS == 'android'? 20:70,
     paddingHorizontal: 15,
     backgroundColor: "#fff",
   },
@@ -560,7 +556,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: "row",
     alignItems: "center",
-
+marginTop:30,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

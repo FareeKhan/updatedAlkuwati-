@@ -9,6 +9,7 @@ import HeaderLogo from '../../components/HeaderLogo'
 import { useTranslation } from 'react-i18next';
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import HeaderBox from '../../components/HeaderBox'
 const MyFavorite = ({ navigation }) => {
     const favoriteData = useSelector((state) => state?.favorite?.AddInFavorite)
     const { t } = useTranslation();
@@ -17,6 +18,7 @@ const MyFavorite = ({ navigation }) => {
         return (
             <>
                 <SingleProductCard
+                    isDot={false}
                     item={item}
                     onPress={() => navigation.navigate('ProductDetails', { id: item?.pid })}
                 />
@@ -26,14 +28,19 @@ const MyFavorite = ({ navigation }) => {
 
     return (
         <View style={styles.mainContainer}>
-            <View style={styles.headerContainer}>
+            {/* <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                                          <Ionicons size={40} name={I18nManager.isRTL ? 'chevron-forward-circle': 'chevron-back-circle'} color={color.theme} />
-                                        </TouchableOpacity>
+                    <Ionicons size={40} name={I18nManager.isRTL ? 'chevron-forward-circle' : 'chevron-back-circle'} color={color.theme} />
+                </TouchableOpacity>
                 <View style={{ marginLeft: "auto", marginRight: "auto" }}>
                     <HeaderLogo />
                 </View>
-            </View>
+            </View> */}
+
+            <HeaderBox
+                cartIcon={true}
+                style={{ marginTop: Platform.OS == 'ios'? 30:20, marginBottom: 20 }}
+            />
 
             {
                 favoriteData?.length == 0 ?
@@ -47,7 +54,8 @@ const MyFavorite = ({ navigation }) => {
                         renderItem={renderItem}
                         showsVerticalScrollIndicator={false}
                         numColumns={2}
-                        columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
+                        contentContainerStyle={{ paddingBottom: 100 }}
+                        columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1, }}
                     />
             }
 
