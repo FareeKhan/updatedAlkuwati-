@@ -37,15 +37,15 @@ console.log('=>',isLanguage)
   useEffect(() => {
     if (!token) {
     }
+    // Increased splash screen duration to allow for image preloading
     const timeOut = setTimeout(() => {
       setIsSplashScreen(false);
-    }, 2000);
+    }, 3000); // Increased from 2000ms to 3000ms to give more time for image preloading
 
     return () => clearTimeout(timeOut);
   }, []);
 
   if (isSplashScreen) {
-  // if (true) {
     return <SplashScreen />;
   }
 

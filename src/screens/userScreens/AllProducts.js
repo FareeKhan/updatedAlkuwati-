@@ -17,6 +17,8 @@ import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import Animated, { LinearTransition } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import FastImage from 'react-native-fast-image'
+import { preloadImagesInBatches } from '../../utils/ImagePreloader'
 
 import withPressAnimated from './hocs/withPressAnimated';
 import registercustomAnimations, { ANIMATIONS } from './animations';
@@ -38,6 +40,8 @@ const AllProducts = ({ navigation }) => {
     const [data, setData] = useState();
     const [expanded, setExpanded] = useState(false);
     const [show, setShow] = useState(false);
+    const [visibleItems, setVisibleItems] = useState([]);
+    const [preloadedImages, setPreloadedImages] = useState({});
 
     const handleViewRef = useRef(null);
 
@@ -74,10 +78,24 @@ const AllProducts = ({ navigation }) => {
         setIsLoader(true)
         try {
             const response = await categoriesList()
-            console.log('shobanaaaa', response)
             if (response?.status) {
                 setIsLoader(false)
                 setStoreCat(response?.data)
+                
+                // Preload images for the first few visible items
+                if (response?.data && response.data.length > 0) {
+                    const imagesToPreload = response.data.slice(0, 6).map(item => item.image).filter(Boolean);
+                    await preloadImagesInBatches(imagesToPreload);
+                    
+                    // Mark these images as preloaded
+                    const preloaded = {};
+                    response.data.slice(0, 6).forEach(item => {
+                        if (item.id && item.image) {
+                            preloaded[item.id] = true;
+                        }
+                    });
+                    setPreloadedImages(preloaded);
+                }
             }
         } catch (error) {
             setIsLoader(false)
@@ -86,29 +104,61 @@ const AllProducts = ({ navigation }) => {
     }
 
     const OnBoxT = (id) => {
-        console.log('showme',id)
-        //itemListAnimation
         if (innetCate == id) {
             setInnetCate(0)
-            //setItemListAnimation('')
-            /*setTimeout(() => {
-                setItemListAnimation('fadeOut');
-            }, 1000)*/
         } else {
             setInnetCate(id)
-            /*setTimeout(() => {
-                setItemListAnimation('fadeInDown');
-            }, 200)*/
+            
+            // When a category is selected, preload its subcategories' images
+            if (storeCat) {
+                const selectedCategory = storeCat.find(cat => cat.id === id);
+                if (selectedCategory && selectedCategory.childrens && selectedCategory.childrens.length > 0) {
+                    const subCatImagesToPreload = selectedCategory.childrens
+                        .slice(0, 6) // Preload first 6 subcategories
+                        .map(item => item.image)
+                        .filter(Boolean);
+                    
+                    // Preload these images
+                    preloadImagesInBatches(subCatImagesToPreload);
+                }
+            }
         }
-        //innetCate == id ? {setInnetCate(0)} : setInnetCate(id);
         ReactNativeHapticFeedback.trigger('notificationError');
     }
 
+    // Handle visible items for lazy loading
+    const handleViewableItemsChanged = useRef(({ viewableItems }) => {
+        const visibleItemIds = viewableItems.map(item => item.item.id);
+        setVisibleItems(visibleItemIds);
+        
+        // Preload images for newly visible items that haven't been preloaded yet
+        const newImagesToPreload = viewableItems
+            .filter(viewableItem => !preloadedImages[viewableItem.item.id])
+            .map(viewableItem => viewableItem.item.image)
+            .filter(Boolean);
+        
+        if (newImagesToPreload.length > 0) {
+            preloadImagesInBatches(newImagesToPreload);
+            
+            // Mark these images as preloaded
+            const newPreloaded = { ...preloadedImages };
+            viewableItems.forEach(viewableItem => {
+                if (viewableItem.item.id) {
+                    newPreloaded[viewableItem.item.id] = true;
+                }
+            });
+            setPreloadedImages(newPreloaded);
+        }
+    }).current;
 
-
+    const viewabilityConfig = {
+        itemVisiblePercentThreshold: 20,
+        minimumViewTime: 100,
+    };
 
     const renderItem = ({ item, index }) => {
         const isTextLeft = index % 2 === 0;
+        const isPreloaded = preloadedImages[item.id] || false;
      
         return (
             <>
@@ -116,15 +166,13 @@ const AllProducts = ({ navigation }) => {
                     animation={isTextLeft ? animationRight : animationLeft}
                     duration={durationInner}
                     delay={(1 + index) * delayInner}
-
-                //iterationCount="infinite" direction="alternate"
                 >
                     <RNBounceable
                         onPress={() => OnBoxT(item?.id)}
                         underlayColor='#000'
                         bounceEffectIn={1.1}
                         bounceEffectOut={1}
-                        style={{ marginTop: 15, /*borderColor:'red',borderWidth:1,borderRadius: 10,*/ }}
+                        style={{ marginTop: 15 }}
                     >
                         <View style={{
                             ...styles.bgContainer,
@@ -143,14 +191,21 @@ const AllProducts = ({ navigation }) => {
 
                             <View style={{ flexDirection: isTextLeft ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <View style={{ width: '65%', }}>
-                                    <Image source={{ uri: item?.image }} style={{ borderRadius: 10, width: '99%', height: 98, objectFit: 'cover', }} />
+                                    <FastImage 
+                                        source={{ 
+                                            uri: item?.image,
+                                            priority: isPreloaded ? FastImage.priority.normal : FastImage.priority.high,
+                                            cache: FastImage.cacheControl.immutable
+                                        }} 
+                                        style={{ borderRadius: 10, width: '99%', height: 98 }}
+                                        resizeMode={FastImage.resizeMode.cover}
+                                    />
                                 </View>
                                 <View style={{
                                     width: '35%',
                                     justifyContent: 'center', paddingHorizontal: 10
                                 }}>
                                     <Text style={{ ...styles.titleTxt, color: innetCate == item?.id ? "white" : "#67300f" }}>{item?.name}</Text>
-                                    {/* <Text style={{...styles.subTxt,color: innetCate == item?.id ? "white" : "#67300f"}}>{item?.total_products} {t('count_product')}</Text> */}
                                 </View>
                             </View>
                         </View>
@@ -158,17 +213,9 @@ const AllProducts = ({ navigation }) => {
                     </RNBounceable>
                 </Animatable.View>
 
-                {/* {innetCate == item?.id &&
-                    <View style={{}}>
-                        <CategorySubList innetCate={innetCate} navigation={navigation} />
-                    </View>
-                } */}
-
-              
-
                     {innetCate == item?.id &&
                     <View style={{}}>
-                        <CategorySubList innetCate={item?.childrens}  navigation={navigation} />
+                        <CategorySubList innetCate={item?.childrens} navigation={navigation} />
                     </View>
                 }
             </>
@@ -183,8 +230,6 @@ const AllProducts = ({ navigation }) => {
 
     const FlatListItemSeparator = () => <View style={styles.line} />;
 
-
-
     return (
         <DrawerSceneWrapper>
             <Animatable.View
@@ -195,9 +240,6 @@ const AllProducts = ({ navigation }) => {
             >
                 <View style={styles.mainContainer}>
                     <View style={styles.headerContainer}>
-                        {/* <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
-                    <ExportSvg.MenuBar />
-                </TouchableOpacity> */}
                         <TouchableOpacity onPress={() => navigation.goBack()}>
                             <Ionicons size={40} name={I18nManager.isRTL ? 'chevron-forward-circle' : 'chevron-back-circle'} color={color.theme} />
                         </TouchableOpacity>
@@ -229,6 +271,13 @@ const AllProducts = ({ navigation }) => {
                             contentContainerStyle={{ paddingBottom: 300 }}
                             showsVerticalScrollIndicator={false}
                             ItemSeparatorComponent={FlatListItemSeparator}
+                            onViewableItemsChanged={handleViewableItemsChanged}
+                            viewabilityConfig={viewabilityConfig}
+                            initialNumToRender={6}
+                            maxToRenderPerBatch={6}
+                            windowSize={10}
+                            removeClippedSubviews={true}
+                            updateCellsBatchingPeriod={50}
                         />
                     </Animatable.View>
 

@@ -10,7 +10,6 @@ import { addProductToCart } from '../redux/reducer/ProductAddToCart'
 import { useNavigation } from '@react-navigation/native'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import Text from './CustomText'
-
 import { useTranslation } from 'react-i18next'
 import { productDetails } from '../services/UserServices'
 import LottieView from 'lottie-react-native'
@@ -19,10 +18,10 @@ import FastImage from 'react-native-fast-image'
 import { fonts } from '../constants/fonts'
 import { showMessage } from 'react-native-flash-message'
 
-const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon, setModalVisible }) => {
+const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon, setModalVisible, isPreloaded = false }) => {
   const dispatch = useDispatch()
   const navigation = useNavigation()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!isPreloaded) // Don't show loader if image is preloaded
   const [isCartLoader, setIsCartLaoder] = useState(false)
 
   const data = useSelector(state => state.cartProducts?.cartProducts);
@@ -30,7 +29,6 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
 
   const isCheck = data?.some((value) => value?.id == item?.id)
 
-  console.log('vsss', isCheck)
   const isFavorite = favoriteList.some(favorite => favorite.id === item.id);
 
   const animation = 'fadeInUp';
@@ -40,7 +38,6 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
   const { t } = useTranslation()
 
   const favoriteProduct = (item) => {
-
     if (isFavorite) {
       dispatch(removeFavorite({
         id: item?.id
@@ -52,44 +49,21 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
     }
   }
 
-
-  // new code 
   const [cartCount, setCartCount] = useState(0);
   const animatedValue = useRef(new Animated.Value(0)).current;
   const shadowOpacity = useRef(new Animated.Value(1)).current;
 
-  // Dynamic Start Position (Near the Button)
-  const startX = 150; // X position of the button (in RTL, it's on the right)
-  const startY = 500; // Y position of the button (bottom)
+  const startX = 150; 
+  const startY = 500; 
 
-  // Destination Position (Cart Icon in RTL)
-  const endX = -150; // Move to the left side (for RTL)
-  const endY = 50; // Move to the top (cart position)
+  const endX = -150; 
+  const endY = 50; 
 
-
-
-  // // end of new code
   useEffect(() => {
-    getProductDetail()
-  }, [])
-
-  // const getProductDetail = async () => {
-
-  //   try {
-  //     const response = await productDetails(item?.id);
-  //     if (response?.status) {
-  //       setIsColor(response?.color_variants?.length > 0)
-  //       setIsSize(response?.size_variants?.length > 0)
-  //       // setProductData(response);
-  //       // setProductObject(response?.data[0]);
-
-  //     }
-  //   } catch (error) {
-
-  //     console.log(error);
-  //   }
-  // };
-
+    if (isPreloaded && item.image) {
+      setLoading(false);
+    }
+  }, [isPreloaded, item.image]);
 
   const getProductDetail = async (item) => {
     console.log('ss', item?.id)
@@ -97,7 +71,6 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
     try {
       const response = await productDetails(item?.id);
       if (response?.status) {
-
         if (response?.data?.quantity > 0) {
           console.log('Object.keys(response?.variant_system?.available_attributes || {}).length > 0', Object.keys(response?.variant_system?.available_attributes || {}).length > 0)
           if (Object.keys(response?.variant_system?.available_attributes || {}).length > 0) {
@@ -115,17 +88,12 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
       }
     } catch (error) {
       setIsCartLaoder(false)
-
     } finally {
       setIsCartLaoder(false)
-
     }
   };
 
   const addToCart = () => {
-
-    // newcodeAddres
-
     if (isCheck) {
       showMessage({
         type: "warning",
@@ -158,10 +126,6 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
           type: "success",
           message: t('productAdded')
         })
-
-        // CustomToast(t('productAdded'), "success")
-
-        // navigation.navigate('MyCart');
         ReactNativeHapticFeedback.trigger('impactLight');
         Animated.timing(shadowOpacity, {
           toValue: 0,
@@ -169,33 +133,8 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
           useNativeDriver: true,
         }).start();
       });
-      // Add the product to cart here
     }
-
-    // if(item?.variants?.length>0){
-    //   alert('ss')
-    //   return
-    // }
-
-
-
-    // end
-    // dispatch(
-    //   addProductToCart({
-    //     id: item?.id,
-    //     productName: item?.name,
-    //     price: item?.price,
-    //     size: 'M',
-    //     counter: 1,
-    //     subText: removeHTMLCode(item?.description),
-    //     image: item?.image,
-    //   }),
-    // );
-
-    // navigation.navigate('MyCart');
-    // ReactNativeHapticFeedback.trigger('impactLight');
   };
-
 
   const translateX = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -206,7 +145,6 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
     inputRange: [0, 0.5],
     outputRange: [startY, endY], // Move from bottom to top
   });
-
 
   const removeHTMLCode = (value) => {
     if (value) {
@@ -225,8 +163,7 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
       delay={(countList) * delayInner}
     >
 
-      {
-        loading &&
+      {loading && (
         <View style={{ borderWidth: 1, marginBottom: 10, borderColor: "#cecece", width: 170, height: 170, marginRight: 5, alignItems: "center", justifyContent: "center", borderRadius: 20, position: "absolute", zIndex: 100 }} >
           <LottieView
             source={require("../assets/loader.json")} // Local JSON file
@@ -235,16 +172,20 @@ const SingleProductCard = ({ item, index, onPress, countList = 1, isShowPlusIcon
             style={{ width: 100, height: 100, color: "red" }}
           />
         </View>
-      }
+      )}
 
       <TouchableOpacity activeOpacity={0.7} onPress={onPress} style={{ alignItems: "center", marginBottom: 15 }}>
-
         <FastImage
           onLoad={() => setLoading(false)}
           onError={() => setLoading(false)}
-          // source={{ uri: item.image }}
-          source={{ uri: item.image, priority: FastImage.priority.high }}
-          style={{ width: 170, height: 170, marginRight: 5, borderRadius: 20 }} borderRadius={20}>
+          source={{ 
+            uri: item.image, 
+            priority: FastImage.priority.high,
+            cache: FastImage.cacheControl.immutable
+          }}
+          style={{ width: 170, height: 170, marginRight: 5, borderRadius: 20 }} 
+          borderRadius={20}
+        >
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", margin: 10 }}>
             {
               isShowPlusIcon &&

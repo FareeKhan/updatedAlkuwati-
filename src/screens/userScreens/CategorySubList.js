@@ -16,6 +16,8 @@ import { LayoutAnimation, UIManager } from "react-native";
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import Animated, { LinearTransition } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
+import FastImage from 'react-native-fast-image';
+import { preloadImagesInBatches } from '../../utils/ImagePreloader';
 
 import withPressAnimated from './hocs/withPressAnimated';
 import registercustomAnimations, { ANIMATIONS } from './animations';
@@ -25,17 +27,16 @@ const AnimatedPressButton = withPressAnimated(RNBounceable)
 
 const CategorySubList = ({ navigation, innetCate }) => {
     const dispatch = useDispatch()
-    const [storeCat, setStoreCat] = useState()
     const [isLoader, setIsLoader] = useState(false)
     const [modalVisible, setModalVisible] = useState(false);
     const [itemListAnimation, setItemListAnimation] = useState('');
     const { t } = useTranslation();
-    const [data, setData] = useState();
     const [expanded, setExpanded] = useState(false);
     const [show, setShow] = useState(false);
+    const [visibleItems, setVisibleItems] = useState([]);
+    const [preloadedImages, setPreloadedImages] = useState({});
 
     const handleViewRef = useRef(null);
-
     const viewRef = useRef(null);
     const animation = 'fadeInDown';
     const animationMain = 'fadeInDownBig';
@@ -44,61 +45,71 @@ const CategorySubList = ({ navigation, innetCate }) => {
     const durationMain = 100;
     const durationInner = 1000;
     const delayInner = 100;
-    const shadowColorDefault = "grey";
-    const shadowColorError = "red";
-    const IconColorGreen = "green";
-    const IconColorRed = "red";
-    const IconColorSize = 32;
 
-    // useEffect(() => {
-    //     getCatList()
-    // }, [])
+    useEffect(() => {
+        // Preload the first 6 subcategory images when this component mounts
+        if (innetCate && innetCate.length > 0) {
+            const imagesToPreload = innetCate.slice(0, 6).map(item => item.image).filter(Boolean);
+            
+            preloadImagesInBatches(imagesToPreload).then(() => {
+                // Mark these images as preloaded
+                const preloaded = {};
+                innetCate.slice(0, 6).forEach(item => {
+                    if (item.id && item.image) {
+                        preloaded[item.id] = true;
+                    }
+                });
+                setPreloadedImages(preloaded);
+            });
+        }
+    }, [innetCate]);
 
-    onClick = (index) => {
-        const temp = this.state.data.slice()
-        temp[index].value = !temp[index].value
-        this.setState({ data: temp })
-    }
+    // Handle visible items for lazy loading
+    const handleViewableItemsChanged = useRef(({ viewableItems }) => {
+        const visibleItemIds = viewableItems.map(item => item.item.id);
+        setVisibleItems(visibleItemIds);
+        
+        // Preload images for newly visible items that haven't been preloaded yet
+        const newImagesToPreload = viewableItems
+            .filter(viewableItem => !preloadedImages[viewableItem.item.id])
+            .map(viewableItem => viewableItem.item.image)
+            .filter(Boolean);
+        
+        if (newImagesToPreload.length > 0) {
+            preloadImagesInBatches(newImagesToPreload);
+            
+            // Mark these images as preloaded
+            const newPreloaded = { ...preloadedImages };
+            viewableItems.forEach(viewableItem => {
+                if (viewableItem.item.id) {
+                    newPreloaded[viewableItem.item.id] = true;
+                }
+            });
+            setPreloadedImages(newPreloaded);
+        }
+    }).current;
 
-    toggleExpand = () => {
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        this.setState({ expanded: !this.state.expanded })
-    }
-
-    // const getCatList = async () => {
-    //     setIsLoader(true)
-    //     try {
-    //         const response = await categoriesListSub(innetCate)
-    //         console.log('response', response)
-    //         if (response?.status) {
-    //             setIsLoader(false)
-    //             setStoreCat(response?.data)
-    //         }
-    //     } catch (error) {
-    //         setIsLoader(false)
-    //         console.log(error)
-    //     }
-    // }
-
-
-
+    const viewabilityConfig = {
+        itemVisiblePercentThreshold: 20,
+        minimumViewTime: 100,
+    };
 
     const renderItem = ({ item, index }) => {
-        const isTextLeft = index % 2 === 0;
-        console.log('showmerEOraea',innetCate)
+        const isPreloaded = preloadedImages[item.id] || false;
+        
         return (
             <>
                 <Animatable.View
                     animation={animationMain}
                     duration={durationInner}
                     delay={(1 + index) * delayInner}
-                //iterationCount="infinite" direction="alternate"
                 >
                    
                     <AnimatedPressButton style={{width:'100%'}} animation='swing' mode="contained"
                         onPress={() => {
                             ReactNativeHapticFeedback.trigger('impactLight');
                             setTimeout(() => {
+                                // Preload the product details images when navigating to SameProduct
                                 navigation.navigate('SameProduct', {
                                     text: item?.name,
                                     subC_ID: item?.id,
@@ -108,7 +119,15 @@ const CategorySubList = ({ navigation, innetCate }) => {
                         }
                     >
                         <View style={{...styles.itemBox,width:100}}>
-                            <Image source={{ uri: item?.image }} style={{ borderRadius: 10, width: '60%', height: 60, objectFit: 'cover', }} />
+                            <FastImage 
+                                source={{ 
+                                    uri: item?.image,
+                                    priority: isPreloaded ? FastImage.priority.normal : FastImage.priority.high,
+                                    cache: FastImage.cacheControl.immutable
+                                }} 
+                                style={{ borderRadius: 10, width: '60%', height: 60 }}
+                                resizeMode={FastImage.resizeMode.cover}
+                            />
                             <Text style={styles.textBox}>{item?.name}</Text>
                         </View>
                     </AnimatedPressButton>
@@ -117,26 +136,15 @@ const CategorySubList = ({ navigation, innetCate }) => {
         )
     }
 
-    /*if (isLoader) {
-        return (
-            <ScreenLoader />
-        )
-    }*/
-console.log('storeCatstoreCatstoreCat',innetCate)
-    const FlatListItemSeparator = () => <View style={styles.line} />;
-
     return (
         <View style={styles.mainContainer}>
-
-
             <Animatable.View
                 ref={viewRef}
                 easing={'ease-in-out'}
                 style={{ marginTop: -10 }}
                 duration={durationMain}>
 
-                <View style={{ marginTop: 0, marginBottom: 0,  /*display: innetCate == item?.id ? 'flex' : 'none'*/ }}>
-
+                <View style={{ marginTop: 0, marginBottom: 0 }}>
                     <View style={styles.containerBox}>
                         <FlatList
                             data={innetCate}
@@ -144,14 +152,18 @@ console.log('storeCatstoreCatstoreCat',innetCate)
                             key={(item, index) => index?.toString()}
                             renderItem={renderItem}
                             estimatedItemSize={400}
+                            onViewableItemsChanged={handleViewableItemsChanged}
+                            viewabilityConfig={viewabilityConfig}
+                            initialNumToRender={6}
+                            maxToRenderPerBatch={6}
+                            windowSize={7}
+                            removeClippedSubviews={true}
+                            updateCellsBatchingPeriod={50}
                         />
-
-
                     </View>
                 </View>
 
             </Animatable.View>
-
         </View>
     )
 }

@@ -119,7 +119,7 @@ const ProductSlider = ({ carouselRef, currentIndex, selectedVariant, setCurrentI
                                 onLoadEnd={() => setLoader(false)}
                                 source={{
                                     uri: selectedImage ? selectedImage : selectedVariant ? selectedVariant?.main_image : mediaItem,
-                                    priority: FastImage.priority.normal,
+                                    priority: FastImage.priority.high,
                                 }}
                                 style={{ width: width, height: width, borderRadius: 10 }}
                                 resizeMode={FastImage.resizeMode.contain}
