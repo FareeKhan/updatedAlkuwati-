@@ -1,16 +1,4 @@
-// product view time -> local storage -> current time
-// -> -> firebase notification, dynamic topic product_id_${ID} 
-// messaging()
-//  .subscribeToTopic(`product_view_${product?.id}`)
-//  .then(() => console.log('Subscribed to topic!'));
-
-// index.tsx app.tsx, local storage, product_* delete > 24 hours
-// -> > firebase loop unsubscribe topic
-
-// messaging().unsubscribeToTp/....
-// delete
-
-
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
@@ -21,38 +9,42 @@ import {
   ScrollView,
   Share,
   StyleSheet,
-
   TouchableOpacity,
   View,
-  PanResponder
+  PanResponder,
 } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
 import ExportSvg from '../../constants/ExportSvg';
 import { color } from '../../constants/color';
 import ProductSlider from '../../components/ProductSlider';
 import { productDetails } from '../../services/UserServices';
 import { useDispatch, useSelector } from 'react-redux';
-import { addProductToCart, handleTotalPrice } from '../../redux/reducer/ProductAddToCart';
+import {
+  addProductToCart,
+  handleTotalPrice,
+} from '../../redux/reducer/ProductAddToCart';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import { useTranslation } from 'react-i18next';
-import AntDesign from 'react-native-vector-icons/AntDesign'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Text from '../../components/CustomText'
-
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Text from '../../components/CustomText';
 import HeaderBox from '../../components/HeaderBox';
-
 import ScreenLoader from '../../components/ScreenLoader';
 import CustomText from '../../components/CustomText';
 import { fonts } from '../../constants/fonts';
+import {
+  preloadImagesInBatches,
+  extractProductImages,
+  isImagePreloaded,
+  PRIORITY,
+} from '../../utils/ImagePreloader';
+
 const ProductDetails = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const { t } = useTranslation();
-  const [isLoader, setIsLoader] = useState(false);
+  const [isLoader, setIsLoader] = useState(true);
   const pan = useRef(new Animated.ValueXY()).current;
-
   const { id, selectedCat } = route.params;
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState('M');
   const [productOrder, setProductOrder] = useState(1);
@@ -62,12 +54,11 @@ const ProductDetails = ({ navigation, route }) => {
   const [selectedImage, setSelectedImage] = useState('');
   const [imgUrl, setImgUrl] = useState('');
   const [selectedAttributes, setSelectedAttributes] = useState({});
-
-
   const [selectedVariant, setSelectedVariant] = useState('');
-
+  const [imageLoadingProgress, setImageLoadingProgress] = useState(0);
+  const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const carouselRef = useRef(null);
-
+  const isMountedRef = useRef(true);
 
   const removeHTMLCode = value => {
     if (value) {
@@ -85,7 +76,7 @@ const ProductDetails = ({ navigation, route }) => {
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gestureState) => {
-        return Math.abs(gestureState.dx) > 20; // Detect horizontal swipe
+        return Math.abs(gestureState.dx) > 20;
       },
       onPanResponderRelease: (_, gestureState) => {
         if (gestureState.dx > 50 || gestureState.dx < -50) {
@@ -96,59 +87,75 @@ const ProductDetails = ({ navigation, route }) => {
   ).current;
 
   useEffect(() => {
+    isMountedRef.current = true;
     getProductDetail();
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
-
 
   const getProductDetail = async () => {
     setIsLoader(true);
+    setImagesPreloaded(false);
     try {
       const response = await productDetails(id);
-      // const response = await productDetails(876);
       if (response?.status) {
         setProductData(response);
         setProductObject(response?.data);
-
         const availableVariant = response?.variant_system?.optimized_variants?.find(
           variant => variant?.stock_quantity > 0
         );
-
         if (availableVariant) {
-
           setSelectedVariant(availableVariant?.main_image);
-          setSelectedImage(availableVariant?.main_image)
-
+          setSelectedImage(availableVariant?.main_image);
           setCurrentIndex(availableVariant?.main_image);
           const firstAttrKey = Object.keys(availableVariant.attributes_array)[0];
           setSelectedAttributes({
             [firstAttrKey]: availableVariant.attributes_array[firstAttrKey],
           });
-        } else {
-         
-          // setCurrentIndex(productData?.product_images[0]?.main_image);
-          // setSelectedImage(productData?.product_images[0]?.main_image);
-          console.log('comecomecome',productData?.product_images[0]);
         }
-        setIsLoader(false);
+        const allImages = extractProductImages(response?.data?.product_images || []);
+        if (allImages.length > 0) {
+          const allPreloaded = allImages.every(isImagePreloaded);
+          if (allPreloaded) {
+            setImagesPreloaded(true);
+            setIsLoader(false);
+          } else {
+            await preloadImagesInBatches(
+              allImages,
+              5,
+              (completed, total) => {
+                if (!isMountedRef.current) return;
+                setImageLoadingProgress(Math.round((completed / total) * 100));
+              },
+              { priority: PRIORITY.HIGH }
+            );
+            if (isMountedRef.current) {
+              setImagesPreloaded(true);
+              setIsLoader(false);
+            }
+          }
+        } else {
+          setImagesPreloaded(true);
+          setIsLoader(false);
+        }
       } else {
         setProductData([]);
+        setImagesPreloaded(true);
+        setIsLoader(false);
       }
     } catch (error) {
       setIsLoader(false);
-      console.log(error);
-    } finally {
-      setIsLoader(false);
+      setImagesPreloaded(true);
     }
   };
 
-    useEffect(() => {
-
+  useEffect(() => {
     if (selectedVariant) {
-      setSelectedImage(selectedVariant?.main_image ? selectedVariant?.main_image : productData?.product_images[0]?.image_url)
-      setCurrentIndex(selectedVariant?.main_image ? selectedVariant?.main_image : productData?.product_images[0]?.image_url)
+      setSelectedImage(selectedVariant?.main_image ? selectedVariant?.main_image : productData?.product_images[0]?.image_url);
+      setCurrentIndex(selectedVariant?.main_image ? selectedVariant?.main_image : productData?.product_images[0]?.image_url);
     }
-
-  }, [selectedVariant])
+  }, [selectedVariant]);
 
   const addToCart = () => {
     dispatch(
@@ -163,12 +170,8 @@ const ProductDetails = ({ navigation, route }) => {
         subText: removeHTMLCode(productObject?.description),
         productWeight: selectedVariant ? selectedVariant?.weight : productObject?.weight ? productObject?.weight : '00000',
         image: selectedVariant ? selectedVariant?.main_image : selectedImage ? selectedImage : productData?.product_images[0]?.image_url,
-
-        // image:
-        //   imgUrl == '' ? productData?.product_images[0]?.image_url : imgUrl,
       }),
     );
-
     if (id && selectedSize) {
       navigation.navigate('MyCart');
     }
@@ -177,12 +180,10 @@ const ProductDetails = ({ navigation, route }) => {
 
   const quantity = type => {
     if (type == 'de') {
-
       setProductOrder(productOrder > 1 ? productOrder - 1 : 1);
     } else {
       if (selectedVariant?.stock_quantity > productOrder) {
         setProductOrder(productOrder + 1);
-
       }
     }
     ReactNativeHapticFeedback.trigger('impactLight');
@@ -192,10 +193,10 @@ const ProductDetails = ({ navigation, route }) => {
     try {
       const iosLink = `https://nextjs-sample-ten-cyan.vercel.app/productDetails/${id}`;
       const androidLink = `https://nextjs-sample-ten-cyan.vercel.app/productDetails/productDetails/${id}`;
-      const shareLink = Platform.OS == 'ios' ? iosLink : androidLink
+      const shareLink = Platform.OS == 'ios' ? iosLink : androidLink;
       await Share.share({
         message: shareLink
-      })
+      });
     } catch (error) {
       console.error('Error sharing product:', error);
     }
@@ -204,61 +205,56 @@ const ProductDetails = ({ navigation, route }) => {
   const handleVariant = (key, value) => {
     const updatedAttributes = { ...selectedAttributes, [key]: value };
     setSelectedAttributes(updatedAttributes);
-
     const matchedVariant = productData?.variant_system?.optimized_variants.find(variant => {
       return Object.entries(updatedAttributes).every(([attrKey, attrValue]) => {
         return variant.attributes_array[attrKey] === attrValue;
       });
     });
-
     if (matchedVariant) {
       setSelectedVariant(matchedVariant);
     }
-
-    // 🧠 Dynamically detect and auto-select the next attribute
     const attributeKeys = Object.keys(productData?.variant_system?.available_attributes || {});
     const currentAttrIndex = attributeKeys.indexOf(key);
     const nextAttrKey = attributeKeys[currentAttrIndex + 1];
-
     if (nextAttrKey) {
-      // Find all available values for the next attribute matching the current selection
       const nextAttrOptions = productData?.variant_system?.optimized_variants
         .filter(variant => {
           return (
             variant.stock_quantity > 0 &&
-            variant.attributes_array[key] === value // current key-value match
+            variant.attributes_array[key] === value
           );
         })
         .map(variant => variant.attributes_array[nextAttrKey]);
-
       if (nextAttrOptions?.length > 0) {
         const firstNextValue = nextAttrOptions[0];
         const autoAttributes = {
           ...updatedAttributes,
           [nextAttrKey]: firstNextValue,
         };
-
         const autoVariant = productData?.variant_system?.optimized_variants.find(variant =>
           Object.entries(autoAttributes).every(([attrKey, attrValue]) => {
             return variant.attributes_array[attrKey] === attrValue;
           })
         );
-
         setSelectedAttributes(autoAttributes);
         if (autoVariant) setSelectedVariant(autoVariant);
       }
     }
   };
+
   const isOutOfStock =
     productData?.variant_system?.has_variants &&
     productData?.variant_system?.optimized_variants?.every(
       variant => variant.stock_quantity === 0
     );
 
-  const isCheckQuantity = productObject?.quantity == 0 || isOutOfStock || (selectedVariant && selectedVariant?.stock_quantity == 0 || selectedVariant == undefined)
+  const isCheckQuantity =
+    productObject?.quantity == 0 ||
+    isOutOfStock ||
+    (selectedVariant && selectedVariant?.stock_quantity == 0) ||
+    selectedVariant == undefined;
 
-
-  if (isLoader) {
+  if (isLoader || !imagesPreloaded) {
     return <ScreenLoader />;
   }
 
@@ -268,46 +264,12 @@ const ProductDetails = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 15 }}>
-
         <HeaderBox
           catName={selectedCat}
           share={true}
           onPressShare={() => sharePress(productObject?.name, productObject?.price)}
         />
-
         <View>
-          {/* {
-            selectedVariant ?
-              <View >
-                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%" }} onPress={() => { setSelectedVariant(null), setCurrentIndex(0) }}>
-                  <AntDesign name={I18nManager.isRTL ? 'right' : 'left'} size={20} color={'#ececec'} />
-                </TouchableOpacity>
-
-                <Image
-                  resizeMode="cover"
-                  source={{ uri: selectedVariant ? selectedVariant?.main_image : selectedImage }}
-                  style={[styles.renderItem1_img, { marginLeft: -15 }]}
-                />
-                <TouchableOpacity style={{ position: "absolute", zIndex: 100, top: "45%", right: 0 }} onPress={() => { setSelectedVariant(null), setCurrentIndex(0) }}>
-                  <AntDesign name={I18nManager.isRTL ? 'left' : 'right'} size={20} color={'#ececec'} />
-                </TouchableOpacity>
-
-              </View>
-              :
-              <ProductSlider
-                currentIndex={currentIndex}
-                carouselRef={carouselRef}
-                setCurrentIndex={setCurrentIndex}
-                data={productData?.product_images}
-                setImgUrl={setImgUrl}
-                item={productObject}
-                setSelectedImage={setSelectedImage}
-                productVariants={productData?.variants}
-                selectedImage={selectedImage}
-              />
-          } */}
-
-
           <ProductSlider
             currentIndex={currentIndex}
             variantArray={productData?.variant_system?.optimized_variants}
@@ -321,131 +283,39 @@ const ProductDetails = ({ navigation, route }) => {
             selectedImage={selectedImage}
             selectedVariant={selectedVariant}
             setSelectedVariant={setSelectedVariant}
-
           />
-
           <View style={styles.productDetailContainer}>
             <View style={styles.productNamePriceBox}>
               <View style={{ width: '70%' }}>
                 <Text style={styles.productName} numberOfLines={2}>{productObject?.name}</Text>
                 <Text style={styles.productSubTxt}>{productObject?.barcode}</Text>
               </View>
-
               <View>
                 <View style={styles.itemCounter}>
-                  {
-                    productObject?.quantity !== 0 &&
+                  {productObject?.quantity !== 0 && (
                     <>
                       <TouchableOpacity onPress={() => quantity('de')}>
                         <Text style={styles.decrementBtnTxt}>-</Text>
                       </TouchableOpacity>
-
                       <Text style={styles.counterNumberTxt}>{productOrder}</Text>
-
                       <TouchableOpacity onPress={() => quantity('add')}>
                         <Text style={styles.incrementBtnTxt}>+</Text>
                       </TouchableOpacity>
                     </>
-                  }
-
+                  )}
                 </View>
-                {
-                  productObject?.quantity == 0 ?
-                    <Text style={styles.availableTxt}>{t('outOfStock')}</Text>
-                    :
-                    <Text style={styles.availableTxt}>{t('available_stocks')}</Text>
-
-
-                }
+                {productObject?.quantity == 0 ? (
+                  <Text style={styles.availableTxt}>{t('outOfStock')}</Text>
+                ) : (
+                  <Text style={styles.availableTxt}>{t('available_stocks')}</Text>
+                )}
               </View>
             </View>
-
-
-            {/* {productData?.variants?.length > 0 && (
-              <Text style={[styles.productName, { marginTop: 20 }]}>{t('color')}</Text>
-            )}
-            <ScrollView horizontal contentContainerStyle={{ gap: 10 }} >
-              {
-                productData?.variants?.map((item, index) => {
-                  return (
-                    <TouchableOpacity style={{ gap: 10 }} onPress={() => setSelectedImage(item?.image)} style={{ marginTop: 15 }}>
-                      <Image source={{ uri: item?.image }} style={{ width: 100, height: 100, gap: 10 }} />
-                    </TouchableOpacity>
-                  )
-                })
-              }
-            </ScrollView> */}
-
-
-
-
-
-
-            {/* {productData?.variants?.length > 0 && (
-              <Text style={[styles.productName]}>{t('p_size')}</Text>
-            )}
-
-            <View style={styles.SizeColorContainer}>
-              <ScrollView contentContainerStyle={{}}>
-
-                <View style={styles.sizeContainer}>
-                  {filterSizes?.map((item, index) => {
-                    return (
-                      <TouchableOpacity
-                        // onPress={() => setSelectedSize(item?.sid)}
-                        onPress={() => setSelectedSize(item?.size)}
-                        style={[
-                          styles.sizeInnerBox,
-                          selectedSize == item?.size && {
-                            backgroundColor: color.theme,
-                            borderColor: color.theme,
-                          },
-                        ]}
-                        key={index}>
-                        <Text
-                          style={{
-                            color: selectedSize == item?.size ? '#fff' : '#000',
-                            fontWeight: '500',
-                          }}>
-                          {item?.size}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </ScrollView>
-            </View> */}
-            {/* {
-              productData?.variant_system?.available_attributes &&
-              Object.entries(productData?.variant_system?.available_attributes).map(([key, values]) => (
-
-                <View key={key} style={{ marginBottom: 10, marginTop: 10 }}>
-                  <CustomText style={styles.productName}>{key}</CustomText>
-
-                  <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 10, marginTop: 10, flexGrow: 1 }}>
-                    {values.map((item, index) => {
-
-                      const isSelected = selectedVariant?.attributes_array?.[key] === item;
-                      return (
-                        (
-                          <TouchableOpacity onPress={() => handleVariant(key, item)} style={[{ borderWidth: 1, paddingHorizontal: 10, paddingVertical: 2, borderColor: "#ececec", borderRadius: 2 }, isSelected && { borderColor: color.theme }]}>
-                            <CustomText key={index}>{item}</CustomText>
-                          </TouchableOpacity>
-                        )
-                      )
-                    })}
-                  </ScrollView>
-                </View>
-              ))
-
-            } */}
-
             {productData?.variant_system?.available_attributes &&
               typeof productData?.variant_system?.available_attributes === 'object' &&
               Object.entries(productData.variant_system.available_attributes).map(([key, values]) => (
                 <View key={key} style={{ marginBottom: 10, marginTop: 10 }}>
                   <CustomText style={styles.productName}>{key}</CustomText>
-
                   <ScrollView
                     showsHorizontalScrollIndicator={false}
                     horizontal
@@ -453,24 +323,19 @@ const ProductDetails = ({ navigation, route }) => {
                   >
                     {values.map((item, index) => {
                       const isSelected = selectedVariant?.attributes_array?.[key] === item;
-
-                      // Filter variants by selected attributes except current key
                       const filteredVariants = productData?.variant_system?.optimized_variants?.filter(variant => {
                         return Object.entries(selectedAttributes).every(([attrKey, attrValue]) => {
                           return attrKey === key || variant.attributes_array[attrKey] === attrValue;
                         });
                       });
-
                       const matchingVariant = filteredVariants.find(
                         variant => variant.attributes_array?.[key] === item
                       );
-
                       const inStock = matchingVariant?.stock_quantity > 0;
-
                       return (
                         <TouchableOpacity
                           key={index}
-                          onPress={() => { (inStock ? handleVariant(key, item) : null) }}
+                          onPress={() => { inStock ? handleVariant(key, item) : null; }}
                           activeOpacity={inStock ? 0.8 : 1}
                           style={[
                             {
@@ -480,12 +345,11 @@ const ProductDetails = ({ navigation, route }) => {
                               borderColor: inStock ? '#ccc' : '#00000010',
                               borderRadius: 4,
                               paddingTop: 0,
-
                             },
                             isSelected && { borderColor: color.primary }
                           ]}
                         >
-                          <CustomText style={{ color: inStock ? color.black : color.gray, }}>
+                          <CustomText style={{ color: inStock ? color.black : color.gray }}>
                             {item}
                           </CustomText>
                         </TouchableOpacity>
@@ -494,20 +358,13 @@ const ProductDetails = ({ navigation, route }) => {
                   </ScrollView>
                 </View>
               ))}
-
-
-
-
             <View style={{ flexDirection: 'row' }}>
-              <Text
-                style={[styles.productName, { marginBottom: 5 }]}>
+              <Text style={[styles.productName, { marginBottom: 5 }]}>
                 {t('p_description')}
               </Text>
             </View>
-
             <Text style={{ ...styles.productDesc }}>
               {removeHTMLCode(productObject?.description)}
-              {/* {productObject?.description} */}
             </Text>
           </View>
         </View>
@@ -519,19 +376,15 @@ const ProductDetails = ({ navigation, route }) => {
           alignSelf: 'center',
           bottom: 90,
         }}>
-        <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart} style={[styles.bottomPriceCartBox, isCheckQuantity && { backgroundColor: "#ccc" }]}>
-          {/* <TouchableOpacity onPress={addToCart} style={[styles.bottomPriceCartBox, { backgroundColor: productObject?.quantity == 0 ? "#cecece" : color.theme }]}> */}
+        <TouchableOpacity disabled={isCheckQuantity} onPress={addToCart} style={[styles.bottomPriceCartBox, isCheckQuantity && { backgroundColor: '#ccc' }]}
+        >
           <Text style={styles.productPrice}>KD {selectedVariant?.price ? selectedVariant?.price : productObject?.price}</Text>
-
-          <View style={[styles.bottomCartBox,]}>
-            {/* <ExportSvg.ShippingCart style={{ marginRight: 10 }} /> */}
-            <Ionicons name={'bag-handle-outline'} size={20} color={"#fff"} style={{ marginRight: 10 }} />
-
+          <View style={[styles.bottomCartBox]}>
+            <Ionicons name={'bag-handle-outline'} size={20} color={'#fff'} style={{ marginRight: 10 }} />
             <Text style={styles.cartTxt}>{t('add_to_cart')}</Text>
           </View>
         </TouchableOpacity>
       </View>
-
     </SafeAreaView>
   );
 };
@@ -549,7 +402,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 20,
   },
-
   productDetailContainer: {
     backgroundColor: '#fff',
     marginHorizontal: -15,
@@ -566,14 +418,14 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 18,
     color: color.theme,
-    textAlign: "left"
+    textAlign: 'left',
   },
   productSubTxt: {
     fontSize: 12,
     color: color.gray,
     marginVertical: 5,
     fontFamily: 'Montserrat-Regular',
-    textAlign: "left",
+    textAlign: 'left',
   },
   starReviewBox: {
     flexDirection: 'row',
@@ -644,8 +496,6 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   innerColorStyle: {
-    // width: 20,
-    // height: 20,
     width: 100,
     height: 100,
     borderRadius: 50,
@@ -668,7 +518,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     alignItems: 'center',
   },
-
   bottomCartBox: {
     flexDirection: 'row',
     alignItems: 'center',

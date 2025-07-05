@@ -1,5 +1,5 @@
 import { Dimensions, FlatList, Modal, StyleSheet, Text, I18nManager, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import ExportSvg from '../constants/ExportSvg';
 import SingleProductCard from './SingleProductCard';
 import { searchProductByName } from '../services/UserServices';
@@ -7,27 +7,65 @@ import { color } from '../constants/color';
 const { height } = Dimensions.get('screen')
 import { useTranslation } from 'react-i18next';
 import { fonts } from '../constants/fonts';
+import { preloadImagesInBatches, extractProductImages, isImagePreloaded, PRIORITY } from '../utils/ImagePreloader';
 
 const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
     const [search, setSearch] = useState('')
     const [foundProduct, setFoundProduct] = useState()
+    const [isLoader, setIsLoader] = useState(false)
+    const [imageLoadingProgress, setImageLoadingProgress] = useState(0)
+    const [imagesPreloaded, setImagesPreloaded] = useState(false)
+    const isMountedRef = useRef(true)
     const { t } = useTranslation();
 
     useEffect(() => {
+        isMountedRef.current = true
         searchProduct()
+        return () => {
+            isMountedRef.current = false
+        }
     }, [search])
 
-
     const searchProduct = async () => {
+        setIsLoader(true)
+        setImagesPreloaded(false)
         try {
             const result = await searchProductByName(search)
             if (result?.status) {
                 setFoundProduct(result?.data)
+                const allImages = extractProductImages(result?.data || [])
+                if (allImages.length > 0) {
+                    const allPreloaded = allImages.every(isImagePreloaded)
+                    if (allPreloaded) {
+                        setImagesPreloaded(true)
+                        setIsLoader(false)
+                    } else {
+                        await preloadImagesInBatches(
+                            allImages,
+                            5,
+                            (completed, total) => {
+                                if (!isMountedRef.current) return
+                                setImageLoadingProgress(Math.round((completed / total) * 100))
+                            },
+                            { priority: PRIORITY.HIGH }
+                        )
+                        if (isMountedRef.current) {
+                            setImagesPreloaded(true)
+                            setIsLoader(false)
+                        }
+                    }
+                } else {
+                    setImagesPreloaded(true)
+                    setIsLoader(false)
+                }
             } else {
                 setFoundProduct([])
+                setImagesPreloaded(true)
+                setIsLoader(false)
             }
         } catch (error) {
-            console.log(error)
+            setIsLoader(false)
+            setImagesPreloaded(true)
         }
     }
 
@@ -38,15 +76,10 @@ const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
         setFoundProduct('')
     } 
     
-    
     const onPressCross = () => {
        setModalVisible(false)
        setSearch('')
     }
-
-
-
-
 
     return (
         <View style={styles.centeredView}>
@@ -74,36 +107,36 @@ const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
                                 <ExportSvg.Search />
                             </TouchableOpacity>
                         </View>
-
-
                         <View style={{ flex: 1 }}>
-                            <FlatList
-                                data={search?.length>0 && foundProduct}
-                                keyExtractor={(item, index) => index?.toString()}
-                                showsVerticalScrollIndicator={false}
-                                numColumns={2}
-                                ListEmptyComponent={() => {
-                                    return (
-                                        <View style={{ alignItems: "center", justifyContent: "center", flex: 1, height: height / 1.5 }}>
-                                            <Text style={{ color: "#000" ,fontFamily:fonts.semiBold}}>{t("no_product_found")}</Text>
-                                        </View>
-
-                                    )
-                                }}
-                                columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
-                                renderItem={({ item }) => {
-                                    return (
-                                        <SingleProductCard
-                                            item={item}
-                                            setModalVisible={setModalVisible}
-                                            onPress={() => onPressSearch(item?.id)}
-                                        />
-                                    )
-                                }}
-
-                            />
+                            {isLoader || !imagesPreloaded ? (
+                                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                </View>
+                            ) : (
+                                <FlatList
+                                    data={search?.length>0 && foundProduct}
+                                    keyExtractor={(item, index) => index?.toString()}
+                                    showsVerticalScrollIndicator={false}
+                                    numColumns={2}
+                                    ListEmptyComponent={() => {
+                                        return (
+                                            <View style={{ alignItems: "center", justifyContent: "center", flex: 1, height: height / 1.5 }}>
+                                                <Text style={{ color: "#000" ,fontFamily:fonts.semiBold}}>{t("no_product_found")}</Text>
+                                            </View>
+                                        )
+                                    }}
+                                    columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1 }}
+                                    renderItem={({ item }) => {
+                                        return (
+                                            <SingleProductCard
+                                                item={item}
+                                                setModalVisible={setModalVisible}
+                                                onPress={() => onPressSearch(item?.id)}
+                                            />
+                                        )
+                                    }}
+                                />
+                            )}
                         </View>
-
                     </View>
                 </View>
             </Modal>

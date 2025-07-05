@@ -1,9 +1,54 @@
-import { StyleSheet, Text, TextInput, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, TextInput, View, ActivityIndicator } from 'react-native'
+import React, { useState, useRef } from 'react'
 import ExportSvg from '../constants/ExportSvg'
 import { color } from '../constants/color'
+import { preloadImagesInBatches, extractProductImages, isImagePreloaded, PRIORITY } from '../utils/ImagePreloader'
 
-const SearchInput = ({value,onChangeText}) => {
+const SearchInput = ({ value, onChangeText, searchResults }) => {
+    const [isLoader, setIsLoader] = useState(false)
+    const [imageLoadingProgress, setImageLoadingProgress] = useState(0)
+    const [imagesPreloaded, setImagesPreloaded] = useState(false)
+    const isMountedRef = useRef(true)
+
+    React.useEffect(() => {
+        isMountedRef.current = true
+        const preload = async () => {
+            setIsLoader(true)
+            setImagesPreloaded(false)
+            const allImages = extractProductImages(searchResults || [])
+            if (allImages.length > 0) {
+                const allPreloaded = allImages.every(isImagePreloaded)
+                if (allPreloaded) {
+                    setImagesPreloaded(true)
+                    setIsLoader(false)
+                } else {
+                    await preloadImagesInBatches(
+                        allImages,
+                        5,
+                        (completed, total) => {
+                            if (!isMountedRef.current) return
+                            setImageLoadingProgress(Math.round((completed / total) * 100))
+                        },
+                        { priority: PRIORITY.HIGH }
+                    )
+                    if (isMountedRef.current) {
+                        setImagesPreloaded(true)
+                        setIsLoader(false)
+                    }
+                }
+            } else {
+                setImagesPreloaded(true)
+                setIsLoader(false)
+            }
+        }
+        if (searchResults && searchResults.length > 0) {
+            preload()
+        }
+        return () => {
+            isMountedRef.current = false
+        }
+    }, [searchResults])
+
     return (
         <View style={styles.container}>
             <ExportSvg.Search style={{
@@ -12,12 +57,15 @@ const SearchInput = ({value,onChangeText}) => {
             }} />
             <TextInput
                 placeholder='Search...'
-                style={{width:"80%",color:"#000"}}
+                style={{ width: "80%", color: "#000" }}
                 placeholderTextColor={color.gray}
                 value={value}
                 onChangeText={onChangeText}
                 autoCorrect={false}
             />
+            {isLoader || !imagesPreloaded ? (
+                <ActivityIndicator size="small" color={color.theme} style={{ marginLeft: 10 }} />
+            ) : null}
         </View>
     )
 }
