@@ -135,5 +135,9 @@
   "outOfStocks": "This Product is out of stock",
   "shipping_cost": "Shipping Cost",
   "loading_images": "Loading images",
-  "loading_products": "Loading products..."
+  "loading_products": "Loading products...",
+  "welcomeSub": "Kuwait's No.1 App",
+  "my_favourites": "My Favourites",
+  "the_categories": "Categories",
+  "proceed_to_checkout": "Proceed to Checkout"
 }

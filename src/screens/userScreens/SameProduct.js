@@ -443,6 +443,7 @@ const SameProduct = ({ navigation, route }) => {
         <SingleProductCard
           item={item}
           countList={1 + index}
+          isDot={false}
           isShowPlusIcon={true}
           isPreloaded={isPreloaded}
           onPress={() => navigation.navigate('ProductDetails', {
