@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View, TextInput, I18nManager, Alert } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, TextInput, I18nManager, Alert, KeyboardAvoidingView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import Screen from './Screen'
 import {
@@ -13,12 +13,13 @@ import { color } from '../../constants/color'
 import axios from 'axios';
 import messaging, { firebase } from '@react-native-firebase/messaging';
 
-import { baseUrl, OTP_URL } from '../../constants/data';
+import { arabicToEnglish, baseUrl, OTP_URL } from '../../constants/data';
 import HeaderLogo from '../../components/HeaderLogo'
 import { loginData } from '../../redux/reducer/Auth';
 import CustomDropDown from '../../components/CustomDropDown';
 import Text from '../../components/CustomText'
 import { showMessage } from 'react-native-flash-message';
+import { fonts } from '../../constants/fonts';
 
 
 
@@ -185,9 +186,9 @@ const Login = ({ navigation, route }) => {
             },
             data: bodyData
         };
-        console.log('config//////', config);
         axios.request(config)
             .then((response) => {
+                console.log('config//////', response?.data);
 
                 if (response?.data?.success) {
                     isVerifyOtp()
@@ -242,6 +243,7 @@ const Login = ({ navigation, route }) => {
                 userName: result?.data?.name,
                 mobile: result?.data?.phone,
                 userId: result?.data?.id,
+                countryCode: countryCodes,
             }))
 
             if (isOrderDetail) {
@@ -265,9 +267,9 @@ const Login = ({ navigation, route }) => {
         } else if (value == 1234) {
             getFunLogin({ phone: phoneNo });
         } else {
-             showMessage({
-                type:"danger",
-                message:t('CodeIncorrect')
+            showMessage({
+                type: "danger",
+                message: t('CodeIncorrect')
             })
         }
     }
@@ -275,8 +277,8 @@ const Login = ({ navigation, route }) => {
     const onPressSend = () => {
         if (phoneNo.length <= 7) {
             showMessage({
-                type:"danger",
-                message:t('inCorrectNo')
+                type: "danger",
+                message: t('inCorrectNo')
             })
             return
 
@@ -322,73 +324,84 @@ const Login = ({ navigation, route }) => {
 
     return (
         <View style={styles.mainContainer}>
-            <Screen>
+
+            <Screen scrollable={true}>
                 <View style={styles.headerContainer}>
 
                     <HeaderLogo />
                 </View>
 
-                {getOTPCoder ?
-                    <>
-                        {/* <Text>{'\u2066+965\u2069'}</Text> */}
-                        <Text style={styles.title}>{t('otp')}</Text>
-                        <Text style={styles.subTitle}>{t('enterDigits')}</Text>
+                {!getOTPCoder &&
 
-                        <Text style={styles.subTitle}>
-                            {'\u2066'}{countryCodes}{phoneNo && phoneNo[0] === '0' ? phoneNo.slice(1) : phoneNo}{'\u2069'}
-                        </Text>
-
-                        {/* <Text style={styles.subTitle}>
-                            {phoneNo && phoneNo[0] === '0' ? `+965${phoneNo.slice(1)}` : `+965${phoneNo}`}
-                        </Text> */}
-                    </>
-                    :
 
                     <Text style={styles.subTitle}>{t('loginNumber')}</Text>
                 }
 
 
                 {getOTPCoder ?
-                    <View style={styles.innerContainer}>
-                        <CodeField
-                            ref={ref}
-                            {...props}
-                            value={value}
-                            onChangeText={setValue}
-                            cellCount={CELL_COUNT}
-                            rootStyle={styles.codeFieldRoot}
-                            keyboardType="number-pad"
-                            textContentType="oneTimeCode"
-                            textInputStyle={{ textAlign: "right", writingDirection: "ltr", textDecorationLine: "line-through" }}
-                            renderCell={({ index, symbol, isFocused }) => (
-                                <View
-                                    key={index}
-                                    style={[styles.cell, isFocused && styles.focusCell]}
-                                >
-                                    <Text
-                                        style={[styles.cellTxt]}
-                                        onLayout={getCellOnLayoutHandler(index)}
-                                    >
-                                        {symbol || (isFocused ? <Cursor /> : null)}
-                                    </Text>
-                                </View>
-                            )}
-                        />
+
+                    <KeyboardAvoidingView behavior='position' contentContainerStyle={{ paddingBottom: 60 }}>
 
 
-                        <TouchableOpacity onPress={() => resend()}>
-                            <Text style={[styles.subTitle, { marginTop: 15 }]}>{t("DidntRcvcode")} <Text>{getTextReSend ? getTextReSend : t("Resend")}</Text></Text>
-                        </TouchableOpacity>
+                        <View>
+                            {/* <Text>{'\u2066+965\u2069'}</Text> */}
+                            <Text style={styles.title}>{t('otp')}</Text>
+                            <Text style={styles.subTitle}>{t('enterDigits')}</Text>
+
+                            <Text style={styles.subTitle}>
+                                {'\u2066'}{countryCodes}{phoneNo && phoneNo[0] === '0' ? phoneNo.slice(1) : phoneNo}{'\u2069'}
+                            </Text>
+
+                            {/* <Text style={styles.subTitle}>
+                            {phoneNo && phoneNo[0] === '0' ? `+965${phoneNo.slice(1)}` : `+965${phoneNo}`}
+                        </Text> */}
+                            <View style={styles.innerContainer}>
+                                <CodeField
+                                    ref={ref}
+                                    autoFocus
+                                    {...props}
+                                    value={value}
+                                    onChangeText={(text) => {
+                                        const digitsOtp = arabicToEnglish(text)
+                                        setValue(digitsOtp)
+                                    }}
+                                    cellCount={CELL_COUNT}
+                                    rootStyle={styles.codeFieldRoot}
+                                    keyboardType="phone-pad"
+                                    textContentType="oneTimeCode"
+                                    textInputStyle={{ textAlign: "right", writingDirection: "ltr", textDecorationLine: "line-through" }}
+                                    renderCell={({ index, symbol, isFocused }) => (
+                                        <View
+                                            key={index}
+                                            style={[styles.cell, isFocused && styles.focusCell]}
+                                        >
+                                            <Text
+                                                style={[styles.cellTxt]}
+                                                onLayout={getCellOnLayoutHandler(index)}
+                                            >
+                                                {symbol || (isFocused ? <Cursor /> : null)}
+                                            </Text>
+                                        </View>
+                                    )}
+                                />
 
 
-                        <TouchableOpacity onPress={() => backLogin()}>
-                            <Text style={[styles.subTitle, { marginTop: 15 }]}>{t("backtoLogin")}</Text>
-                        </TouchableOpacity>
+                                <TouchableOpacity onPress={() => resend()}>
+                                    <Text style={[styles.subTitle, { marginTop: 15 }]}>{t("DidntRcvcode")} <Text>{getTextReSend ? getTextReSend : t("Resend")}</Text></Text>
+                                </TouchableOpacity>
 
-                        <TouchableOpacity onPress={() => onPressLogin()} style={styles.bottomPlaceOrderBox}>
-                            <Text style={[styles.orderTxt, { textAlign: 'center' }]}>{t("verify")}</Text>
-                        </TouchableOpacity>
-                    </View>
+
+                                <TouchableOpacity onPress={() => backLogin()}>
+                                    <Text style={[styles.subTitle, { marginTop: 15 }]}>{t("backtoLogin")}</Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity onPress={() => onPressLogin()} style={styles.bottomPlaceOrderBox}>
+                                    <Text style={[styles.orderTxt, { textAlign: 'center' }]}>{t("verify")}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </KeyboardAvoidingView>
+
                     :
                     <View style={{}}>
                         <View style={{ marginTop: 20 }}>
@@ -423,11 +436,15 @@ const Login = ({ navigation, route }) => {
                                     placeholder={t('phoneNumber')}
                                     value={phoneNo}
                                     keyboardType="number-pad"
-                                    onChangeText={setPhoneNo}
+                                    onChangeText={(text) => {
+                                        const phoneNoDigits = arabicToEnglish(text);
+                                        setPhoneNo(phoneNoDigits);
+                                    }}
                                     autoCorrect={false}
                                     maxLength={10}
                                     style={{ color: "#000" }}
                                     placeholderTextColor={'#cecece'}
+
                                 />
                             </View>
                         </View>
@@ -467,7 +484,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         marginBottom: 10,
         textAlign: "center",
-        marginTop: 90,
+        marginTop: 120,
         color: "#000"
     },
     bottomPlaceOrderBox: {
@@ -485,7 +502,7 @@ const styles = StyleSheet.create({
     },
     innerContainer: {
         paddingHorizontal: 20,
-        marginTop: 90
+        marginTop: 30
     },
     phoneTxt: {
         color: "grey",
@@ -534,15 +551,10 @@ const styles = StyleSheet.create({
     cell: {
         width: 45,
         height: 45,
-        borderColor: "#00000030",
         alignItems: "center",
         justifyContent: "center",
         borderRadius: 10,
-        borderColor: "#fff",
         paddingBottom: 5,
-
-
-
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -552,11 +564,12 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         backgroundColor: "#fff",
         elevation: 7,
-
     },
     cellTxt: {
         fontSize: 25,
         color: "#000",
+        top: I18nManager.isRTL ? -4 : -3
+
 
     },
     focusCell: {

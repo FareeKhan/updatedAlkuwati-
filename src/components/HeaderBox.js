@@ -1,4 +1,4 @@
-import { I18nManager, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { I18nManager, StyleSheet, TouchableOpacity, View } from 'react-native'
 import React, { useEffect } from 'react'
 import { DrawerActions, useNavigation } from '@react-navigation/native'
 import ExportSvg from '../constants/ExportSvg';
@@ -6,6 +6,7 @@ import HeaderLogo from './HeaderLogo';
 import { useSelector } from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { color } from '../constants/color';
+import Text from './CustomText'
 
 const HeaderBox = ({ isDrawer, catName, share, onPressShare, cartIcon, bagIcon,style }) => {
     const navigation = useNavigation()
@@ -41,7 +42,7 @@ const HeaderBox = ({ isDrawer, catName, share, onPressShare, cartIcon, bagIcon,s
 
             {
                 catName ?
-                    <Text style={{ color: color.theme, fontSize: 15, fontFamily: "500" }} >{catName?.length > 30 ? catName?.slice(0,30)+'...' : catName}</Text>
+                    <Text style={{ color: color.theme, fontSize: 15}} >{catName?.length > 30 ? catName?.slice(0,30)+'...' : catName}</Text>
                     :
                     <HeaderLogo />
             }

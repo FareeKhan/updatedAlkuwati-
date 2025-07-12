@@ -233,35 +233,35 @@ const HomeScreen = ({ navigation }) => {
     return (
       <View>
         {
-          item?.category?.products?.length > 0 && 
+          item?.category?.products?.length > 0 &&
           <>
-           <View style={styles.arrivalBox}>
-          <Text style={styles.arrivalTxt}>{item?.category?.name}</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('SameProduct', {
-              selected: item?.category?.name,
-              subC_ID: item?.category?.id
-            })}>
-            <Text style={styles.viewTxt}>{t('view_all')}</Text>
-          </TouchableOpacity>
-        </View>
+            <View style={styles.arrivalBox}>
+              <Text style={styles.arrivalTxt}>{item?.category?.name}</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('SameProduct', {
+                  selected: item?.category?.name,
+                  subC_ID: item?.category?.id
+                })}>
+                <Text style={styles.viewTxt}>{t('view_all')}</Text>
+              </TouchableOpacity>
+            </View>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {
-            item?.category?.products?.map((innerItem, index) => {
-              return (
-                <SingleProductCard
-                  isShowPlusIcon={true}
-                  item={innerItem}
-                  onPress={() => navigation.navigate('ProductDetails', { id: innerItem?.id })}
-                />
-              )
-            })
-          }
-        </ScrollView>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {
+                item?.category?.products?.map((innerItem, index) => {
+                  return (
+                    <SingleProductCard
+                      isShowPlusIcon={true}
+                      item={innerItem}
+                      onPress={() => navigation.navigate('ProductDetails', { id: innerItem?.id })}
+                    />
+                  )
+                })
+              }
+            </ScrollView>
           </>
         }
-       
+
 
       </View>
 
@@ -361,7 +361,6 @@ const HomeScreen = ({ navigation }) => {
       </TouchableOpacity>
     )
   }
-  console.log('arrivalDataarrivalData',arrivalData)
 
 
   // if (loader) {
@@ -642,17 +641,12 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    // elevation: 9,
     borderColor: '#301A58',
     borderRadius: 10,
     width: 70,
     height: 130,
     marginHorizontal: 2,
-    justifyContent: 'center',
-    flexDirection: 'row',
-    alignContent: 'center',
-    alignItems: 'center',
-    paddingTop: 15,
+    marginVertical:10,
   },
 
   item: {

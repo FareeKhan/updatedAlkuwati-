@@ -10,10 +10,8 @@ import {
 import React, { useEffect, useState, useRef } from 'react';
 import ExportSvg from '../../constants/ExportSvg';
 import { color } from '../../constants/color';
-import { getSameProduct } from '../../services/UserServices';
 import ScreenLoader from '../../components/ScreenLoader';
 import SingleProductCard from '../../components/SingleProductCard';
-import axios from 'axios';
 import Text from '../../components/CustomText';
 import SearchModal from '../../components/SearchModal';
 import { 
@@ -29,7 +27,6 @@ const ITEM_WIDTH = Dimensions.get('window').width * 0.8;
 
 import * as Animatable from 'react-native-animatable';
 import {
-  fetchCategoryProducts,
   categoriesListSub,
 } from '../../services/UserServices';
 import EmptyScreen from '../../components/EmptyScreen';
@@ -42,7 +39,7 @@ import { fonts } from '../../constants/fonts';
 const SameProduct = ({ navigation, route }) => {
   const { text, subC_ID, selected, navID } = route?.params;
   const [modalVisible, setModalVisible] = useState(false);
-  const [isLoader, setIsLoader] = useState(true); // Start with loader active
+  const [isLoader, setIsLoader] = useState(true);
   const [productLoader, setProductLoader] = useState(false);
   const [selectedCat, setSelectedCat] = useState(subC_ID);
   const [storeCategories, setStoreCategories] = useState([]);
@@ -60,7 +57,6 @@ const SameProduct = ({ navigation, route }) => {
 
   const { t } = useTranslation();
 
-  console.log('Current selectedCat:', selectedCat); // Debug logging
 
   const animationMain = 'fadeInRight';
   const durationInner = 1000;
@@ -96,15 +92,16 @@ const SameProduct = ({ navigation, route }) => {
 
   // Initial load - fetch first category data and start preloading
   useEffect(() => {
-    LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
     getCatList();
 
     // Cleanup function to abort any pending requests when unmounting
     return () => {
-      isMountedRef.current = false;
+   setTimeout(()=>{
+   isMountedRef.current = false;
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+   },2500)
     };
   }, []);
 
@@ -622,7 +619,8 @@ const SameProduct = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.arrivalTxt}>{storeCategories?.category?.name}</Text>
+        {/* <Text style={styles.arrivalTxt}>{storeCategories?.category?.name}</Text> */}
+        <Text style={styles.arrivalTxt}>{text}</Text>
 
         <View style={styles.catBox}>
           <FlatList
@@ -636,8 +634,6 @@ const SameProduct = ({ navigation, route }) => {
               const isLoading = categoryLoadProgress[item.id] === 'loading';
               const isLoaded = allCategoriesProducts[item.id] && allCategoriesProducts[item.id].length > 0;
               const isSelected = parseInt(selectedCat) === parseInt(item.id); // Convert to numbers for comparison
-              
-              console.log(`Rendering category ${item.id}, selected: ${isSelected}, selectedCat: ${selectedCat}`);
               
               return (
                 <Animatable.View
@@ -725,7 +721,7 @@ export default SameProduct;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    paddingTop: Platform.OS == 'ios' ? 40 : 20,
+    paddingTop: Platform.OS == 'ios' ? 70 : 20,
     paddingHorizontal: 15,
     marginBottom: 80,
   },

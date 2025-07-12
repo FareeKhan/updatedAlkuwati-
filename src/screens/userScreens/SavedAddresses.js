@@ -40,6 +40,7 @@ const SavedAddresses = ({ navigation, route }) => {
         setLoader(value);
         try {
             const response = await userShippingAddress(userId);
+            console.log('responseresponse',response)
             if (response?.data?.length > 0) {
                 setData(response?.data)
                 setLoader(false);
@@ -62,7 +63,7 @@ const SavedAddresses = ({ navigation, route }) => {
         const addressredux = {
             fullName: item?.full_name,
             street: item?.street,
-            city: item?.city,
+            // city: item?.city,
             piece: item?.street,
             email: item?.email,
             area: item?.area,
@@ -101,10 +102,10 @@ const SavedAddresses = ({ navigation, route }) => {
 
     const handleEdit = async (id) => {
         navigation.navigate('ShippingAddress', {
-            id: id
+            id: id,
+            isEdit:false
         })
     }
-
 
     const AddressLine = ({ label, value }) => (
         <View style={{
@@ -126,9 +127,28 @@ const SavedAddresses = ({ navigation, route }) => {
             // <Swipeable renderRightActions={() => rightSwipe(item?.id)}>
             <TouchableOpacity onPress={() => handleAddress(item)} style={[styles.userAddressBox, selectedItem == item?.id && { borderColor: color.theme }]} >
                 <View >
-                    <AddressLine label={t('Street')} value={item?.street} />
-                    <AddressLine label={t('City')} value={item?.city} />
-                    <AddressLine label={t('governorate')} value={item?.area} />
+                    {
+
+                        item?.country == t('Kuwait') ?
+                            <>
+                            {
+                                item?.street && 
+                                <AddressLine label={t('avenue')} value={item?.street} />
+
+                            }
+                                <AddressLine label={t('governorate')} value={item?.area} />
+                            </>
+                            :
+                            <>
+                            {
+                                item?.street && 
+                                <AddressLine label={t('postalCoder')} value={item?.street} />
+
+                            }
+                                <AddressLine label={t('City')} value={item?.area} />
+                            </>
+                    }
+
                     <AddressLine label={t('phoneNumber')} value={`\u2066${item?.phone}\u2069`} />
                     <AddressLine label={t('Country')} value={item?.country} />
                 </View>
@@ -158,7 +178,7 @@ const SavedAddresses = ({ navigation, route }) => {
     return (
         <ScreenView>
             <HeaderBox
-                style={[{ width: "60%"},Platform.OS == 'ios' && {marginTop:30 }]}
+                style={[{ width: "60%" }, Platform.OS == 'ios' && { marginTop: 30 }]}
             />
 
             {/* {
@@ -170,11 +190,11 @@ const SavedAddresses = ({ navigation, route }) => {
                 </TouchableOpacity>
             } */}
 
-             <TouchableOpacity style={{ borderWidth: 1, alignSelf: "baseline", paddingHorizontal: 10, paddingVertical: 2, borderRadius: 5, borderColor: "#cecece" }} onPress={() => navigation.navigate('ShippingAddress', {
-                    isMap: true
-                })}>
-                    <CustomText style={{ fontSize: 16, fontWeight: "600", color: color.theme, textAlign: "left" }}>+ {t('addNew')}</CustomText>
-                </TouchableOpacity>
+            <TouchableOpacity style={{ borderWidth: 1, alignSelf: "baseline", paddingHorizontal: 10, paddingVertical: 2, borderRadius: 5, borderColor: "#cecece" }} onPress={() => navigation.navigate('ShippingAddress', {
+                isMap: true
+            })}>
+                <CustomText style={{ fontSize: 16, fontWeight: "600", color: color.theme, textAlign: "left" }}>+ {t('addNew')}</CustomText>
+            </TouchableOpacity>
 
             <View style={{ flex: 1, marginTop: 30 }}>
                 <FlatList

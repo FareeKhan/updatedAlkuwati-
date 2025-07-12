@@ -1,4 +1,4 @@
-import { Alert, Button, I18nManager, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Button, I18nManager, KeyboardAvoidingView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import Screen from './Screen'
 
@@ -16,7 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 //import { BASE_URL, OTP_URL } from '../../constant/config';
 
-import { baseUrl, OTP_URL } from '../../constants/data';
+import { arabicToEnglish, baseUrl, OTP_URL } from '../../constants/data';
 import ExportSvg from '../../constants/ExportSvg'
 import HeaderLogo from '../../components/HeaderLogo'
 import { loginData } from '../../redux/reducer/Auth';
@@ -86,7 +86,6 @@ const VerifyCode = ({ navigation, route }) => {
                 console.log(error);
             });
 
-        console.log(getGeneratedOTP, "INcheck");
     }
 
     const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
@@ -195,7 +194,7 @@ const VerifyCode = ({ navigation, route }) => {
             }))
             handlePress(result?.data?.id)
 
-        console.log('daddddd',result?.data?.id)
+            console.log('daddddd', result?.data?.id)
 
         } catch (error) {
             console.log('error', error)
@@ -204,7 +203,7 @@ const VerifyCode = ({ navigation, route }) => {
 
     const handlePress = async (id) => {
         const response = await addShippingAddress(reduxAddress, id)
-        console.log('------>>',response)
+        console.log('------>>', response)
         try {
             if (response?.data) {
                 dispatch(
@@ -214,12 +213,12 @@ const VerifyCode = ({ navigation, route }) => {
                     }),
                 );
 
-                    navigation.navigate('PaymentOrder', {
-                FinalTotal: FinalTotal,
-                subTotal: subTotal,
-                discount: discount,
-                delCharges: delCharges,
-            })
+                navigation.navigate('PaymentOrder', {
+                    FinalTotal: FinalTotal,
+                    subTotal: subTotal,
+                    discount: discount,
+                    delCharges: delCharges,
+                })
 
 
             }
@@ -259,61 +258,71 @@ const VerifyCode = ({ navigation, route }) => {
 
     return (
         <View style={styles.mainContainer}>
-            <Screen>
-                <View style={styles.headerContainer}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Ionicons size={40} name={I18nManager.isRTL ? 'chevron-forward-circle' : 'chevron-back-circle'} color={color.theme} />
-                    </TouchableOpacity>
-                    <HeaderLogo />
-                </View>
+            <Screen scrollable={true}>
+
+                <KeyboardAvoidingView behavior='position' contentContainerStyle={{ paddingBottom: 60 }}>
+
+                    <View>
+
+                        <View style={styles.headerContainer}>
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <Ionicons size={40} name={I18nManager.isRTL ? 'chevron-forward-circle' : 'chevron-back-circle'} color={color.theme} />
+                            </TouchableOpacity>
+                            <HeaderLogo />
+                        </View>
 
 
-                <Text style={styles.title}>{t('otp')}</Text>
-                <Text style={styles.subTitle}>{t('enterDigits')}</Text>
-                <Text style={styles.subTitle}>
-                    {'\u202A'}{phoneNo}{'\u202C'}
-                </Text>
+                        <Text style={styles.title}>{t('otp')}</Text>
+                        <Text style={styles.subTitle}>{t('enterDigits')}</Text>
+                        <Text style={styles.subTitle}>
+                            {'\u202A'}{phoneNo}{'\u202C'}
+                        </Text>
 
-                <View style={styles.innerContainer}>
-                    <CodeField
-                        ref={ref}
-                        {...props}
-                        value={value}
-                        onChangeText={setValue}
-                        cellCount={CELL_COUNT}
-                        rootStyle={styles.codeFieldRoot}
-                        keyboardType="number-pad"
-                        textContentType="oneTimeCode"
-                        renderCell={({ index, symbol, isFocused }) => (
-                            <View
-                                key={index}
-                                style={[styles.cell, isFocused && styles.focusCell]}
-                            >
-                                <Text
-                                    style={[styles.cellTxt, { textAlign: "right", }]}
-                                    onLayout={getCellOnLayoutHandler(index)}
-                                >
-                                    {symbol || (isFocused ? <Cursor /> : null)}
-                                </Text>
-                            </View>
-                        )}
-                    />
-
-
-
-                    <TouchableOpacity onPress={() => resend()}>
-
-
-                        <Text style={[styles.subTitle, { marginTop: 15 }]}>{t("DidntRcvcode")} <Text>{getTextReSend ? getTextReSend : t("Resend")}</Text></Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={() => onPressLogin()} style={styles.bottomPlaceOrderBox}>
-                        <Text style={[styles.orderTxt, { textAlign: 'center' }]}>{t("verify")}</Text>
-                    </TouchableOpacity>
+                        <View style={styles.innerContainer}>
+                            <CodeField
+                                ref={ref}
+                                {...props}
+                                value={value}
+                                onChangeText={(text) => {
+                                    const digitsOtp = arabicToEnglish(text)
+                                    setValue(digitsOtp)
+                                }}
+                                cellCount={CELL_COUNT}
+                                rootStyle={styles.codeFieldRoot}
+                                keyboardType="number-pad"
+                                textContentType="oneTimeCode"
+                                renderCell={({ index, symbol, isFocused }) => (
+                                    <View
+                                        key={index}
+                                        style={[styles.cell, isFocused && styles.focusCell]}
+                                    >
+                                        <Text
+                                            style={[styles.cellTxt, { textAlign: "right", }]}
+                                            onLayout={getCellOnLayoutHandler(index)}
+                                        >
+                                            {symbol || (isFocused ? <Cursor /> : null)}
+                                        </Text>
+                                    </View>
+                                )}
+                            />
 
 
 
-                </View>
+                            <TouchableOpacity onPress={() => resend()}>
+
+
+                                <Text style={[styles.subTitle, { marginTop: 15 }]}>{t("DidntRcvcode")} <Text>{getTextReSend ? getTextReSend : t("Resend")}</Text></Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity onPress={() => onPressLogin()} style={styles.bottomPlaceOrderBox}>
+                                <Text style={[styles.orderTxt, { textAlign: 'center' }]}>{t("verify")}</Text>
+                            </TouchableOpacity>
+
+
+
+                        </View>
+                    </View>
+                </KeyboardAvoidingView>
 
 
             </Screen>
@@ -363,7 +372,7 @@ const styles = StyleSheet.create({
     },
     innerContainer: {
         paddingHorizontal: 20,
-        marginTop: 90,
+        marginTop: 30,
     },
     phoneTxt: {
         color: "grey",

@@ -1,4 +1,4 @@
-import { Alert, FlatList, Image, ImageBackground, Platform, StyleSheet, Text, Button, TouchableOpacity, View } from 'react-native'
+import { Alert, FlatList, Image, ImageBackground, Platform, StyleSheet, Text, Button, TouchableOpacity, View, Dimensions } from 'react-native'
 import React, { useEffect, useState, useRef } from 'react'
 import ExportSvg from '../../constants/ExportSvg'
 import SearchInput from '../../components/SearchInput'
@@ -21,6 +21,7 @@ import { preloadImagesInBatches } from '../../utils/ImagePreloader';
 
 import withPressAnimated from './hocs/withPressAnimated';
 import registercustomAnimations, { ANIMATIONS } from './animations';
+const width = Dimensions.get('screen')
 
 registercustomAnimations()
 const AnimatedPressButton = withPressAnimated(RNBounceable)
@@ -103,9 +104,10 @@ const CategorySubList = ({ navigation, innetCate }) => {
                     animation={animationMain}
                     duration={durationInner}
                     delay={(1 + index) * delayInner}
+                    style={{width:"33%"}}
                 >
                    
-                    <AnimatedPressButton style={{width:'100%'}} animation='swing' mode="contained"
+                    <AnimatedPressButton style={{width:width}} animation='swing' mode="contained"
                         onPress={() => {
                             ReactNativeHapticFeedback.trigger('impactLight');
                             setTimeout(() => {
@@ -118,14 +120,14 @@ const CategorySubList = ({ navigation, innetCate }) => {
                         }
                         }
                     >
-                        <View style={{...styles.itemBox,width:100}}>
+                        <View style={{...styles.itemBox}}>
                             <FastImage 
                                 source={{ 
                                     uri: item?.image,
                                     priority: isPreloaded ? FastImage.priority.normal : FastImage.priority.high,
                                     cache: FastImage.cacheControl.immutable
                                 }} 
-                                style={{ borderRadius: 10, width: '60%', height: 60 }}
+                                style={{ borderRadius: 10, width: '75%', height: 60 }}
                                 resizeMode={FastImage.resizeMode.cover}
                             />
                             <Text style={styles.textBox}>{item?.name}</Text>
@@ -156,9 +158,11 @@ const CategorySubList = ({ navigation, innetCate }) => {
                             viewabilityConfig={viewabilityConfig}
                             initialNumToRender={6}
                             maxToRenderPerBatch={6}
+                            contentContainerStyle={{gap:40}}
                             windowSize={7}
                             removeClippedSubviews={true}
                             updateCellsBatchingPeriod={50}
+                            columnWrapperStyle={{justifyContent:"space-between",width:"100%"}}
                         />
                     </View>
                 </View>

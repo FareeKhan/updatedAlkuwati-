@@ -7,6 +7,7 @@ const { createSlice } = require("@reduxjs/toolkit");
 const initialState = {
     isLogin: false,
     userId: null,
+    countryCode: null,
     phoneNo: null,
     userName: null,
     token: null,
@@ -25,11 +26,12 @@ export const authUser = createSlice({
     initialState,
     reducers: {
         loginData: (state, action) => {
-            const { userName, mobile, token, userId } = action.payload
+            const { userName, mobile, token, userId ,countryCode} = action.payload
             state.token = token;
             state.userName = userName;
             state.mobile = mobile;
             state.userId = userId
+            state.countryCode = countryCode
             console.log('vvv', userId)
         },
         changeDirection: (state, action) => {

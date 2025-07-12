@@ -57,6 +57,7 @@
   "phoneNumber": "رقم الهاتف",
   "shipaddress": "عنوان الشحن",
   "typename": "اكتب اسمك الكامل",
+  "userName": "اسم المستخدم",
   "fName": "الاسم الكامل",
   "EStreet": "أدخل الشارع",
   "Street": "الشارع",
@@ -129,7 +130,7 @@
   "delete": "حذف",
   "addressDeleted": "تم حذف العنوان بنجاح",
   "changeAddress": "تغيير العنوان",
-  "noAvailable":"الاسم غير متوفر",
+  "noAvailable":"يرجى تسجيل الدخول",
 
   "Kuwait": "الكويت",
   "Saudi Arabia": "المملكة العربية السعودية",
@@ -173,5 +174,10 @@
   "cash": "نقداً",
   "subTotal": "المجموع الفرعي",
 "delivery": "التوصيل",
-"outOfStocks": "هذا المنتج غير متوفر في المخزون"
+"outOfStocks": "هذا المنتج غير متوفر في المخزون",
+"Resend": "إعادة إرسال",
+"loading_products": "جارٍ تحميل المنتجات...",
+"loading_images": "جارٍ تحميل الصور",
+"postalCode": "الرمز البريدي (اختياري)",
+"postalCoder": "الرمز البريدي"
 }

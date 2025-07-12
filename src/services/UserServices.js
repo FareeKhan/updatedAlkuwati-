@@ -155,7 +155,7 @@ export const editShippingAddress = async (address, userID, id) => {
                 "full_name": address?.fullName,
                 "phone": address?.phone,
                 "address": 'address',
-                "emirates": 'emirates'
+              "emirates": address?.emirates || '',
             })
         });
 
@@ -191,7 +191,7 @@ export const addShippingAddress = async (address, userID) => {
                 "user_id": userID,
                 "full_name": address?.fullName,
                 "phone": address?.phone,
-                "emirates": 'emirates',
+                "emirates": address?.emirates || '',
                 "email": address?.email || null,
                 "pickupLocation": address?.pickupLocation || null,
             })
@@ -486,7 +486,6 @@ export const personalData = async (id) => {
         console.log('oo', e)
     }
 };
-
 export const updateProfile = async (data) => {
 
     try {

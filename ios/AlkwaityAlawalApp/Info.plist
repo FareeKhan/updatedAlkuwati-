@@ -33,6 +33,10 @@
 	</dict>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Allow alkuwaity to access your location while you are using the app to provide accurate delivery of products to your address. For example, we use your location to find the nearest delivery personel and update the delivery status in real-time while you use the app.</string>
+	<key>UISupportedInterfaceOrientations</key>
+<array>
+    <string>UIInterfaceOrientationPortrait</string>
+</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Allow alkuwaity to access your location while you are using the app to provide accurate delivery of products to your address. For example, we use your location to find the nearest delivery personel and update the delivery status in real-time while you use the app.</string>
 	<key>UIAppFonts</key>
@@ -94,12 +98,7 @@
 	<array>
 		<string>arm64</string>
 	</array>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
+	
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>CFBundleURLTypes</key>

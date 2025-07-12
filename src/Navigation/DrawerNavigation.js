@@ -136,7 +136,7 @@ const CustomDrawerContent = ({ navigation }) => {
                 <HeaderLogo />
             </View>
             <View style={styles.menuContainer}>
-                <ScrollView >
+                <ScrollView  showsVerticalScrollIndicator={false}>
                     <TouchableOpacity
                         onPress={() => navigation.navigate('StackNavigations', { screen: "HomeScreen" })}
                         activeOpacity={0.8}
@@ -147,9 +147,11 @@ const CustomDrawerContent = ({ navigation }) => {
 
                         <Text style={styles.menuText}>{t('home')}</Text>
                     </TouchableOpacity>
-                    <View style={styles.border} />
 
-                    <TouchableOpacity
+                    
+                    {/* <View style={styles.border} /> */}
+
+                    {/* <TouchableOpacity
                         onPress={() => navigation.navigate('StackNavigations', {
                             screen: 'DiscountProducts'
                         })}
@@ -159,20 +161,10 @@ const CustomDrawerContent = ({ navigation }) => {
                             activeItem === 'DiscountProducts' && styles.activeMenuItem,
                         ]}>
                         <Text style={styles.menuText}>{t("discount_products")}</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     {foundProduct.length > 0 && isDrawerOpen &&
-                        // <Accordion
-                        //     sections={foundProduct ?? []}
-                        //     activeSections={activeSections}
-                        //     //renderSectionTitle={_renderSectionTitle}
-                        //     renderHeader={_renderHeader}
-                        //     renderContent={_renderContent}
-                        //     onChange={_updateSections}
-                        //     underlayColor=""
-
-                        // />
-
+                  
 
                         <Accordion
                             sections={foundProduct || []} // Ensure sections are not undefined

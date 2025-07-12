@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Modal, StyleSheet, Text, I18nManager, TextInput, TouchableOpacity, View } from 'react-native'
+import { Dimensions, FlatList, Modal, StyleSheet, Text, I18nManager, TextInput, TouchableOpacity, View, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState, useRef } from 'react'
 import ExportSvg from '../constants/ExportSvg';
 import SingleProductCard from './SingleProductCard';
@@ -7,6 +7,11 @@ import { color } from '../constants/color';
 const { height } = Dimensions.get('screen')
 import { useTranslation } from 'react-i18next';
 import { fonts } from '../constants/fonts';
+
+import HeaderLogo from './HeaderLogo';
+
+
+
 import { preloadImagesInBatches, extractProductImages, isImagePreloaded, PRIORITY } from '../utils/ImagePreloader';
 
 const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
@@ -110,6 +115,7 @@ const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
                         <View style={{ flex: 1 }}>
                             {isLoader || !imagesPreloaded ? (
                                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                    <ActivityIndicator size={"small"} color={color.theme}   />
                                 </View>
                             ) : (
                                 <FlatList
@@ -120,7 +126,7 @@ const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
                                     ListEmptyComponent={() => {
                                         return (
                                             <View style={{ alignItems: "center", justifyContent: "center", flex: 1, height: height / 1.5 }}>
-                                                <Text style={{ color: "#000" ,fontFamily:fonts.semiBold}}>{t("no_product_found")}</Text>
+                                                <Text style={{ color: "#000" ,fontFamily:fonts.semiBold}}>{search?.length > 0 ? t("no_product_found") : <HeaderLogo/>}</Text>
                                             </View>
                                         )
                                     }}

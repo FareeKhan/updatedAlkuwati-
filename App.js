@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 
 import { NavigationContainer } from '@react-navigation/native'
 import AppNavigation from './src/Navigation/AppNavigation'
-
+import Orientation from 'react-native-orientation-locker';
 import { Provider } from 'react-redux'
 import { store, persistor } from './src/redux/store'
 
@@ -37,6 +37,9 @@ const App = () => {
   }, []);
 
 
+useEffect(() => {
+  Orientation.lockToPortrait(); // Locks the app to portrait mode
+}, []);
   useEffect(() => {
     showMeToken()
     messaging().setBackgroundMessageHandler(async remoteMessage => {

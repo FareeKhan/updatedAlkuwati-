@@ -34,12 +34,17 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import HeaderBox from "../../components/HeaderBox";
+import { showMessage } from "react-native-flash-message";
 
 const UserProfile = ({ navigation }) => {
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.auth?.userId);
   const userPhone = useSelector((state) => state.auth?.mobile);
+  const countryCode = useSelector((state) => state.auth?.countryCode);
   const userName = useSelector((state) => state.customerAddress?.storeAddress?.fullName);
+
+  console.log('countryCodecountryCodecountryCode',countryCode)
+  // const userName = useSelector((state) => state.customerAddress?.storeAddress?.fullName);
   const { t } = useTranslation();
   const [userData, setUserData] = useState("");
   const [getName, setName] = useState();
@@ -162,7 +167,6 @@ const UserProfile = ({ navigation }) => {
   };
 
 
-
   const OpenURLButton = useCallback(async (url) => {
     // Checking if the link is supported for links with custom URL scheme.
     const supported = await Linking.canOpenURL(url);
@@ -176,44 +180,35 @@ const UserProfile = ({ navigation }) => {
     }
   });
 
-  // useEffect(() => {
-  //   profileData();
-  //   orderData();
-  // }, []);
-
   useEffect(() => {
-    // profileData();
     orderData();
   }, [userId]);
-  console.log('userIduserIduserId', userId)
 
-  // const profileData = async () => {
-  //   setProfileLoader(true)
-  //   try {
-  //     const response = await personalData(userId);
-  //     console.log('responsekljjkljklj', response)
-  //     if (response?.status) {
-  //       setUserData(response?.data);
-  //       setImage(response?.data?.name);
-  //       setSupportURL(response?.supporturl);
-  //       setProfileLoader(false)
-  //     }
-  //   } catch (error) {
-  //     setProfileLoader(false)
-  //     console.log(error);
-  //   }finally{
-  //     setProfileLoader(false)
-  //   }
-  // };
+  const profileData = async () => {
+    setProfileLoader(true)
+    try {
+      const response = await personalData(userId);
+      console.log('responsekljjkljklj', response)
+      if (response?.status) {
+        setUserData(response?.data);
+        setProfileLoader(false)
+      }
+    } catch (error) {
+      setProfileLoader(false)
+      console.log(error);
+    }finally{
+      setProfileLoader(false)
+    }
+  };
 
 
-  // useEffect(() => {
-  //   const unsubscribe = navigation.addListener('focus', () => {
-  //     profileData();
-  //   });
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      profileData();
+    });
 
-  //   return unsubscribe;
-  // }, [navigation]);
+    return unsubscribe;
+  }, [navigation]);
 
 
   const setImage = (name) => {
@@ -249,6 +244,18 @@ const UserProfile = ({ navigation }) => {
     });
   };
 
+
+  const onPressProfile = ()=>{
+    if(userId){
+      navigation.navigate('UserDetails')
+    }else{
+      showMessage({
+        type:"danger",
+        message:t('noAvailable')
+      })
+    }
+  }
+
   return (
     <DrawerSceneWrapper>
       <View style={styles.mainContainer}>
@@ -259,18 +266,22 @@ const UserProfile = ({ navigation }) => {
         />
 
 
-        <View style={styles.profileContainer}>
+        <TouchableOpacity disabled onPress={onPressProfile} style={styles.profileContainer}>
 
           <View style={{ borderWidth: 1, height: 35, width: 35, borderRadius: 50, alignItems: "center", justifyContent: "center" }}>
             <AntDesign name={'user'} size={20} color={"#000"} />
           </View>
-          <View style={{ marginLeft: 10, marginTop: 7 }}>
+          <View style={{ marginLeft: 10, marginTop: 7,width:"80%" }}>
 
-            <Text style={styles.userName}>{userName ? userName : t('noAvailable')}</Text>
-            <Text style={styles.userEmail}>{'\u202A'}{userPhone}{'\u202C'}</Text>
+            <Text style={styles.userName}>{userId ? userName : t('noAvailable')}</Text>
+            {
+              userId &&
+            <Text style={styles.userEmail}>{'\u202A'}{countryCode}{userPhone}{'\u202C'}</Text>
+
+            }
 
           </View>
-        </View>
+        </TouchableOpacity>
         <>
 
           <ScrollView

@@ -1,4 +1,4 @@
-import { ActivityIndicator, Animated, Dimensions, Easing, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Animated, Dimensions, Easing, I18nManager, Image, ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import ExportSvg from '../constants/ExportSvg'
 import { color } from '../constants/color'
@@ -23,6 +23,9 @@ const SingleProductCard = ({ item, index, isDot = true, onPress, countList = 1, 
   const navigation = useNavigation()
   const [loading, setLoading] = useState(!isPreloaded) // Don't show loader if image is preloaded
   const [isCartLoader, setIsCartLaoder] = useState(false)
+  const [isStockLoader, setIsStockLoader] = useState(false)
+  const [isCheckStockIsAvaialable, setIsCheckStockIsAvailable] = useState(false)
+
 
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const favoriteList = useSelector((state) => state?.favorite?.AddInFavorite)
@@ -30,6 +33,7 @@ const SingleProductCard = ({ item, index, isDot = true, onPress, countList = 1, 
   const isCheck = data?.some((value) => value?.id == item?.id)
 
   const isFavorite = favoriteList.some(favorite => favorite.id === item.id);
+
 
   const animation = 'fadeInUp';
   const durationInner = 1000;
@@ -60,10 +64,47 @@ const SingleProductCard = ({ item, index, isDot = true, onPress, countList = 1, 
   const endY = 50;
 
   useEffect(() => {
+    checkStock()
+  }, [])
+
+  useEffect(() => {
     if (isPreloaded && item.image) {
       setLoading(false);
     }
   }, [isPreloaded, item.image]);
+
+
+  const checkStock = async () => {
+    setIsStockLoader(true)
+    try {
+      const response = await productDetails(item?.id);
+      console.log('heyShowmeRstate',response?.status)
+      if (response?.status) {
+        const isOutOfStock =
+          response?.variant_system?.has_variants &&
+          response?.variant_system?.optimized_variants?.every(
+            variant => variant.stock_quantity === 0
+          );
+        const availableVariant = response?.variant_system?.optimized_variants?.find(
+          variant => variant?.stock_quantity > 0
+        );
+        const isCheckQuantity =
+          response?.data?.quantity == 0 ||
+          isOutOfStock ||
+          (availableVariant && availableVariant?.stock_quantity == 0) ||
+          availableVariant == undefined;
+        setIsCheckStockIsAvailable(isCheckQuantity)
+      }
+    } catch (error) {
+      setIsStockLoader(false)
+    } finally {
+      setIsStockLoader(false)
+    }
+  };
+
+
+
+
 
   const getProductDetail = async (item) => {
     console.log('ss', item?.id)
@@ -189,12 +230,21 @@ const SingleProductCard = ({ item, index, isDot = true, onPress, countList = 1, 
           <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", margin: 10 }}>
             {
               isShowPlusIcon &&
-              <TouchableOpacity onPress={() => getProductDetail(item)} style={{}}>
+              <TouchableOpacity disabled={isCheckStockIsAvaialable} onPress={() => getProductDetail(item)} style={{}}>
                 {
-                  isCartLoader ?
+                  isCartLoader || isStockLoader ?
                     <ActivityIndicator size={'small'} color={color.theme} />
                     :
-                    <AntDesign name="pluscircle" size={20} color="#67300f" style={{ marginBottom: 0 }} />
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
+                      <AntDesign name="pluscircle" size={20} color={isCheckStockIsAvaialable ? "#cecece90" : "#67300f"} style={{ marginBottom: 0 }} />
+                      {
+                        isCheckStockIsAvaialable &&
+                        <View style={{ paddingHorizontal: 5, backgroundColor: "#cecece90", borderRadius: 5 }}>
+                          <Text style={{ fontSize: I18nManager.isRTL ? 12 : 13 }}>{t('outOfStock')}</Text>
+                        </View>
+                      }
+
+                    </View>
 
                 }
               </TouchableOpacity>

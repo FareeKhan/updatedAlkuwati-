@@ -496,3 +496,9 @@ export const paymentMethodCard = (t)=>[
 
 
 
+export  const arabicToEnglish = (text) => {
+        const arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+        const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        return text.replace(/[٠-٩]/g, (d) => englishNumbers[arabicNumbers.indexOf(d)]);
+
+    };

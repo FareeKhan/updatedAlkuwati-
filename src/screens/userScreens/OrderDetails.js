@@ -207,7 +207,7 @@ const OrderDetails = ({ navigation, route }) => {
                 <SmallImageLoader imagePath={item?.image} />
 
 
-                <View style={{ marginLeft: 10, width: "80%" }}>
+                <View style={{ marginLeft: 10, width: "70%" }}>
                     <Text numberOfLines={1} style={{ ...styles.productTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>{item?.productName}</Text>
                     <Text style={{ ...styles.subTitle, textAlign: I18nManager.isRTL ? 'left' : 'left' }}>{item?.subText}</Text>
                     {
@@ -268,9 +268,19 @@ const OrderDetails = ({ navigation, route }) => {
                         :
                         <View>
                             <View style={styles.userAddressBox}>
-                                <AddressLine label={t('Street')} value={userAddress?.street} />
-                                <AddressLine label={t('City')} value={userAddress?.city} />
-                                <AddressLine label={t('governorate')} value={userAddress?.area} />
+                                {
+                                    userAddress?.country == t('Kuwait') ?
+                                        <>
+                                            <AddressLine label={t('avenue')} value={userAddress?.street} />
+                                            <AddressLine label={t('governorate')} value={userAddress?.area} />
+
+                                        </>
+                                        :
+                                        <>
+                                            <AddressLine label={t('postalCoder')} value={userAddress?.street} />
+                                            <AddressLine label={t('City')} value={userAddress?.area} />
+                                        </>
+                                }
                                 <AddressLine label={t('phoneNumber')} value={`\u2066${userAddress?.phone}\u2069`} />
                                 <AddressLine label={t('Country')} value={userAddress?.country} />
                             </View>

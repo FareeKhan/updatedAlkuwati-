@@ -33,7 +33,8 @@ const UserDetails = ({ navigation, route }) => {
   const userId = useSelector(state => state.auth?.userId);
   const userAddress = useSelector((state) => state?.customerAddress?.storeAddress)
 
-  console.log(';userAddress',userAddress)
+  console.log('userIduserId',userId)
+
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
@@ -81,12 +82,13 @@ const UserDetails = ({ navigation, route }) => {
     const data = {
       id: userId,
       fullName: fullName,
-      phoneNumber: phoneNumber,
-      email: email
+      phoneNumber:  '+971554087425',
+      email: 'abc@gmail.com'
     }
     try {
       const response = await updateProfile(data)
       console.log('response',response)
+      console.log('datadatadatadatadata',data)
       if (response?.status) {
         alert(t('updated'));
         navigation.goBack()
@@ -142,7 +144,7 @@ const UserDetails = ({ navigation, route }) => {
           showsVerticalScrollIndicator={false}>
           <CustomInput
             placeholder={t('typename')}
-            title={t('fName')}
+            title={t('userName')}
             style={{ marginTop: 20 }}
             value={fullName}
             onChangeText={setFullName}
