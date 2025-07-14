@@ -181,7 +181,10 @@
 "cash": "Cash",
 "paymentSuccess": "Order placed successfully!",
 "paymentSubText": "Thank you! Your order has been placed successfully",
-"continueShopping": "Continue Shopping"
+"continueShopping": "Continue Shopping",
+"no_product_in_favorite": "No products in favorites",
+"user_details": "User Details",
+"no_item_in_the_cart": "No items in the cart"
 
 
 

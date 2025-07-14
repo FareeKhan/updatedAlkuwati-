@@ -14,9 +14,9 @@ import ScreenLoader from '../../components/ScreenLoader';
 import SingleProductCard from '../../components/SingleProductCard';
 import Text from '../../components/CustomText';
 import SearchModal from '../../components/SearchModal';
-import { 
-  preloadImagesInBatches, 
-  extractProductImages, 
+import {
+  preloadImagesInBatches,
+  extractProductImages,
   isImagePreloaded,
   markImagesAsPreloaded,
   PRIORITY,
@@ -35,13 +35,15 @@ import { useTranslation } from 'react-i18next';
 import HeaderBox from '../../components/HeaderBox';
 import CustomLoader from '../../components/CustomLoader';
 import { fonts } from '../../constants/fonts';
+import { useNavigation } from '@react-navigation/native';
 
-const SameProduct = ({ navigation, route }) => {
-  const { text, subC_ID, selected, navID } = route?.params;
+const SameProduct = ({ route,subId }) => {
+  const navigation = useNavigation()
+  const { text, subC_ID, selected, navID } = route?.params || '';
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoader, setIsLoader] = useState(true);
   const [productLoader, setProductLoader] = useState(false);
-  const [selectedCat, setSelectedCat] = useState(subC_ID);
+  const [selectedCat, setSelectedCat] = useState(subC_ID || subId);
   const [storeCategories, setStoreCategories] = useState([]);
   const [preloadedImages, setPreloadedImages] = useState({});
   const [visibleItems, setVisibleItems] = useState([]);
@@ -54,8 +56,9 @@ const SameProduct = ({ navigation, route }) => {
   const [preloadingQueue, setPreloadingQueue] = useState([]);
   const abortControllerRef = useRef();
   const isMountedRef = useRef(true);
-
   const { t } = useTranslation();
+
+  console.log('////////',subId)
 
 
   const animationMain = 'fadeInRight';
@@ -71,15 +74,15 @@ const SameProduct = ({ navigation, route }) => {
   const handleViewableItemsChanged = useRef(({ viewableItems }) => {
     const visibleItemIds = viewableItems.map(item => item.item.id);
     setVisibleItems(visibleItemIds);
-    
+
     const newImagesToPreload = viewableItems
       .filter(viewableItem => !preloadedImages[viewableItem.item.id])
       .map(viewableItem => viewableItem.item.image)
       .filter(Boolean);
-    
+
     if (newImagesToPreload.length > 0) {
       preloadImagesInBatches(newImagesToPreload);
-      
+
       const newPreloaded = { ...preloadedImages };
       viewableItems.forEach(viewableItem => {
         if (viewableItem.item.id) {
@@ -96,12 +99,12 @@ const SameProduct = ({ navigation, route }) => {
 
     // Cleanup function to abort any pending requests when unmounting
     return () => {
-   setTimeout(()=>{
-   isMountedRef.current = false;
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-   },2500)
+      setTimeout(() => {
+        isMountedRef.current = false;
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+      }, 2500)
     };
   }, []);
 
@@ -111,12 +114,12 @@ const SameProduct = ({ navigation, route }) => {
     if (storeCategories?.subcategories?.length > 0) {
       const firstSubCat = storeCategories.subcategories[0];
       console.log('Available subcategories:', storeCategories.subcategories.map(cat => cat.id));
-      
+
       // If no category is selected or the selected one isn't in the list, select the first one
       const isSelectedCatInList = storeCategories.subcategories.some(
         cat => parseInt(cat.id) === parseInt(selectedCat)
       );
-      
+
       if (!isSelectedCatInList && firstSubCat?.id) {
         console.log(`Auto-selecting first subcategory: ${firstSubCat.id} (${firstSubCat.name})`);
         handleSubCategory(firstSubCat.id);
@@ -129,29 +132,29 @@ const SameProduct = ({ navigation, route }) => {
     if (preloadingQueue.length > 0 && !backgroundLoading) {
       const processQueue = async () => {
         setBackgroundLoading(true);
-        
+
         try {
           const nextBatch = preloadingQueue[0];
           console.log(`Processing preload queue: ${nextBatch.images.length} images for category ${nextBatch.categoryId}`);
-          
+
           // Preload images with lower priority since this is background work
           await preloadImagesInBatches(
-            nextBatch.images, 
+            nextBatch.images,
             8, // Larger batch size for background loading
             null, // No progress tracking for background loading
-            { 
-              priority: PRIORITY.LOW, 
-              cache: CACHE.IMMUTABLE 
+            {
+              priority: PRIORITY.LOW,
+              cache: CACHE.IMMUTABLE
             }
           );
-          
+
           if (isMountedRef.current) {
             // Update the category loading progress
             setCategoryLoadProgress(prev => ({
               ...prev,
               [nextBatch.categoryId]: 'complete'
             }));
-            
+
             // Remove the processed batch from queue
             setPreloadingQueue(prev => prev.slice(1));
           }
@@ -163,7 +166,7 @@ const SameProduct = ({ navigation, route }) => {
           }
         }
       };
-      
+
       processQueue();
     }
   }, [preloadingQueue, backgroundLoading]);
@@ -177,9 +180,11 @@ const SameProduct = ({ navigation, route }) => {
 
   // Only hide the loader when initial loading is complete
   useEffect(() => {
-    if (initialLoadComplete) {
+    setTimeout(()=>{
+      if (initialLoadComplete) {
       setIsLoader(false);
     }
+    },2500)
   }, [initialLoadComplete]);
 
   // Track image loading progress to provide feedback
@@ -191,40 +196,40 @@ const SameProduct = ({ navigation, route }) => {
   const getCatList = async () => {
     setProductLoader(true);
     setIsLoader(true); // Ensure loader is visible
-    
+
     try {
       const response = await categoriesListSub(selectedCat);
       if (response?.status) {
         setStoreCategories(response?.data);
         setLastLoadedCategoryId(selectedCat); // Track which category was loaded
-        
+
         // If we received subcategories but no products, it might mean we need to select a subcategory
-        if (response?.data?.subcategories?.length > 0 && 
-            (!response?.data?.products || response?.data?.products.length === 0)) {
+        if (response?.data?.subcategories?.length > 0 &&
+          (!response?.data?.products || response?.data?.products.length === 0)) {
           console.log('No products in main category, will select first subcategory');
           // Let the useEffect handle selecting the first subcategory
         }
-        
+
         // Preload ALL products from selected category
         if (response?.data?.products && response.data.products.length > 0) {
           const allProducts = response.data.products;
           const totalProducts = allProducts.length;
           const imagesToPreload = extractProductImages(allProducts);
           const totalImages = imagesToPreload.length;
-          
+
           console.log(`Preloading ${totalImages} images from ${totalProducts} products for category ${selectedCat}`);
-          
+
           // Remove fixed delay, only wait for images to load
           const preloadPromise = preloadImagesInBatches(
-            imagesToPreload, 
+            imagesToPreload,
             5, // Batch size
             (completed, total) => updateImageLoadingProgress(completed, total),
             { priority: PRIORITY.HIGH } // High priority for initial visible content
           );
-          
+
           // Wait for image preloading to complete
           await preloadPromise;
-          
+
           // Mark all images as preloaded
           const preloaded = {};
           allProducts.forEach(product => {
@@ -233,13 +238,13 @@ const SameProduct = ({ navigation, route }) => {
             }
           });
           setPreloadedImages(preloaded);
-          
+
           // Store current category products
           setAllCategoriesProducts(prev => ({
             ...prev,
             [selectedCat]: response.data.products
           }));
-          
+
           // Mark initial loading as complete - this will hide the loader
           setInitialLoadComplete(true);
         } else {
@@ -271,51 +276,51 @@ const SameProduct = ({ navigation, route }) => {
     // Skip subcategories that are already loaded or are the current category
     const subcatsToLoad = subcategories
       .filter(subcat => subcat.id !== currentCatId && !allCategoriesProducts[subcat.id]);
-    
+
     if (subcatsToLoad.length === 0) return;
-    
+
     console.log(`Adding ${subcatsToLoad.length} subcategories to preload queue`);
-    
+
     // Create a new AbortController for these requests
     abortControllerRef.current = new AbortController();
     const { signal } = abortControllerRef.current;
-    
+
     // Update progress tracking
     const newProgress = {};
     subcatsToLoad.forEach(subcat => {
       newProgress[subcat.id] = 'pending';
     });
     setCategoryLoadProgress(prev => ({ ...prev, ...newProgress }));
-    
+
     // Load all subcategories in parallel but process their images in the background queue
     subcatsToLoad.forEach(async (subcat) => {
       if (!isMountedRef.current || signal.aborted) return;
-      
+
       try {
         setCategoryLoadProgress(prev => ({ ...prev, [subcat.id]: 'loading' }));
         const subcatResponse = await categoriesListSub(subcat.id, signal);
-        
+
         if (subcatResponse?.status && subcatResponse?.data?.products && subcatResponse.data.products.length > 0) {
           // Store the products for this subcategory
           setAllCategoriesProducts(prev => ({
             ...prev,
             [subcat.id]: subcatResponse.data.products
           }));
-          
+
           // Extract images to preload
           const subcatProducts = subcatResponse.data.products;
           const subcatImages = extractProductImages(subcatProducts);
-          
+
           if (subcatImages.length > 0 && !signal.aborted && isMountedRef.current) {
             // Add to preloading queue instead of loading immediately
             setPreloadingQueue(prev => [
-              ...prev, 
-              { 
-                categoryId: subcat.id, 
-                images: subcatImages 
+              ...prev,
+              {
+                categoryId: subcat.id,
+                images: subcatImages
               }
             ]);
-            
+
             // Mark products as having their images queued for preloading
             const newPreloaded = {};
             subcatProducts.forEach(product => {
@@ -341,9 +346,9 @@ const SameProduct = ({ navigation, route }) => {
   const backgroundLoadSubcategories = async (subcategories, currentCatId) => {
     // Skip if already loading in background
     if (backgroundLoading) return;
-    
+
     setBackgroundLoading(true);
-    
+
     // Create a new AbortController for these requests
     abortControllerRef.current = new AbortController();
     const { signal } = abortControllerRef.current;
@@ -364,36 +369,36 @@ const SameProduct = ({ navigation, route }) => {
       for (const subcat of subcatsToLoad) {
         // Check if we should abort
         if (signal.aborted || !isMountedRef.current) break;
-        
+
         try {
           setCategoryLoadProgress(prev => ({ ...prev, [subcat.id]: 'loading' }));
           const subcatResponse = await categoriesListSub(subcat.id, signal);
-          
+
           if (subcatResponse?.status && subcatResponse?.data?.products) {
             // Store the products for this subcategory
             setAllCategoriesProducts(prev => ({
               ...prev,
               [subcat.id]: subcatResponse.data.products
             }));
-            
+
             // Preload first few images for this subcategory (lower priority)
             if (subcatResponse.data.products.length > 0) {
               const subcatProducts = subcatResponse.data.products;
               const subcatImages = extractProductImages(subcatProducts);
-              
+
               // Preload these images with a slight delay to prioritize visible content
               if (!signal.aborted && isMountedRef.current) {
                 // Pre-mark images as preloaded to avoid duplicate preloads
                 markImagesAsPreloaded(subcatImages);
-                
+
                 // Preload the images with low priority
                 preloadImagesInBatches(
-                  subcatImages, 
+                  subcatImages,
                   8, // Larger batch size for background loading
                   null, // No progress callback for background loading
                   { priority: PRIORITY.LOW }
                 );
-                
+
                 // Mark these images as preloaded in our local state too
                 const newPreloaded = { ...preloadedImages };
                 subcatProducts.forEach(product => {
@@ -404,7 +409,7 @@ const SameProduct = ({ navigation, route }) => {
                 setPreloadedImages(prev => ({ ...prev, ...newPreloaded }));
               }
             }
-            
+
             setCategoryLoadProgress(prev => ({ ...prev, [subcat.id]: 'complete' }));
           } else {
             setCategoryLoadProgress(prev => ({ ...prev, [subcat.id]: 'error' }));
@@ -415,7 +420,7 @@ const SameProduct = ({ navigation, route }) => {
             setCategoryLoadProgress(prev => ({ ...prev, [subcat.id]: 'error' }));
           }
         }
-        
+
         // Small delay between requests to prevent API throttling
         if (!signal.aborted && isMountedRef.current && subcatsToLoad.length > 1) {
           await new Promise(resolve => setTimeout(resolve, 300));
@@ -434,7 +439,7 @@ const SameProduct = ({ navigation, route }) => {
 
   const renderItem = ({ item, index }) => {
     const isPreloaded = preloadedImages[item.id] || false;
-    
+
     return (
       <>
         <SingleProductCard
@@ -454,15 +459,15 @@ const SameProduct = ({ navigation, route }) => {
 
   const handleSubCategory = (id) => {
     console.log(`Switching from category ${selectedCat} to ${id}`);
-    
+
     if (id !== selectedCat) {
       // Always update selectedCat immediately for UI highlighting
       setSelectedCat(id);
-      
+
       // If we have the products cached, use them immediately without showing a loader
       if (allCategoriesProducts[id] && allCategoriesProducts[id].length > 0) {
         console.log(`Using cached data for category ${id}, no loader needed`);
-        
+
         // Preserve the existing subcategories list and category info when switching
         setStoreCategories(prev => {
           // Get the full category data to ensure we maintain proper structure
@@ -479,33 +484,33 @@ const SameProduct = ({ navigation, route }) => {
               }
             });
           }
-          
+
           // Use cached products immediately
           return {
             ...prev,
             products: allCategoriesProducts[id]
           };
         });
-        
+
         // Check if images are already preloaded
         const productsToCheck = allCategoriesProducts[id];
         const imagesToCheck = extractProductImages(productsToCheck);
         const allImagesPreloaded = imagesToCheck.every(img => isImagePreloaded(img));
-        
+
         if (!allImagesPreloaded) {
           console.log(`Some images for category ${id} need preloading, doing it silently`);
           // Silently preload or refresh images in background without showing loader
           preloadImagesInBatches(
-            imagesToCheck, 
+            imagesToCheck,
             8, // Larger batch for already cached categories
             null, // No progress tracking for silent preloading
-            { 
+            {
               priority: PRIORITY.HIGH, // High priority for current view
               skipCache: false // Skip already preloaded images
             }
           );
         }
-        
+
         // Mark these images as preloaded
         const newPreloaded = {};
         allCategoriesProducts[id].forEach(product => {
@@ -514,7 +519,7 @@ const SameProduct = ({ navigation, route }) => {
           }
         });
         setPreloadedImages(prev => ({ ...prev, ...newPreloaded }));
-        
+
         // Get subcategories and start background loading if needed
         categoriesListSub(id).then(response => {
           if (response?.status && response?.data?.subcategories && isMountedRef.current) {
@@ -529,23 +534,23 @@ const SameProduct = ({ navigation, route }) => {
         setInitialLoadComplete(false);
         setImageLoadingProgress(0);
         setProductLoader(true);
-        
+
         // We don't have these products cached, so fetch them
         categoriesListSub(id)
           .then(response => {
             if (response?.status && isMountedRef.current) {
               setStoreCategories(response?.data);
               setLastLoadedCategoryId(id); // Track which category was loaded
-              
+
               if (response?.data?.products) {
                 setAllCategoriesProducts(prev => ({
                   ...prev,
                   [id]: response.data.products
                 }));
-                
+
                 // Preload ALL images from the fetched products
                 const imagesToPreload = extractProductImages(response.data.products);
-                
+
                 // Remove fixed delay, only wait for images to load
                 const preloadPromise = preloadImagesInBatches(
                   imagesToPreload,
@@ -553,11 +558,11 @@ const SameProduct = ({ navigation, route }) => {
                   (completed, total) => updateImageLoadingProgress(completed, total),
                   { priority: PRIORITY.HIGH } // High priority for visible content
                 );
-                
+
                 // Wait for image preloading to complete
                 return preloadPromise.then(() => {
                   if (!isMountedRef.current) return;
-                  
+
                   const newPreloaded = {};
                   response.data.products.forEach(product => {
                     if (product.id && product.image) {
@@ -565,7 +570,7 @@ const SameProduct = ({ navigation, route }) => {
                     }
                   });
                   setPreloadedImages(prev => ({ ...prev, ...newPreloaded }));
-                  
+
                   // Start background loading of other subcategories
                   if (response?.data?.subcategories) {
                     startPreloadingAllSubcategories(response.data.subcategories, id);
@@ -604,20 +609,23 @@ const SameProduct = ({ navigation, route }) => {
       delay={100}
       style={{ flex: 1 }}>
       <View style={styles.mainContainer}>
-        <HeaderBox cartIcon={true} />
-        <View style={styles.searchContainer}>
-          <TouchableOpacity
-            style={[styles.searchBox]}
-            onPress={() => setModalVisible(true)}>
-            <ExportSvg.Search
-              style={{
-                marginLeft: 18,
-                marginRight: 10,
-              }}
-            />
-            <Text style={{ color: '#00000080' }}>{t('search_here')}</Text>
-          </TouchableOpacity>
-        </View>
+
+        {!subId && <>
+          <HeaderBox cartIcon={true} />
+          <View style={styles.searchContainer}>
+            <TouchableOpacity
+              style={[styles.searchBox]}
+              onPress={() => setModalVisible(true)}>
+              <ExportSvg.Search
+                style={{
+                  marginLeft: 18,
+                  marginRight: 10,
+                }}
+              />
+              <Text style={{ color: '#00000080' }}>{t('search_here')}</Text>
+            </TouchableOpacity>
+          </View>
+        </>}
 
         {/* <Text style={styles.arrivalTxt}>{storeCategories?.category?.name}</Text> */}
         <Text style={styles.arrivalTxt}>{text}</Text>
@@ -634,7 +642,7 @@ const SameProduct = ({ navigation, route }) => {
               const isLoading = categoryLoadProgress[item.id] === 'loading';
               const isLoaded = allCategoriesProducts[item.id] && allCategoriesProducts[item.id].length > 0;
               const isSelected = parseInt(selectedCat) === parseInt(item.id); // Convert to numbers for comparison
-              
+
               return (
                 <Animatable.View
                   animation={animationMain}
@@ -666,7 +674,7 @@ const SameProduct = ({ navigation, route }) => {
         </View>
 
         {productLoader ? (
-          <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <CustomLoader bg={false} colors={color.theme} size={'large'} />
             <Text style={styles.loadingText}>
               {t('loading_products')}
@@ -677,11 +685,11 @@ const SameProduct = ({ navigation, route }) => {
                   {t('loading_images')}: {imageLoadingProgress}%
                 </Text>
                 <View style={styles.progressBarOuter}>
-                  <View 
+                  <View
                     style={[
-                      styles.progressBarInner, 
+                      styles.progressBarInner,
                       { width: `${imageLoadingProgress}%` }
-                    ]} 
+                    ]}
                   />
                 </View>
               </View>
@@ -694,7 +702,7 @@ const SameProduct = ({ navigation, route }) => {
             keyExtractor={(item, index) => selectedCat + '_' + item.id + '_' + index}
             showsVerticalScrollIndicator={false}
             numColumns={2}
-            columnWrapperStyle={{justifyContent: 'space-between'}}
+            columnWrapperStyle={{ justifyContent: 'space-between' }}
             ListEmptyComponent={<EmptyScreen text={t('no_data_found')} />}
             onViewableItemsChanged={handleViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
@@ -724,6 +732,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS == 'ios' ? 70 : 20,
     paddingHorizontal: 15,
     marginBottom: 80,
+    
   },
   headerContainer: {
     flexDirection: 'row',

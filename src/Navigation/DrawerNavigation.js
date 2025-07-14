@@ -17,6 +17,7 @@ import RNBounceable from '@freakycoder/react-native-bounceable';
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import withPressAnimated from '../screens/userScreens/hocs/withPressAnimated';
 import registercustomAnimations from '../screens/userScreens/animations';
+import { fonts } from '../constants/fonts';
 
 registercustomAnimations()
 
@@ -88,18 +89,8 @@ const CustomDrawerContent = ({ navigation }) => {
             </>
         );
     };
-    // <CateSubNavigation cate={2} isactive={activeSections.includes(i) } subCates={section.sub} cateID={1} />
-
     const _renderContent = (section, i) => {
         return (
-            // <View style={styles.content}>
-            //     {(section.sub !== undefined) ?
-            //         // <CateSubNavigation cate={2} isactive={activeSections.length > 0 && activeSections && activeSections == i} subCates={section.sub} cateID={1} />
-            //         <Text>dasdasdasds</Text>
-            //         : <Text style={{ textAlign: 'center', paddingVertical: 20, paddingBottom: 20 }}>{t('NoCategories')}</Text>}
-            // </View>
-
-
             <View style={styles.content}>
                 {Array.isArray(section?.sub) && section?.sub?.length > 0 ? (
                     <CateSubNavigation
@@ -167,7 +158,7 @@ const CustomDrawerContent = ({ navigation }) => {
                   
 
                         <Accordion
-                            sections={foundProduct || []} // Ensure sections are not undefined
+                            sections={foundProduct || []} 
                             activeSections={activeSections}
                             renderHeader={_renderHeader}
                             renderContent={_renderContent}
@@ -220,13 +211,6 @@ export const DrawerNavigation = () => {
             }}
             drawerContent={(props) => <CustomDrawerContent  {...props} />}
         >
-
-            {/* <Drawer.Screen
-                name={'BottomNavigation'}
-                component={BottomNavigation}
-                options={{ headerShown: false }}
-            /> */}
-
 
             <Drawer.Screen
                 name={'StackNavigations'}
@@ -284,11 +268,9 @@ export const styles = StyleSheet.create({
         color: color.theme,
     },
     menuText: {
-        fontFamily: 'Montserrat-Medium',
         color: '#67300f',
         fontSize: 16,
-        fontWeight: '500'
-
+       fontFamily:fonts.medium
     },
     footerContainer: {
         gap: 15,

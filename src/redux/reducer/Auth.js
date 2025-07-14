@@ -8,6 +8,7 @@ const initialState = {
     isLogin: false,
     userId: null,
     countryCode: null,
+    country: null,
     phoneNo: null,
     userName: null,
     token: null,
@@ -18,7 +19,8 @@ const initialState = {
     autoLogin: false,
     mobile: '',
     tryAutoLogin: false,
-    direction: false
+    direction: false,
+    userData: []
 }
 
 export const authUser = createSlice({
@@ -26,12 +28,13 @@ export const authUser = createSlice({
     initialState,
     reducers: {
         loginData: (state, action) => {
-            const { userName, mobile, token, userId ,countryCode} = action.payload
+            const { userName, mobile, token, userId, countryCode,country } = action.payload
             state.token = token;
             state.userName = userName;
             state.mobile = mobile;
             state.userId = userId
             state.countryCode = countryCode
+            state.country = country
             console.log('vvv', userId)
         },
         changeDirection: (state, action) => {
@@ -41,6 +44,19 @@ export const authUser = createSlice({
             const { isLanguage } = action.payload
             state.isLanguage = isLanguage
         },
+
+        userReduxData: (state, action) => {
+            const { phoneUserNumber, fullName } = action.payload;
+            const existingUser = state.userData.find((item) => item?.phoneUserNumber === phoneUserNumber);
+
+            if (existingUser) {
+                existingUser.fullName = fullName;
+            } else {
+                state.userData.push({ phoneUserNumber, fullName });
+            }
+
+        }
+        ,
         login: (state, action) => {
             const { isLogin } = action.payload
             state.isLogin = isLogin
@@ -72,6 +88,6 @@ export const authUser = createSlice({
     }
 })
 
-export const { loginData, logout, isLogin, login, changeLanguage,changeDirection } = authUser.actions;
+export const { loginData, logout, isLogin, login, changeLanguage, changeDirection, userReduxData } = authUser.actions;
 
 export default authUser.reducer

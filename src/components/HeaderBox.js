@@ -8,7 +8,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { color } from '../constants/color';
 import Text from './CustomText'
 
-const HeaderBox = ({ isDrawer, catName, share, onPressShare, cartIcon, bagIcon,style }) => {
+const HeaderBox = ({ isDrawer, onBackPress,catName, share, onPressShare, cartIcon, bagIcon,style }) => {
     const navigation = useNavigation()
     const data = useSelector(state => state.cartProducts?.cartProducts);
  useEffect(() => {
@@ -26,7 +26,7 @@ const HeaderBox = ({ isDrawer, catName, share, onPressShare, cartIcon, bagIcon,s
                         <ExportSvg.MenuBar />
                     </TouchableOpacity>
                     :
-                    <TouchableOpacity onPress={() => navigation.goBack()} >
+                    <TouchableOpacity onPress={onBackPress ? onBackPress :() => navigation.goBack()} >
                         <Ionicons
                             size={40}
                             name={

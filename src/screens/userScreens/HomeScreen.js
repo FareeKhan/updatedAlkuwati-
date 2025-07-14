@@ -52,6 +52,8 @@ import HeaderBox from '../../components/HeaderBox';
 import LottieView from "lottie-react-native";
 import SliderDots from '../../components/SliderDots';
 import { fonts } from '../../constants/fonts';
+import ScreenLoader from '../../components/ScreenLoader';
+import SameProduct from './SameProduct';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -79,6 +81,8 @@ const HomeScreen = ({ navigation }) => {
   const [loader, setLoader] = useState(false);
   const [currentIndexDot, setCurrentIndexDot] = useState('');
   const [featureData, setFeatureData] = useState([]);
+  const [SameScreenId, setSameScreenId] = useState('');
+
 
   const { t } = useTranslation();
 
@@ -203,10 +207,12 @@ const HomeScreen = ({ navigation }) => {
         <TouchableOpacity
           activeOpacity={1}
           onPress={() =>
-            navigation.navigate('SameProduct', {
-              text: item?.link_category,
-              subC_ID: item?.id,
-            })
+            // navigation.navigate('SameProduct', {
+            //   text: item?.link_category,
+            //   subC_ID: item?.id,
+            // })
+
+            setSameScreenId(item?.id)
 
           }>
           <View style={[styles.item, { marginHorizontal: ITEM_MARGIN * 0.1 }]}>
@@ -238,10 +244,19 @@ const HomeScreen = ({ navigation }) => {
             <View style={styles.arrivalBox}>
               <Text style={styles.arrivalTxt}>{item?.category?.name}</Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate('SameProduct', {
-                  selected: item?.category?.name,
-                  subC_ID: item?.category?.id
-                })}>
+                // onPress={() => navigation.navigate('SameProduct', {
+                //   selected: item?.category?.name,
+                //   subC_ID: item?.category?.id
+                // })} 
+
+
+
+                onPress={() => setSameScreenId(item?.category?.id)}
+
+
+
+
+              >
                 <Text style={styles.viewTxt}>{t('view_all')}</Text>
               </TouchableOpacity>
             </View>
@@ -279,16 +294,24 @@ const HomeScreen = ({ navigation }) => {
           style={{ alignItems: 'center', marginBottom: 15 }}
           animation="rubberBand"
           mode="contained"
-          onPress={() => {
-            setTimeout(() => {
-              navigation.navigate('SameProduct', {
-                text: item?.name,
-                subC_ID: item?.id,
-              });
-            }, 300);
+          // onPress={() => {
+          //   setTimeout(() => {
+          //     navigation.navigate('SameProduct', {
+          //       text: item?.name,
+          //       subC_ID: item?.id,
+          //     });
+          //   }, 300);
 
-            ReactNativeHapticFeedback.trigger('impactLight');
-          }}>
+          //   ReactNativeHapticFeedback.trigger('impactLight');
+          // }}
+
+
+
+          onPress={() => setSameScreenId(item?.id)}
+
+
+
+        >
           <ImageBackground
             source={{ uri: item.image }}
             style={{ width: 60, height: 60, marginRight: 5 }}
@@ -311,13 +334,12 @@ const HomeScreen = ({ navigation }) => {
   const renderItemNewList = ({ item, index }) => {
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate('SameProduct', {
-          // selected: item?.name,
-          // subC_ID: item?.parent_id
+        // onPress={() => navigation.navigate('SameProduct', {
+        //  text: item?.name,
+        //   subC_ID: item?.id,
+        // })}
 
-          text: item?.name,
-          subC_ID: item?.id,
-        })}
+        onPress={() => setSameScreenId(item?.id)}
         style={styles.newCatContainer}>
         <Image source={{ uri: item?.image }} style={{ width: "100%", height: 150 }} />
 
@@ -330,38 +352,6 @@ const HomeScreen = ({ navigation }) => {
 
 
 
-  const renderListBanner = ({ item, index }) => {
-    const bannerHeight = imageHeights[item.id] || 100;
-    return (
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={() =>
-          navigation.navigate('SameProduct', {
-            text: item?.link_category,
-            subC_ID: item?.id,
-          })
-        }
-        style={{ marginHorizontal: 20, marginRight: 30, height: imageHeights }}
-      >
-        <ImageBackground
-          source={{ uri: item?.image }}
-          style={{ width: width / 1.1, height: bannerHeight }}
-          borderRadius={10}>
-        </ImageBackground>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 15, justifyContent: "center" }}>
-          {
-            secBanners?.map(() => {
-              return (
-                <View style={{ width: 8, height: 8, backgroundColor: "red", borderRadius: 50 }} />
-              )
-            })
-          }
-        </View>
-
-      </TouchableOpacity>
-    )
-  }
-
 
   // if (loader) {
   //   return <ScreenLoader />;
@@ -370,7 +360,8 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.mainContainer}>
       <HeaderBox
-        isDrawer={true}
+        isDrawer={SameScreenId ? false : true}
+        onBackPress={() => setSameScreenId('')}
         cartIcon={true}
       />
 
@@ -382,7 +373,7 @@ const HomeScreen = ({ navigation }) => {
           {t('welcomeSub')}
         </Text>
       </View>
-      <View style={styles.searchContainer}>
+      <View style={[styles.searchContainer, SameScreenId && { marginBottom: 0 }]}>
         <TouchableOpacity
           style={[styles.searchBox]}
           onPress={() => setModalVisible(true)}>
@@ -396,123 +387,96 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
+
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1,
           paddingBottom: Platform.OS == 'ios' ? 70 : 50,
-        }}>
-        <View style={{ marginRight: -15 }}>
-          <FlatList
-            horizontal
-            data={banner}
-            renderItem={renderItem}
-            keyExtractor={(item, index) => index?.toString()}
-            showsHorizontalScrollIndicator={false}
-            pagingEnabled
-            snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-            snapToAlignment="start"
-            decelerationRate="fast"
-          />
-        </View>
+        }}
+      >
 
-        <View style={{ ...styles.arrivalBox, marginTop: 15 }}>
-          <Text style={styles.arrivalTxt}>{t('the_categories')}</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('AllProducts')}>
-            <Text style={styles.viewTxt}>{t('view_all')}</Text>
-          </TouchableOpacity>
-        </View>
+        {
+          SameScreenId ?
+            <View style={{ flex: 1, marginTop: Platform.OS == "ios" ? -80 : -40 }}>
+              <SameProduct subId={SameScreenId} />
+            </View>
+            :
+            <View>
 
+              <View style={{ marginRight: -15 }}>
+                <FlatList
+                  horizontal
+                  data={banner}
+                  renderItem={renderItem}
+                  keyExtractor={(item, index) => index?.toString()}
+                  showsHorizontalScrollIndicator={false}
+                  pagingEnabled
+                  snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
+                  snapToAlignment="start"
+                  decelerationRate="fast"
+                />
+              </View>
 
-        {/* nategories section */}
-
-
-
-
-        <View style={{}}>
-          <FlatList
-            horizontal
-            data={getCategoies}
-            keyExtractor={(item, index) => index?.toString()}
-            renderItem={renderCategories}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-            snapToAlignment="start"
-            decelerationRate="fast"
-          />
-        </View>
-
-
-        <FlatList
-          data={featureData}
-          keyExtractor={(item, index) => index?.toString()}
-          renderItem={renderItemNewList}
-          columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 15 }}
-          numColumns={2}
-        />
-
-        <SliderDots
-          data={secBanners}
-          imageHeights={imageHeights}
-        />
-
-        {/* {
-          arrivalCategories?.map((item, index) => {
-            return (
-              <>
-                {
-                  arrivalData[index]?.length > 0 &&
-                  <View style={styles.arrivalBox}>
-                    <Text style={styles.arrivalTxt}>{item?.value}</Text>
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate('SameProduct', {
-                        selected: item?.value,
-                        subC_ID: item?.id
-                      })}>
-                      <Text style={styles.viewTxt}>{t('view_all')}</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                }
-
-
-                <View style={{ flex: 1 }}>
-                  <FlatList
-                    horizontal
-                    data={arrivalData[index]}
-                    keyExtractor={(item, index) => index?.toString()}
-                    renderItem={renderArrivalItem}
-                    showsVerticalScrollIndicator={false}
-                    snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-                    snapToAlignment="start"
-                    decelerationRate="fast"
-                  />
-                </View>
-              </>
-          )
-          })
-        } */}
+              <View style={{ ...styles.arrivalBox, marginTop: 15 }}>
+                <Text style={styles.arrivalTxt}>{t('the_categories')}</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('AllProducts')}>
+                  <Text style={styles.viewTxt}>{t('view_all')}</Text>
+                </TouchableOpacity>
+              </View>
 
 
 
-        <View style={{ flex: 1 }}>
-          <FlatList
-            // horizontal
-            data={arrivalData}
-            keyExtractor={(item, index) => index?.toString()}
-            renderItem={renderArrivalItem}
-            showsVerticalScrollIndicator={false}
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-            snapToAlignment="start"
-            decelerationRate="fast"
-          />
-        </View>
+              <View style={{}}>
+                <FlatList
+                  horizontal
+                  data={getCategoies}
+                  keyExtractor={(item, index) => index?.toString()}
+                  renderItem={renderCategories}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
+                  snapToAlignment="start"
+                  decelerationRate="fast"
+                />
+              </View>
 
+
+              <FlatList
+                data={featureData}
+                keyExtractor={(item, index) => index?.toString()}
+                renderItem={renderItemNewList}
+                columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 15 }}
+                numColumns={2}
+              />
+
+              <SliderDots
+                data={secBanners}
+                imageHeights={imageHeights}
+              />
+
+              <View style={{ flex: 1 }}>
+                <FlatList
+                  // horizontal
+                  data={arrivalData}
+                  keyExtractor={(item, index) => index?.toString()}
+                  renderItem={renderArrivalItem}
+                  showsVerticalScrollIndicator={false}
+                  showsHorizontalScrollIndicator={false}
+                  snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
+                  snapToAlignment="start"
+                  decelerationRate="fast"
+                />
+              </View>
+
+            </View>
+        }
 
       </ScrollView>
+
+
 
       <SearchModal
         setModalVisible={setModalVisible}
@@ -558,7 +522,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginVertical: 20,
+    marginTop: 20,
+    marginBottom: 20,
   },
 
   searchBox: {
@@ -646,7 +611,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 130,
     marginHorizontal: 2,
-    marginVertical:10,
+    marginVertical: 10,
   },
 
   item: {

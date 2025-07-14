@@ -26,73 +26,43 @@ import ScreenLoader from '../../components/ScreenLoader';
 import HeaderLogo from '../../components/HeaderLogo';
 import { useTranslation } from 'react-i18next';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { userReduxData } from '../../redux/reducer/Auth';
+import { fonts } from '../../constants/fonts';
 
 const UserDetails = ({ navigation, route }) => {
   const { btnText } = route.params ?? '';
 
   const userId = useSelector(state => state.auth?.userId);
-  const userAddress = useSelector((state) => state?.customerAddress?.storeAddress)
+  const userPhone = useSelector((state) => state.auth?.mobile);
+  const countryCode = useSelector((state) => state.auth?.countryCode);
+  const userDataFromRedux = useSelector((state) => state.auth?.userData);
+  const phoneUserNumber = countryCode + userPhone
+  const isCheckAvailableName = userDataFromRedux?.find((item) => item?.phoneUserNumber == phoneUserNumber)
 
-  console.log('userIduserId',userId)
 
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
-  const [fullName, setFullName] = useState(userAddress?.fullName);
+  const [fullName, setFullName] = useState(isCheckAvailableName?.fullName);
   const [phoneNumber, setPhoneNumber] = useState();
   const [email, setEmail] = useState();
   const [btnLoader, setBtnLoader] = useState(false);
 
-
   const [loader, setLoader] = useState(false);
   const [isLoading, setLoading] = useState(true);
-
-  useEffect(() => {
-  
-    getUserDetail()
-  }, []);
-
 
   const handlePress = () => {
     profileUpdate()
   };
 
-  const getUserDetail = async () => {
-    setLoading(true)
-    try {
-      const response = await personalData(userId)
-      console.log('Object',response)
-      console.log('Object',response)
-      if (response?.status) {
-        setFullName(response?.data?.name?response?.data?.name : userAddress?.fullName)
-        setPhoneNumber(response?.data?.phone_number !== null ? response?.data?.phone_number : response?.data?.phone)
-        setEmail(response?.data?.email)
-      }
-    } catch (error) {
-      console.log('error', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-
-
   const profileUpdate = async () => {
-    setBtnLoader(true)
-    const data = {
-      id: userId,
-      fullName: fullName,
-      phoneNumber:  '+971554087425',
-      email: 'abc@gmail.com'
-    }
     try {
-      const response = await updateProfile(data)
-      console.log('response',response)
-      console.log('datadatadatadatadata',data)
-      if (response?.status) {
-        alert(t('updated'));
+      const response = await updateProfile(userId, fullName)
+      console.log('userPhoneuserPhone',response)
+      if (response?.success) {
+        dispatch(userReduxData({ fullName, phoneUserNumber }))
         navigation.goBack()
-      }else{
+      } else {
         alert(t('someThingWentWrong'));
       }
     } catch (error) {
@@ -100,12 +70,6 @@ const UserDetails = ({ navigation, route }) => {
     } finally {
       setBtnLoader(false)
     }
-  }
-
-
-
-  if (isLoading) {
-    return <ScreenLoader />;
   }
 
   return (
@@ -132,7 +96,7 @@ const UserDetails = ({ navigation, route }) => {
         </View>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={[styles.productName]}>{t('user_details')}</Text>
+        {/* <Text style={[styles.productName]}>{t('user_details')}</Text> */}
       </View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -190,7 +154,7 @@ export default UserDetails;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    paddingTop: Platform.OS == 'ios' ? 40 : 20,
+    paddingTop: Platform.OS == 'ios' ? 70 : 20,
     paddingHorizontal: 15,
     backgroundColor: '#fff',
   },
@@ -206,6 +170,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: color.theme,
-    fontFamily: 'Montserrat-Bold',
+    fontFamily:fonts.medium
   },
 });

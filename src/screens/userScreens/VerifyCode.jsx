@@ -28,6 +28,7 @@ const CELL_COUNT = 4;
 const VerifyCode = ({ navigation, route }) => {
     const dispatch = useDispatch()
     const reduxAddress = useSelector((item) => item?.customerAddress?.storeAddress)
+    console.log('reduxAddressreduxAddress',reduxAddress)
 
     const { t } = useTranslation()
     const [isLoading, setLoading] = useState(true);
@@ -191,10 +192,9 @@ const VerifyCode = ({ navigation, route }) => {
                 userName: result?.data?.name,
                 mobile: result?.data?.phone,
                 userId: result?.data?.id,
+                country: reduxAddress?.country,
             }))
             handlePress(result?.data?.id)
-
-            console.log('daddddd', result?.data?.id)
 
         } catch (error) {
             console.log('error', error)

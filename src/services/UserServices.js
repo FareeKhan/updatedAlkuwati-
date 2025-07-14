@@ -145,15 +145,15 @@ export const editShippingAddress = async (address, userID, id) => {
             },
             body: JSON.stringify({
                 "block_avenue": 'block_avenue',
-                "street": address?.street,
+                "street": address?.street || 'oo',
                 "house": "house",
-                "area": address?.area,
-                "city": address?.city,
-                "country": address?.country,
+                "area": address?.area || 'oo',
+                "city": address?.city || 'oo',
+                "country": address?.country || 'oo',
                 "governorate": "governorate",
                 "user_id": userID,
-                "full_name": address?.fullName,
-                "phone": address?.phone,
+                "full_name": address?.fullName || 'oo',
+                "phone": address?.phone || 'oo',
                 "address": 'address',
               "emirates": address?.emirates || '',
             })
@@ -182,15 +182,15 @@ export const addShippingAddress = async (address, userID) => {
             },
             body: JSON.stringify({
                 "block_avenue": 'block_avenue',
-                "street": address?.street,
-                "house": "house",
-                "area": address?.area,
-                "city": address?.city,
-                "country": address?.country,
+                "street": address?.street || 'll',
+                "house": "house" ,
+                "area": address?.area || 'ss',
+                "city": address?.city || '--',
+                "country": address?.country || 'sadas',
                 "governorate": "governorate",
                 "user_id": userID,
-                "full_name": address?.fullName,
-                "phone": address?.phone,
+                "full_name": address?.fullName || '',
+                "phone": address?.phone || '',
                 "emirates": address?.emirates || '',
                 "email": address?.email || null,
                 "pickupLocation": address?.pickupLocation || null,
@@ -486,20 +486,43 @@ export const personalData = async (id) => {
         console.log('oo', e)
     }
 };
-export const updateProfile = async (data) => {
+// export const updateProfile = async (data) => {
 
+//     try {
+//         const response = await fetch(`${baseUrl}/setAppUsersUpdate`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 Accept: 'application/json',
+//             },
+//             body: JSON.stringify({
+//                 'id': data?.id,
+//                 'email': data?.email,
+//                 'name': data?.fullName,
+//                 'phone': data?.phoneNumber,
+//             })
+//         });
+
+//         const result = await response.json();
+//         return result;
+
+//     } catch (e) {
+//         console.log('oo', e)
+//     }
+// };
+
+export const updateProfile = async (userId,fullName) => {
     try {
-        const response = await fetch(`${baseUrl}/setAppUsersUpdate`, {
+        const response = await fetch(`${baseUrl}/customer/update-name`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
             },
             body: JSON.stringify({
-                'id': data?.id,
-                'email': data?.email,
-                'name': data?.fullName,
-                'phone': data?.phoneNumber,
+                'token': true,
+                'userId': userId,
+                'userName': fullName,
             })
         });
 

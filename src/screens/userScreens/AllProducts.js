@@ -25,6 +25,7 @@ import registercustomAnimations, { ANIMATIONS } from './animations';
 import CategorySubList from './CategorySubList'
 import DrawerSceneWrapper from '../../Navigation/DrawerSceneWrapper'
 import HeaderBox from '../../components/HeaderBox'
+import EmptyScreen from '../../components/EmptyScreen'
 
 
 registercustomAnimations()
@@ -79,15 +80,16 @@ const AllProducts = ({ navigation }) => {
         setIsLoader(true)
         try {
             const response = await categoriesList()
+            console.log('===>>>', response)
             if (response?.status) {
                 setIsLoader(false)
                 setStoreCat(response?.data)
-                
+
                 // Preload images for the first few visible items
                 if (response?.data && response.data.length > 0) {
                     const imagesToPreload = response.data.slice(0, 6).map(item => item.image).filter(Boolean);
                     await preloadImagesInBatches(imagesToPreload);
-                    
+
                     // Mark these images as preloaded
                     const preloaded = {};
                     response.data.slice(0, 6).forEach(item => {
@@ -96,11 +98,17 @@ const AllProducts = ({ navigation }) => {
                         }
                     });
                     setPreloadedImages(preloaded);
+
                 }
+            }else{
+                setStoreCat([])
+
             }
         } catch (error) {
             setIsLoader(false)
             console.log(error)
+        } finally {
+            setIsLoader(false)
         }
     }
 
@@ -109,7 +117,7 @@ const AllProducts = ({ navigation }) => {
             setInnetCate(0)
         } else {
             setInnetCate(id)
-            
+
             // When a category is selected, preload its subcategories' images
             if (storeCat) {
                 const selectedCategory = storeCat.find(cat => cat.id === id);
@@ -118,7 +126,7 @@ const AllProducts = ({ navigation }) => {
                         .slice(0, 6) // Preload first 6 subcategories
                         .map(item => item.image)
                         .filter(Boolean);
-                    
+
                     // Preload these images
                     preloadImagesInBatches(subCatImagesToPreload);
                 }
@@ -131,16 +139,16 @@ const AllProducts = ({ navigation }) => {
     const handleViewableItemsChanged = useRef(({ viewableItems }) => {
         const visibleItemIds = viewableItems.map(item => item.item.id);
         setVisibleItems(visibleItemIds);
-        
+
         // Preload images for newly visible items that haven't been preloaded yet
         const newImagesToPreload = viewableItems
             .filter(viewableItem => !preloadedImages[viewableItem.item.id])
             .map(viewableItem => viewableItem.item.image)
             .filter(Boolean);
-        
+
         if (newImagesToPreload.length > 0) {
             preloadImagesInBatches(newImagesToPreload);
-            
+
             // Mark these images as preloaded
             const newPreloaded = { ...preloadedImages };
             viewableItems.forEach(viewableItem => {
@@ -160,7 +168,7 @@ const AllProducts = ({ navigation }) => {
     const renderItem = ({ item, index }) => {
         const isTextLeft = index % 2 === 0;
         const isPreloaded = preloadedImages[item.id] || false;
-     
+
         return (
             <>
                 <Animatable.View
@@ -192,12 +200,12 @@ const AllProducts = ({ navigation }) => {
 
                             <View style={{ flexDirection: isTextLeft ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                                 <View style={{ width: '65%', }}>
-                                    <FastImage 
-                                        source={{ 
+                                    <FastImage
+                                        source={{
                                             uri: item?.image,
                                             priority: isPreloaded ? FastImage.priority.normal : FastImage.priority.high,
                                             cache: FastImage.cacheControl.immutable
-                                        }} 
+                                        }}
                                         style={{ borderRadius: 10, width: '99%', height: 98 }}
                                         resizeMode={FastImage.resizeMode.cover}
                                     />
@@ -214,7 +222,7 @@ const AllProducts = ({ navigation }) => {
                     </RNBounceable>
                 </Animatable.View>
 
-                    {innetCate == item?.id &&
+                {innetCate == item?.id &&
                     <View style={{}}>
                         <CategorySubList innetCate={item?.childrens} navigation={navigation} />
                     </View>
@@ -240,34 +248,16 @@ const AllProducts = ({ navigation }) => {
                 style={{ flex: 1 }}
             >
                 <View style={styles.mainContainer}>
-                    {/* <View style={styles.headerContainer}>
-                        <TouchableOpacity onPress={() => navigation.goBack()}>
-                            <Ionicons size={40} name={I18nManager.isRTL ? 'chevron-forward-circle' : 'chevron-back-circle'} color={color.theme} />
-                        </TouchableOpacity>
-                        <HeaderLogo />
-                        <TouchableOpacity onPress={() => navigation.navigate('MyCart')}>
-                            <ExportSvg.Cart />
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.searchContainer}>
-                        <TouchableOpacity style={[styles.searchBox]} onPress={() => setModalVisible(true)}>
-                            <ExportSvg.Search style={{
-                                marginLeft: 18,
-                                marginRight: 10
-                            }} />
-                            <Text style={{ color: "#00000080" }}>{t("search_here")}</Text>
-                        </TouchableOpacity>
-                    </View> */}
-                    <HeaderBox 
-                    cartIcon={true}
-                    style={{paddingHorizontal:20}}
-                    
+                    <HeaderBox
+                        cartIcon={true}
+                        style={{ paddingHorizontal: 20 }}
+
                     />
 
                     <Animatable.View
                         ref={viewRef}
                         easing={'ease-in-out'}
-                        style={{ paddingHorizontal: 15 ,marginTop:30}}
+                        style={{ paddingHorizontal: 15, marginTop: 30 }}
                         duration={durationMain}>
                         <FlatList
                             data={storeCat}
@@ -284,6 +274,7 @@ const AllProducts = ({ navigation }) => {
                             windowSize={10}
                             removeClippedSubviews={true}
                             updateCellsBatchingPeriod={50}
+                            ListEmptyComponent={()=><EmptyScreen />}
                         />
                     </Animatable.View>
 

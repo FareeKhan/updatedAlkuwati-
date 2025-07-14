@@ -284,7 +284,9 @@ const OrderDetails = ({ navigation, route }) => {
                                 <AddressLine label={t('phoneNumber')} value={`\u2066${userAddress?.phone}\u2069`} />
                                 <AddressLine label={t('Country')} value={userAddress?.country} />
                             </View>
-                            {!userId && <TouchableOpacity onPress={() => navigation.navigate('ShippingAddress')} style={styles.editBox}>
+                            {!userId && <TouchableOpacity onPress={() => navigation.navigate('ShippingAddress',{
+                                isEdit:true
+                            })} style={styles.editBox}>
                                 <Text style={{ color: color.theme }}>{t("edit")}</Text>
                             </TouchableOpacity>}
                         </View>

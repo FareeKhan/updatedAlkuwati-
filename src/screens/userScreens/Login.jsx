@@ -238,12 +238,14 @@ const Login = ({ navigation, route }) => {
 
             });
             const result = await response.json();
+            console.log('sssss',result)
             dispatch(loginData({
                 token: FCNToken,
                 userName: result?.data?.name,
                 mobile: result?.data?.phone,
                 userId: result?.data?.id,
                 countryCode: countryCodes,
+                country: country,
             }))
 
             if (isOrderDetail) {

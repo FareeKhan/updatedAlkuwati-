@@ -43,7 +43,7 @@ import { showMessage } from 'react-native-flash-message';
 import AntDesign from 'react-native-vector-icons/AntDesign'
 
 const ShippingAddress = ({ navigation, route }) => {
-  const { id, btnText, isMap ,isEdit} = route.params ?? '';
+  const { id, btnText, isMap, isEdit } = route.params ?? '';
   const { t } = useTranslation();
   const governorate_en = governorateData(t)
   const countries_en = CountriesData(t)
@@ -51,6 +51,15 @@ const ShippingAddress = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const userId = useSelector(state => state.auth.userId);
   const reduxAddress = useSelector((item) => item?.customerAddress?.storeAddress)
+console.log('userasdasd',userId)
+  const userPhone = useSelector((state) => state.auth?.mobile);
+  const countryCode = userId ? useSelector((state) => state.auth?.countryCode) : '';
+  const isCountry = userId ? useSelector((state) => state.auth?.country) : '';
+  const userDataFromRedux = userId ? useSelector((state) => state.auth?.userData) :'';
+  const phoneUserNumber = userId ? countryCode + userPhone : ''
+  const isCheckAvailableName = userId ?  userDataFromRedux?.find((item) => item?.phoneUserNumber == phoneUserNumber) : ''
+
+
   const [modalVisible, setModalVisible] = useState(false);
 
 
@@ -153,31 +162,33 @@ const ShippingAddress = ({ navigation, route }) => {
   const isHandleCityGov = country == t('Kuwait')
 
   const handleAreaValue = governorate_en[0]?.label
-  console.log('isHandleCityGovisHandleCityGov', userAddress?.street)
+  console.log('isHandleCityGovisHandleCityGov', userAddress?.area)
+  console.log('isHandleCityGovisHandleCityGov', userAddress?.area)
 
   useEffect(() => {
     const selectedCountry = countries_en.find((item) => item.label === userAddress?.country);
-    const displayNumber = userAddress?.phone?.startsWith(selectedCountry.code)
+    const displayNumber = userAddress?.phone?.startsWith(selectedCountry?.code)
       ? userAddress?.phone.slice(4)
       : userAddress?.phone;
     setFullName(userId ? userAddress?.full_name : userAddress?.fullName);
     // setCity(userAddress?.city);
-    setArea(userAddress?.area);
-    setPhoneNumber(displayNumber);
+    setArea( userAddress?.area);
+    setPhoneNumber(displayNumber?displayNumber :userPhone?.startsWith('+') ?userPhone?.slice(4) :userPhone);
     setAvenuePostalCoder(userAddress?.street);
     setEmail(userAddress?.email);
-    setCountry(userAddress?.country ? userAddress?.country : countries_en[0]?.label);
+    setCountry(userAddress?.country ? userAddress?.country : isCountry? isCountry :countries_en[0]?.label);
     setVilla(userAddress?.emirates);
   }, [userAddress]);
 
 
-  useEffect(() => {
-    if (isEdit) {
-      setArea(isHandleCityGov ? handleAreaValue : '');
-    }
-  }, [isHandleCityGov])
+  // useEffect(() => {
+  //   if (isEdit) {
+  //     setArea(isHandleCityGov ? handleAreaValue : '');
+  //   }
+  // }, [isHandleCityGov])
 
-console.log('avenuePostalCoderavenuePostalCoderavenuePostalCoder',userAddress?.area)
+  // console.log('favvvv',)
+
 
   const handleEdit = async () => {
     setLoader(true)
@@ -214,7 +225,7 @@ console.log('avenuePostalCoderavenuePostalCoderavenuePostalCoder',userAddress?.a
     }
 
     // if (!fullName || !villa || !city || !area || !country) {
-    if (!fullName || !villa || !area || !country) {
+    if ( !villa || !area || !country) {
 
       showMessage({
         type: "danger",
@@ -244,6 +255,7 @@ console.log('avenuePostalCoderavenuePostalCoderavenuePostalCoder',userAddress?.a
         pickupLocation: pickupLocation
 
       };
+      console.log('addressreduxaddressredux',addressredux)
       dispatch(
         storeUserAddress({
           ...addressredux,
@@ -265,8 +277,6 @@ console.log('avenuePostalCoderavenuePostalCoderavenuePostalCoder',userAddress?.a
   const handlePress = async () => {
     // console.log(phoneNumber?.slice(1),'phoneNumber')
     if (
-      fullName == '' ||
-      avenuePostalCoder == '' ||
       villa == '' ||
       area == '' ||
       country == ''
@@ -327,6 +337,18 @@ console.log('avenuePostalCoderavenuePostalCoderavenuePostalCoder',userAddress?.a
     const selectedCountry = countries_en.find((item) => item.label === country);
     if (selectedCountry) {
       setCountryCodes(selectedCountry.code);
+      if (country == t('Kuwait')) {
+        setArea(governorate_en[0]?.label)
+      } else {
+        if (isEdit) {
+          setArea(userAddress?.area)
+
+        } else {
+          setArea('')
+
+        }
+
+      }
     } else {
       setCountryCodes('');
     }
@@ -357,13 +379,12 @@ console.log('avenuePostalCoderavenuePostalCoderavenuePostalCoder',userAddress?.a
   return (
     <View style={{ marginHorizontal: 20, paddingTop: 40 }}>
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingBottom: 150 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 350 }}
         showsVerticalScrollIndicator={false}>
         <HeaderBox
           style={[{ width: "60%" }, Platform.OS == 'ios' && { marginTop: 30 }]}
 
         />
-
 
         <View style={{ flexDirection: 'row', marginTop: 20 }}>
           <Text style={[styles.productName]}>{t('shipaddress')}</Text>
@@ -389,36 +410,6 @@ console.log('avenuePostalCoderavenuePostalCoderavenuePostalCoder',userAddress?.a
 
           />
         ) : (
-          // <View>
-          //   <Text
-          //     style={{
-          //       textAlign: 'left',
-          //       marginBottom: 10,
-          //       color: color.theme,
-          //       marginTop: 20,
-          //     }}>
-          //     {t('City')}
-          //   </Text>
-
-          //   <TextInput
-          //     placeholder={t('City')}
-          //     value={area}
-          //     onChangeText={setArea}
-          //     autoCorrect={false}
-          //     maxLength={10}
-          //     style={{
-          //       color: '#000',
-          //       height: 50,
-          //       paddingHorizontal: 10,
-          //       textAlign: I18nManager.isRTL ? 'right' : 'left',
-          //       writingDirection: 'rtl',
-          //       backgroundColor: '#cccccc70',
-          //       borderRadius: 7,
-          //     }}
-          //     placeholderTextColor={'#cecece'}
-          //   />
-          // </View>
-
           <CustomInput
             placeholder={t('City')}
             title={t('City')}
@@ -427,20 +418,6 @@ console.log('avenuePostalCoderavenuePostalCoderavenuePostalCoder',userAddress?.a
             onChangeText={setArea}
           />
         )}
-
-
-
-        {/* 
-  <CustomInput
-          placeholder={t('City')}
-          title={t('City')}
-          style={{ marginTop: 20 }}
-          value={city}
-          onChangeText={setCity}
-        /> */}
-
-
-
 
         <View style={{ marginTop: 20 }}>
           <Text
@@ -477,13 +454,18 @@ console.log('avenuePostalCoderavenuePostalCoderavenuePostalCoder',userAddress?.a
             />
           </View>
         </View>
-        <CustomInput
-          placeholder={t('typename')}
-          title={t('fName')}
-          style={{ marginTop: 20 }}
-          value={fullName}
-          onChangeText={setFullName}
-        />
+        {
+          isCheckAvailableName?.fullName &&
+          <CustomInput
+            editable={false}
+            placeholder={t('typename')}
+            title={t('fName')}
+            style={{ marginTop: 20 }}
+            value={isCheckAvailableName?.fullName}
+            onChangeText={setFullName}
+          />
+        }
+
 
         <CustomInput
           placeholder={isHandleCityGov ? t('avenue') : t('postalCode')}

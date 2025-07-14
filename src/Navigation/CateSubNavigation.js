@@ -7,48 +7,18 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import CateThreeNavigation from './CateThreeNavigation';
 import ReactNativeHapticFeedback from "react-native-haptic-feedback";
 import { useTranslation } from 'react-i18next';
+import { fonts } from '../constants/fonts';
 
 LogBox.ignoreAllLogs();
 
 const CateSubNavigation = ({ subCates, isactive,navigation,setStateValue }) => {
     const [activeSections, setActiveSections] = useState([]);
     const {t} = useTranslation(t)
-    const viewRef = useRef(null);
 
-    const animation = 'flipInY';
-    const durationInner = 1000;
-    const delayInner = 100;
-
-    // Ensure subCates is valid
     if (!subCates || !Array.isArray(subCates) || subCates.length === 0) {
         return <Text style={{ textAlign: 'center', padding: 20 }}>No Categories</Text>;
     }
 
-    // const _renderHeader = (section, index) => {
-    //     ReactNativeHapticFeedback.trigger('impactLight');
-    //     const isActive = activeSections.includes(index);
-
-    //     return (
-    //         <>
-    //             <Animatable.View
-    //                 animation={isActive ? animation : ''}
-    //                 duration={durationInner}
-    //                 delay={(index + 1) * delayInner}
-    //                 useNativeDriver={true} 
-    //             >
-    //                 <View style={[styles.header, styles.menuItem, isActive && styles.headerSelected]}>
-    //                     <Text style={styles.menuText}>{section?.name}</Text>
-    //                     <AntDesign 
-    //                         name={isActive ? "minuscircleo" : "pluscircleo"} 
-    //                         size={20} 
-    //                         color="#67300f" 
-    //                     />
-    //                 </View>
-    //             </Animatable.View>
-    //             {index < subCates.length - 1 && <View style={styles.border} />}
-    //         </>
-    //     );
-    // };
 
     const _renderHeader = (section, index) => {
         const isActive = activeSections.includes(index);
@@ -75,15 +45,16 @@ const CateSubNavigation = ({ subCates, isactive,navigation,setStateValue }) => {
     
 
     const _renderContent = (section, index) => {
+        console.log('===>>',section)
         return (
             <View style={styles.content}>
-                {section?.subthree ? (
+                {section?.sub ? (
                     // <Text style={styles.noCategoriesText}>No Categories</Text>
 
                     <CateThreeNavigation 
                         cate={section.name} 
                         isactive={activeSections.includes(index)} 
-                        subCates={section.subthree} 
+                        subCates={section.sub} 
                         cateID={section.id} 
                         navigation={navigation}
                         setStateValue={setStateValue}
@@ -98,6 +69,8 @@ const CateSubNavigation = ({ subCates, isactive,navigation,setStateValue }) => {
     const _updateSections = (activeSections) => {
         setActiveSections(activeSections);
     };
+
+    console.log('subCatessubCatessubCates',subCates)
 
     return (
         <View style={styles.container}>
@@ -138,8 +111,8 @@ const styles = StyleSheet.create({
     },
     menuText: {
         fontSize: 16,
-        fontWeight: '500',
         color: '#67300f',
+        fontFamily:fonts.regular
     },
     content: {
         borderLeftWidth: 2,

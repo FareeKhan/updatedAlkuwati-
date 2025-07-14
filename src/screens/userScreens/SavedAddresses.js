@@ -103,7 +103,7 @@ const SavedAddresses = ({ navigation, route }) => {
     const handleEdit = async (id) => {
         navigation.navigate('ShippingAddress', {
             id: id,
-            isEdit:false
+            isEdit:true
         })
     }
 

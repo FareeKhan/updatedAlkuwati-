@@ -33,17 +33,22 @@ import Fontisto from "react-native-vector-icons/Fontisto";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import Entypo from "react-native-vector-icons/Entypo";
 import HeaderBox from "../../components/HeaderBox";
 import { showMessage } from "react-native-flash-message";
+import { emptyStoreUserAddress } from "../../redux/reducer/UserShippingAddress";
 
 const UserProfile = ({ navigation }) => {
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.auth?.userId);
+  const userName = useSelector((state) => state.auth?.userName);
   const userPhone = useSelector((state) => state.auth?.mobile);
   const countryCode = useSelector((state) => state.auth?.countryCode);
-  const userName = useSelector((state) => state.customerAddress?.storeAddress?.fullName);
+  const userDataFromRedux = useSelector((state) => state.auth?.userData);
+  const phoneUserNumber = countryCode + userPhone
+  const isCheckAvailableName = userDataFromRedux?.find((item) => item?.phoneUserNumber == phoneUserNumber)
+  // const userName = useSelector((state) => state.customerAddress?.storeAddress?.fullName);
 
-  console.log('countryCodecountryCodecountryCode',countryCode)
   // const userName = useSelector((state) => state.customerAddress?.storeAddress?.fullName);
   const { t } = useTranslation();
   const [userData, setUserData] = useState("");
@@ -196,7 +201,7 @@ const UserProfile = ({ navigation }) => {
     } catch (error) {
       setProfileLoader(false)
       console.log(error);
-    }finally{
+    } finally {
       setProfileLoader(false)
     }
   };
@@ -217,6 +222,7 @@ const UserProfile = ({ navigation }) => {
 
   const LogoutPress = () => {
     dispatch(logout());
+    dispatch(emptyStoreUserAddress());
     navigation.navigate("Login");
   };
 
@@ -245,13 +251,13 @@ const UserProfile = ({ navigation }) => {
   };
 
 
-  const onPressProfile = ()=>{
-    if(userId){
+  const onPressProfile = () => {
+    if (userId) {
       navigation.navigate('UserDetails')
-    }else{
+    } else {
       showMessage({
-        type:"danger",
-        message:t('noAvailable')
+        type: "danger",
+        message: t('noAvailable')
       })
     }
   }
@@ -266,22 +272,29 @@ const UserProfile = ({ navigation }) => {
         />
 
 
-        <TouchableOpacity disabled onPress={onPressProfile} style={styles.profileContainer}>
+        <TouchableOpacity disabled={!userId} onPress={onPressProfile} style={styles.profileContainer}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <View style={{ borderWidth: 1, height: 35, width: 35, borderRadius: 50, alignItems: "center", justifyContent: "center" }}>
+              <AntDesign name={'user'} size={20} color={"#000"} />
+            </View>
+            <View style={{ width: "80%" }}>
 
-          <View style={{ borderWidth: 1, height: 35, width: 35, borderRadius: 50, alignItems: "center", justifyContent: "center" }}>
-            <AntDesign name={'user'} size={20} color={"#000"} />
+              <Text style={styles.userName}>{userId ? isCheckAvailableName?.fullName : t('noAvailable')}</Text>
+              {
+                userId &&
+                <Text style={styles.userEmail}>{'\u202A'}{countryCode}{userPhone}{'\u202C'}</Text>
+
+              }
+            </View>
           </View>
-          <View style={{ marginLeft: 10, marginTop: 7,width:"80%" }}>
 
-            <Text style={styles.userName}>{userId ? userName : t('noAvailable')}</Text>
-            {
-              userId &&
-            <Text style={styles.userEmail}>{'\u202A'}{countryCode}{userPhone}{'\u202C'}</Text>
 
-            }
-
-          </View>
+          {
+            userId &&
+            <Entypo name={I18nManager.isRTL ? 'chevron-small-left' : 'chevron-small-right'} size={25} color={color.black} />
+          }
         </TouchableOpacity>
+
         <>
 
           <ScrollView
@@ -536,7 +549,7 @@ export default UserProfile;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    paddingTop:Platform.OS == 'android'? 20:70,
+    paddingTop: Platform.OS == 'android' ? 20 : 70,
     paddingHorizontal: 15,
     backgroundColor: "#fff",
   },
@@ -567,7 +580,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: "row",
     alignItems: "center",
-marginTop:30,
+    marginTop: 30,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -583,7 +596,6 @@ marginTop:30,
   },
   userName: {
     fontSize: 17,
-    fontFamily: "Montserrat-Regular",
     color: color.theme,
     fontWeight: "600",
     textAlign: "left",
