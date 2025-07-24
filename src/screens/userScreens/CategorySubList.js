@@ -1,15 +1,8 @@
-import { Alert, FlatList, Image, ImageBackground, Platform, StyleSheet, Text, Button, TouchableOpacity, View, Dimensions } from 'react-native'
+import { Alert, FlatList,  Platform, StyleSheet, Text, Button, TouchableOpacity, View, Dimensions } from 'react-native'
 import React, { useEffect, useState, useRef } from 'react'
-import ExportSvg from '../../constants/ExportSvg'
-import SearchInput from '../../components/SearchInput'
-import { allProducts } from '../../constants/data'
+
 import { color } from '../../constants/color'
-import { categoriesList, categoriesListSub } from '../../services/UserServices'
-import ScreenLoader from '../../components/ScreenLoader'
-import SearchModal from '../../components/SearchModal'
-import { useDispatch } from 'react-redux'
-import { DrawerActions } from '@react-navigation/native'
-import HeaderLogo from '../../components/HeaderLogo'
+
 import RNBounceable from '@freakycoder/react-native-bounceable';
 import * as Animatable from 'react-native-animatable';
 import { LayoutAnimation, UIManager } from "react-native";
@@ -21,28 +14,20 @@ import { preloadImagesInBatches } from '../../utils/ImagePreloader';
 
 import withPressAnimated from './hocs/withPressAnimated';
 import registercustomAnimations, { ANIMATIONS } from './animations';
+import { fonts } from '../../constants/fonts'
 const width = Dimensions.get('screen')
 
 registercustomAnimations()
 const AnimatedPressButton = withPressAnimated(RNBounceable)
 
 const CategorySubList = ({ navigation, innetCate }) => {
-    const dispatch = useDispatch()
-    const [isLoader, setIsLoader] = useState(false)
-    const [modalVisible, setModalVisible] = useState(false);
-    const [itemListAnimation, setItemListAnimation] = useState('');
     const { t } = useTranslation();
-    const [expanded, setExpanded] = useState(false);
-    const [show, setShow] = useState(false);
     const [visibleItems, setVisibleItems] = useState([]);
     const [preloadedImages, setPreloadedImages] = useState({});
 
     const handleViewRef = useRef(null);
     const viewRef = useRef(null);
-    const animation = 'fadeInDown';
     const animationMain = 'fadeInDownBig';
-    const animationRight = 'slideInRight';
-    const animationLeft = 'slideInLeft';
     const durationMain = 100;
     const durationInner = 1000;
     const delayInner = 100;
@@ -182,7 +167,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start' // if you want to fill rows left to right
     },
     itemBox: {
-        // width: 105, // is 50% of container width
+        width: Platform.OS == 'ios'? 110:105, // is 50% of container width
         height: 100,
         margin: 5,
         shadowColor: '#301A58',
@@ -198,7 +183,7 @@ const styles = StyleSheet.create({
         borderColor: '#301A58',
         borderRadius: 10, backgroundColor: '#dbdfe0',
     },
-    textBox: { fontSize: 12, fontWeight: '500', marginTop: 8, color: color.theme },
+    textBox: { fontSize: 12, marginTop: 8, color: color.theme ,fontFamily:fonts.regular},
     mainContainer: {
         flex: 1,
         paddingTop: Platform.OS == 'ios' ? 20 : 20,

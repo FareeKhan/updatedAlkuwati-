@@ -57,7 +57,6 @@ export const preloadImages = (images, options = {}) => {
   });
   
   if (uriImages.length > 0) {
-    console.log(`Preloading ${uriImages.length} new images`);
     return FastImage.preload(uriImages);
   }
   

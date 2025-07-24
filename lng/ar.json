@@ -61,8 +61,7 @@
   "fName": "الاسم الكامل",
   "EStreet": "أدخل الشارع",
   "Street": "الشارع",
-  // "City": "المدينة",
-  "City": "القطعة",
+  "City": "المدينة",
   "spa": "الولاية/المقاطعة/المنطقة",
   "Area": "المنطقة",
   "typePhoneNumber": "أدخل رقم الهاتف",
@@ -82,7 +81,7 @@
   "discount": "خصم",
   "p_total_amout": "المبلغ الإجمالي",
   "no_items": "لا توجد عناصر",
-  "delete_account": "حذف الحساب",
+  "Delete Account": "حذف الحساب",
   "discounts_offer": "العروض",
   "available_stocks": "المخزون المتوفر",
   "p_description": "الوصف",
@@ -101,17 +100,16 @@
   "Readyfordelivery": "جاهز للتوصيل",
   "Outfordelivery": "خرج للتوصيل",
   "Delivered": "تم التوصيل",
-  "DeleteYourAccount": "حذف حسابك", 
-  "ASure": "هل أنت متأكد أنك تريد حذف حسابك؟", 
+  "Delete Your Account?": "حذف حسابك", 
+  "Are You Sure?": "هل أنت متأكد أنك تريد حذف حسابك؟", 
   "cancel": "إلغاء", 
   "ok": "موافق",
-"support": "الدعم",
+"Support": "الدعم",
 
 "continueShopping": "متابعة التسوق",
 
 "color": "لون",
 "size": "حجم",
-"avenue": "شارع",
 
 
   "isNotValid": "رقم الهاتف غير صالح",
@@ -138,7 +136,7 @@
   "Bahrain": "البحرين",
   "Qatar": "قطر",
   "Oman": "عمان",
-  "fillAll": "يرجى ملء جميع الحقول",
+  "fillAll": "يرجى تعبئة جميع الحقول",
   "deleteTitle": "تنبيه الحذف",
   "sureDelete": "هل أنت متأكد أنك تريد حذف هذا العنوان؟",
   "noAddress": "لم يتم العثور على عنوان",
@@ -154,9 +152,6 @@
   "outOfStock":"المخزون غير متوفر",
   "confirm":"تأكيد الموقع",
   "loading": "جارٍ التحميل",
-  // "reels": "الريلز",
-
-  // "reels":"فيديوهات",
   "reels":"فيديوهات",
   "MoreInfo": "اطلب المنتج الآن",
   // "MoreInfo": "مزيد من المعلومات",
@@ -179,5 +174,22 @@
 "loading_products": "جارٍ تحميل المنتجات...",
 "loading_images": "جارٍ تحميل الصور",
 "postalCode": "الرمز البريدي (اختياري)",
-"postalCoder": "الرمز البريدي"
+"postalCoder": "الرمز البريدي",
+
+"TermsCondition": "الشروط والأحكام",
+"refundPolicy": "سياسة الاسترجاع والاستبدال",
+"aboutPage": "من نحن",
+"areaCity": "المدينة / المنطقة",
+
+"block": "القطعة",
+"street": "الشارع",
+"house": "المنزل",
+"avenue": "الجادة (Optional)",
+"PO-BOX": "الرمز البريدي (Optional)",
+"additionalInfo": "تفاصيل اخرى (Optional)",
+"area": "المنطقة",
+
+"avenues": "الجادة",
+
+
 }

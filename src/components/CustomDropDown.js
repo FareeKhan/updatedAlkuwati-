@@ -101,7 +101,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color:"#ccc",
         textAlign: 'left',
-        paddingLeft:5
+        paddingLeft:5,
+        fontFamily:fonts.regular
     },
     selectedTextStyle: {
         fontSize: 13,

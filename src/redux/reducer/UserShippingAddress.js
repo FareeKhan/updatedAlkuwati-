@@ -5,7 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const userAddress = createSlice({
     name: 'userAddress',
     initialState: {
-        storeAddress: {}
+        storeAddress: null
     },
     reducers: {
         storeUserAddress :(state,action)=>{

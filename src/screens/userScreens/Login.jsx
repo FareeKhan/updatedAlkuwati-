@@ -99,10 +99,6 @@ const Login = ({ navigation, route }) => {
         },
     ];
 
-
-
-
-
     const [isLoading, setLoading] = useState(true);
     const userId = useSelector((state) => state.auth)
     const [getOTPCoder, setOTPCoder] = useState();
@@ -110,7 +106,6 @@ const Login = ({ navigation, route }) => {
     const [phoneNo, setPhoneNo] = useState('')
     const [country, setCountry] = useState(I18nManager.isRTL ? countries_ar[0]?.label : countries_en[0]?.label);
     const [countryCodes, setCountryCodes] = useState('+965');
-
 
     const [value, setValue] = useState('')
     const [FCNToken, setFCNToken] = useState();
@@ -321,9 +316,6 @@ const Login = ({ navigation, route }) => {
         }
     }, [country]);
 
-
-
-
     return (
         <View style={styles.mainContainer}>
 
@@ -334,11 +326,8 @@ const Login = ({ navigation, route }) => {
                 </View>
 
                 {!getOTPCoder &&
-
-
                     <Text style={styles.subTitle}>{t('loginNumber')}</Text>
                 }
-
 
                 {getOTPCoder ?
 

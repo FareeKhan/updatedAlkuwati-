@@ -51,6 +51,7 @@ const PaymentOrder = ({ navigation, route }) => {
   const userId = useSelector(state => state.auth?.userId);
   const reduxAddress = useSelector((item) => item?.customerAddress?.storeAddress)
   const { totalPrice } = useSelector(state => state.cartProducts);
+  console.log('datadatadata',data)
 
   const refRBSheet = useRef(null);
   const { t } = useTranslation();

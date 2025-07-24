@@ -31,6 +31,7 @@ import SavedAddresses from '../screens/userScreens/SavedAddresses';
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import VideoScreen from '../screens/userScreens/VideoScreen';
 import { fonts } from '../constants/fonts';
+import WebPages from '../screens/userScreens/WebPages';
 
 const Tab = createBottomTabNavigator();
 
@@ -53,6 +54,7 @@ export const StackNavigations = () => {
             <Stack.Screen name="ProductDetails" component={ProductDetails} options={{ headerShown: false }} />
             <Stack.Screen name="CategoriesList" component={CategoriesList} />
             <Stack.Screen name="DiscountProducts" component={DiscountProducts} />
+            <Stack.Screen name="WebPages" component={WebPages} />
 
 
             <Stack.Screen name="ShippingAddress" component={ShippingAddress} options={{

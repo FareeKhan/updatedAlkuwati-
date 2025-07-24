@@ -47,7 +47,7 @@ export const HomeStack = () => {
             <Stack.Screen name="PaymentOrder" component={PaymentOrder} />
             <Stack.Screen name="DiscountProducts" component={DiscountProducts} />
             {/* <Stack.Screen name="VerifyCode" component={VerifyCode} /> */}
-            <Stack.Screen name="Login" component={Login} />
+            {/* <Stack.Screen name="Login" component={Login} /> */}
 
             
             <Stack.Screen

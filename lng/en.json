@@ -161,7 +161,10 @@
 "noAddress": "No address found",
 "fName": "Full Name",
   "governorate":"Governorate",
-"avenue": "Avenue",
+"avenue": "Avenue (Optional)",
+"avenues": "Avenue",
+"continue": "Continue",
+"total_price": "Total Price",
   "villa":"Villa",
   "postalCode":"Postal Code (optional)",
   "postalCoder":"Postal Code",
@@ -184,10 +187,19 @@
 "continueShopping": "Continue Shopping",
 "no_product_in_favorite": "No products in favorites",
 "user_details": "User Details",
-"no_item_in_the_cart": "No items in the cart"
+"no_item_in_the_cart": "No items in the cart",
 
+"TermsCondition": "Terms & conditions",
+"refundPolicy": "Refund and Exchange Policy",
+"aboutPage": "About Us",
 
-
-
+"areaCity": "Area / City",
+"block": "Block",
+"street": "Street",
+"house": "House",
+"PO-BOX": "PO BOX",
+"additionalInfo": "Additional info (Optional)",
+"area": "Area",
+"fillAll": "Please fill all the fields",
 
 }

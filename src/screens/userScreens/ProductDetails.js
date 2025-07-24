@@ -154,11 +154,12 @@ const ProductDetails = ({ navigation, route }) => {
   };
 
 
-
+console.log('ssss',productObject)
   const addToCart = () => {
     dispatch(
       addProductToCart({
         id: id,
+        odo_id: productObject?.odoo_id,
         productName: productObject?.name,
         price: productObject?.price,
         size: selectedSize,
@@ -335,7 +336,7 @@ const ProductDetails = ({ navigation, route }) => {
                       return (
                         <TouchableOpacity
                           key={index}
-                          onPress={() => { inStock ? handleVariant(key, item) : null; }}
+                          onPress={() => { inStock ? handleVariant(key, item) : handleVariant(key, item) ; }}
                           activeOpacity={inStock ? 0.8 : 1}
                           style={[
                             {
@@ -358,7 +359,9 @@ const ProductDetails = ({ navigation, route }) => {
                   </ScrollView>
                 </View>
               ))}
-            <View style={{ flexDirection: 'row' }}>
+              {
+                productObject?.description && <>
+                 <View style={{ flexDirection: 'row' }}>
               <Text style={[styles.productName, { marginBottom: 5 }]}>
                 {t('p_description')}
               </Text>
@@ -366,6 +369,10 @@ const ProductDetails = ({ navigation, route }) => {
             <Text style={{ ...styles.productDesc }}>
               {removeHTMLCode(productObject?.description)}
             </Text>
+                </>
+                
+              }
+           
           </View>
         </View>
       </ScrollView>

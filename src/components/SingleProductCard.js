@@ -78,7 +78,6 @@ const SingleProductCard = ({ item, index, isDot = true, onPress, countList = 1, 
     setIsStockLoader(true)
     try {
       const response = await productDetails(item?.id);
-      console.log('heyShowmeRstate',response?.status)
       if (response?.status) {
         const isOutOfStock =
           response?.variant_system?.has_variants &&
@@ -160,6 +159,8 @@ const SingleProductCard = ({ item, index, isDot = true, onPress, countList = 1, 
             counter: 1,
             subText: removeHTMLCode(item?.description),
             image: item?.image,
+                 odo_id: productObject?.odoo_id,
+
           }),
         );
 

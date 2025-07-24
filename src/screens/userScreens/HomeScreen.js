@@ -7,198 +7,140 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-
   TouchableOpacity,
   View,
-  PermissionsAndroid,
+  I18nManager,
 } from 'react-native';
-import React, { useEffect, useState, useRef } from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import ExportSvg from '../../constants/ExportSvg';
-import { color } from '../../constants/color';
-import notifee, {
-  AndroidImportance,
-  AndroidVisibility,
-  AndroidStyle,
-  AndroidColor,
-} from '@notifee/react-native';
+import {color} from '../../constants/color';
+
 import {
   homeBanner,
-  newArrivals,
-  getSettingOption,
   categoriesListSubTwoCategory,
-  categoriesListSub,
-  dummyCategories,
   getFeaturedData,
   newArrivalsData,
 } from '../../services/UserServices';
-import Text from '../../components/CustomText'
+import Text from '../../components/CustomText';
 
 import SingleProductCard from '../../components/SingleProductCard';
 import SearchModal from '../../components/SearchModal';
 
-const { width } = Dimensions.get('screen');
+const {width} = Dimensions.get('screen');
 const ITEM_WIDTH = Dimensions.get('window').width * 0.8;
 const ITEM_MARGIN = Dimensions.get('window').width * 0.1;
-import { useTranslation } from 'react-i18next';
-import HeaderLogo from '../../components/HeaderLogo';
+import {useTranslation} from 'react-i18next';
 import * as Animatable from 'react-native-animatable';
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
 import RNBounceable from '@freakycoder/react-native-bounceable';
 import withPressAnimated from './hocs/withPressAnimated';
-import registercustomAnimations, { ANIMATIONS } from './animations';
-import { useSelector } from 'react-redux';
+import registercustomAnimations, {ANIMATIONS} from './animations';
+import {useSelector} from 'react-redux';
 import HeaderBox from '../../components/HeaderBox';
-import LottieView from "lottie-react-native";
 import SliderDots from '../../components/SliderDots';
-import { fonts } from '../../constants/fonts';
 import ScreenLoader from '../../components/ScreenLoader';
 import SameProduct from './SameProduct';
+import FastImage from 'react-native-fast-image';
 
 const screenWidth = Dimensions.get('window').width;
 
 registercustomAnimations();
 const AnimatedPressButton = withPressAnimated(RNBounceable);
 
+const HomeScreen = ({navigation}) => {
+  const {t} = useTranslation();
 
-const newCatData = [
-  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_QcxHp6g0eeP4a_oIdDIuDtfYxdyId9Z8RA&s',
-  'https://img.freepik.com/free-photo/man-beige-shirt-pants-casual-wear-fashion_53876-102889.jpg?semt=ais_hybrid&w=740',
-  'https://img.freepik.com/free-photo/man-beige-shirt-pants-casual-wear-fashion_53876-102889.jpg?semt=ais_hybrid&w=740',
-  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_QcxHp6g0eeP4a_oIdDIuDtfYxdyId9Z8RA&s',
-
-]
-
-const HomeScreen = ({ navigation }) => {
-  const data = useSelector(state => state.cartProducts?.cartProducts);
-
-  const { openDrawer } = navigation;
   const [banner, setBanner] = useState([]);
   const [secBanners, setSecBanners] = useState([]);
+  const [zeroIndexBanner, setZeroIndexBanner] = useState([]);
   const [arrivalData, setArrivalData] = useState([]);
   const [getCategoies, setCategoies] = useState([]);
-  const [isLoader, setIsLoader] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [currentIndexDot, setCurrentIndexDot] = useState('');
   const [featureData, setFeatureData] = useState([]);
   const [SameScreenId, setSameScreenId] = useState('');
-
-
-  const { t } = useTranslation();
-
-  const [arrivalCategories, setArrivalCategories] = useState([]);
-  const [firstName, setFirstNames] = useState([]);
   const [imageHeights, setImageHeights] = useState({});
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const viewRef = useRef(null);
   const animation = 'fadeInRightBig';
   const animationMain = 'fadeInRight';
-  const durationMain = 100;
   const durationInner = 1000;
   const delayInner = 100;
-
-  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
   }, []);
 
   useEffect(() => {
-    discountHomeBanner();
-    funCategories();
-    // getSettingOptionShow();
-    GetFeatured();
-    getNewArrivals();
+    fetchAllApi();
   }, []);
 
-
-  const funCategories = async () => {
+  const fetchAllApi = async () => {
     setLoader(true);
     try {
-      const result = await categoriesListSubTwoCategory();
-      if (result?.status) {
-        setLoader(false);
-        setCategoies(result?.data);
-      } else {
-        setLoader(false);
-      }
-    } catch (error) {
-      setLoader(false);
-      console.log(error);
-    }
-  };
+      const [topBanner, catSection, featureArray, arrivalData] =
+        await Promise.all([
+          homeBanner(),
+          categoriesListSubTwoCategory(),
+          getFeaturedData(),
+          newArrivalsData(),
+        ]);
 
-  const discountHomeBanner = async () => {
-    setLoader(true);
-    try {
-      const result = await homeBanner();
-      if (result?.status) {
-        setLoader(false);
-        const mainBanners = result?.data?.filter((item, index) => item?.banner_type !== 'section_banner')
-        const secondaryBanners = result?.data?.filter((item, index) => item?.banner_type == 'section_banner')
+      if (topBanner?.status) {
+        const mainBanners = topBanner?.data?.filter(
+          (item, index) => item?.banner_type !== 'section_banner',
+        );
+        const secondaryBanners = topBanner?.data?.filter(
+          (item, index) => item?.banner_type == 'section_banner',
+        );
+
+        const zeroBanner = topBanner?.data?.filter(
+          (item, index) =>
+            item?.banner_type == 'section_banner' &&
+            item?.show_after_section_number == 0,
+        );
         setBanner(mainBanners);
         setSecBanners(secondaryBanners);
-      } else {
-        setLoader(false);
+        setZeroIndexBanner(zeroBanner);
+      }
+
+      if (catSection?.status) {
+        setCategoies(catSection?.data);
+      }
+
+      if (featureArray?.status) {
+        setFeatureData(featureArray?.data);
+      }
+
+      if (featureArray?.status) {
+        setFeatureData(featureArray?.data);
+      }
+
+      if (arrivalData?.status == 'success') {
+        setArrivalData(arrivalData?.data);
       }
     } catch (error) {
-      setLoader(false);
-      console.log(error);
-    }
-  };
-
-  const getNewArrivals = async name => {
-
-    try {
-      const result = await newArrivalsData();
-      if (result?.status == 'success') {
-        setArrivalData(result?.data);
-      } else {
-        setIsLoader(false);
-      }
-    } catch (error) {
-
-      setIsLoader(false);
-      console.log(error);
+      console.log('error', error);
     } finally {
       setLoader(false);
     }
   };
-
-
-  const GetFeatured = async () => {
-    try {
-      const result = await getFeaturedData();
-      if (result?.status) {
-        setFeatureData(result?.data)
-        // setArrivalData(result?.data);
-        // setOptionNameOne(name);
-      } else {
-        setIsLoader(false);
-      }
-    } catch (error) {
-
-      setIsLoader(false);
-      console.log(error);
-    } finally {
-      setLoader(false);
-    }
-  };
-
 
   useEffect(() => {
     secBanners?.forEach(banner => {
       if (!imageHeights[banner.id]) {
-        Image.getSize(banner.image, (width, height) => {
-          const calculatedHeight = (screenWidth * height) / width;
-          setImageHeights(prev => ({ ...prev, [banner.id]: calculatedHeight }));
-        }, error => console.log('Error loading image size:', error));
+        Image.getSize(
+          banner.image,
+          (width, height) => {
+            const calculatedHeight = (screenWidth * height) / width;
+            setImageHeights(prev => ({...prev, [banner.id]: calculatedHeight}));
+          },
+          error => console.log('Error loading image size:', error),
+        );
       }
     });
   }, [secBanners]);
 
-
-  const renderItem = ({ item, index }) => {
+  const renderItem = ({item, index}) => {
     return (
       <Animatable.View
         animation={animationMain}
@@ -212,15 +154,14 @@ const HomeScreen = ({ navigation }) => {
             //   subC_ID: item?.id,
             // })
 
-            setSameScreenId(item?.id)
-
+            setSameScreenId(item?.category_id)
           }>
-          <View style={[styles.item, { marginHorizontal: ITEM_MARGIN * 0.1 }]}>
+          <View style={[styles.item, {marginHorizontal: ITEM_MARGIN * 0.1}]}>
             <ImageBackground
-              source={{ uri: item?.image }}
-              style={{ width: width / 1.3, height: 160 }}
+              source={{uri: item?.image}}
+              style={{width: width / 1.3, height: 160}}
               borderRadius={20}>
-              <View style={{ paddingLeft: 15, paddingTop: 20 }}>
+              <View style={{paddingLeft: 15, paddingTop: 20}}>
                 {/* <Text style={styles.discountTxt}>{item?.title_line_1}</Text>
                 <Text style={styles.discountTitle}>{item?.title_line_2}</Text>
                 <Text style={styles.subTitleTxt}>{item?.title_line_3}</Text> */}
@@ -235,11 +176,14 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
-  const renderArrivalItem = ({ item, index }) => {
+  const renderArrivalItem = ({item, index}) => {
+    const bannersToShow = secBanners?.filter(
+      banner => Number(banner?.show_after_section_number) === index + 1,
+    );
+
     return (
       <View>
-        {
-          item?.category?.products?.length > 0 &&
+        {item?.category?.products?.length > 0 && (
           <>
             <View style={styles.arrivalBox}>
               <Text style={styles.arrivalTxt}>{item?.category?.name}</Text>
@@ -247,43 +191,41 @@ const HomeScreen = ({ navigation }) => {
                 // onPress={() => navigation.navigate('SameProduct', {
                 //   selected: item?.category?.name,
                 //   subC_ID: item?.category?.id
-                // })} 
-
-
-
-                onPress={() => setSameScreenId(item?.category?.id)}
-
-
-
-
-              >
+                // })}
+                onPress={() => setSameScreenId(item?.category?.id)}>
                 <Text style={styles.viewTxt}>{t('view_all')}</Text>
               </TouchableOpacity>
             </View>
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {
-                item?.category?.products?.map((innerItem, index) => {
-                  return (
-                    <SingleProductCard
-                      isShowPlusIcon={true}
-                      item={innerItem}
-                      onPress={() => navigation.navigate('ProductDetails', { id: innerItem?.id })}
-                    />
-                  )
-                })
-              }
+              {item?.category?.products?.map((innerItem, index) => {
+                return (
+                  <SingleProductCard
+                    isShowPlusIcon={true}
+                    item={innerItem}
+                    onPress={() =>
+                      navigation.navigate('ProductDetails', {id: innerItem?.id})
+                    }
+                  />
+                );
+              })}
             </ScrollView>
           </>
-        }
+        )}
 
-
+        {bannersToShow?.length > 0 && (
+          <SliderDots
+            data={bannersToShow}
+            imageHeights={imageHeights}
+            dataIndex={index}
+            setSameScreenId={setSameScreenId}
+          />
+        )}
       </View>
-
     );
   };
 
-  const renderCategories = ({ item, index }) => {
+  const renderCategories = ({item, index}) => {
     return (
       <Animatable.View
         animation={animation}
@@ -291,7 +233,7 @@ const HomeScreen = ({ navigation }) => {
         delay={(1 + index) * delayInner}
         style={styles.cateListBox}>
         <AnimatedPressButton
-          style={{ alignItems: 'center', marginBottom: 15 }}
+          style={{alignItems: 'center', marginBottom: 15}}
           animation="rubberBand"
           mode="contained"
           // onPress={() => {
@@ -305,33 +247,28 @@ const HomeScreen = ({ navigation }) => {
           //   ReactNativeHapticFeedback.trigger('impactLight');
           // }}
 
-
-
-          onPress={() => setSameScreenId(item?.id)}
-
-
-
-        >
+          onPress={() => setSameScreenId(item?.id)}>
           <ImageBackground
-            source={{ uri: item.image }}
-            style={{ width: 60, height: 60, marginRight: 5 }}
+            source={{uri: item.image}}
+            style={{width: 60, height: 60, marginRight: 5}}
             borderRadius={10}></ImageBackground>
           <Text
             style={{
               fontSize: 12,
               marginTop: 5,
               textAlign: 'center',
-
             }}>
-            {item?.name}
+              {
+
+              }
+            {I18nManager.isRTL?  item?.name : item?.name_en  || item?.name}
           </Text>
         </AnimatedPressButton>
       </Animatable.View>
     );
   };
 
-
-  const renderItemNewList = ({ item, index }) => {
+  const renderItemNewList = ({item, index}) => {
     return (
       <TouchableOpacity
         // onPress={() => navigation.navigate('SameProduct', {
@@ -341,21 +278,23 @@ const HomeScreen = ({ navigation }) => {
 
         onPress={() => setSameScreenId(item?.id)}
         style={styles.newCatContainer}>
-        <Image source={{ uri: item?.image }} style={{ width: "100%", height: 150 }} />
-
-        <View style={styles.innerNewCatBox}>
-          <Text style={styles.txtNewCat}>{item?.name}</Text>
-        </View>
+        <FastImage
+          source={{
+            uri: item?.image,
+            priority: FastImage.priority.high,
+          }}
+          style={{width: '100%', height: 150}}>
+          <View style={styles.innerNewCatBox}>
+            <Text style={styles.txtNewCat}>{item?.name}</Text>
+          </View>
+        </FastImage>
       </TouchableOpacity>
-    )
+    );
+  };
+
+  if (loader) {
+    return <ScreenLoader />;
   }
-
-
-
-
-  // if (loader) {
-  //   return <ScreenLoader />;
-  // }
 
   return (
     <View style={styles.mainContainer}>
@@ -365,15 +304,15 @@ const HomeScreen = ({ navigation }) => {
         cartIcon={true}
       />
 
-      <View style={{ flexDirection: 'row' }}>
+      <View style={{flexDirection: 'row'}}>
         <Text style={styles.welcomeTxt}>{t('welcome')}</Text>
       </View>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={[styles.subTxt, { color: color.gray }]}>
+      <View style={{flexDirection: 'row'}}>
+        <Text style={[styles.subTxt, {color: color.gray}]}>
           {t('welcomeSub')}
         </Text>
       </View>
-      <View style={[styles.searchContainer, SameScreenId && { marginBottom: 0 }]}>
+      <View style={[styles.searchContainer, SameScreenId && {marginBottom: 0}]}>
         <TouchableOpacity
           style={[styles.searchBox]}
           onPress={() => setModalVisible(true)}>
@@ -383,100 +322,93 @@ const HomeScreen = ({ navigation }) => {
               marginRight: 10,
             }}
           />
-          <Text style={{ color: '#00000080' }}>{t('search_here')}</Text>
+          <Text style={{color: '#00000080'}}>{t('search_here')}</Text>
         </TouchableOpacity>
       </View>
-
-
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           flexGrow: 1,
           paddingBottom: Platform.OS == 'ios' ? 70 : 50,
-        }}
-      >
-
-        {
-          SameScreenId ?
-            <View style={{ flex: 1, marginTop: Platform.OS == "ios" ? -80 : -40 }}>
-              <SameProduct subId={SameScreenId} />
-            </View>
-            :
-            <View>
-
-              <View style={{ marginRight: -15 }}>
-                <FlatList
-                  horizontal
-                  data={banner}
-                  renderItem={renderItem}
-                  keyExtractor={(item, index) => index?.toString()}
-                  showsHorizontalScrollIndicator={false}
-                  pagingEnabled
-                  snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-                  snapToAlignment="start"
-                  decelerationRate="fast"
-                />
-              </View>
-
-              <View style={{ ...styles.arrivalBox, marginTop: 15 }}>
-                <Text style={styles.arrivalTxt}>{t('the_categories')}</Text>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('AllProducts')}>
-                  <Text style={styles.viewTxt}>{t('view_all')}</Text>
-                </TouchableOpacity>
-              </View>
-
-
-
-              <View style={{}}>
-                <FlatList
-                  horizontal
-                  data={getCategoies}
-                  keyExtractor={(item, index) => index?.toString()}
-                  renderItem={renderCategories}
-                  showsVerticalScrollIndicator={false}
-                  showsHorizontalScrollIndicator={false}
-                  snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-                  snapToAlignment="start"
-                  decelerationRate="fast"
-                />
-              </View>
-
-
+        }}>
+        {SameScreenId ? (
+          <View style={{flex: 1, marginTop: Platform.OS == 'ios' ? -80 : -40}}>
+            <SameProduct subId={SameScreenId} />
+          </View>
+        ) : (
+          <View>
+            <View style={{}}>
               <FlatList
-                data={featureData}
+                horizontal
+                data={banner}
+                renderItem={renderItem}
                 keyExtractor={(item, index) => index?.toString()}
-                renderItem={renderItemNewList}
-                columnWrapperStyle={{ justifyContent: "space-between", marginBottom: 15 }}
-                numColumns={2}
+                showsHorizontalScrollIndicator={false}
+                pagingEnabled
+                snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
+                snapToAlignment="start"
+                decelerationRate="fast"
               />
+            </View>
 
+            <View style={{...styles.arrivalBox, marginTop: 15}}>
+              <Text style={styles.arrivalTxt}>{t('the_categories')}</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('AllProducts')}>
+                <Text style={styles.viewTxt}>{t('view_all')}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={{}}>
+              <FlatList
+                horizontal
+                data={getCategoies}
+                keyExtractor={(item, index) => index?.toString()}
+                renderItem={renderCategories}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
+                snapToAlignment="start"
+                decelerationRate="fast"
+              />
+            </View>
+
+            <FlatList
+              data={featureData}
+              keyExtractor={(item, index) => index?.toString()}
+              renderItem={renderItemNewList}
+              columnWrapperStyle={{
+                justifyContent: 'space-between',
+                marginBottom: 15,
+              }}
+              numColumns={2}
+            />
+
+            {zeroIndexBanner?.length > 0 && (
               <SliderDots
-                data={secBanners}
+                setSameScreenId={setSameScreenId}
+                data={zeroIndexBanner}
                 imageHeights={imageHeights}
               />
+            )}
 
-              <View style={{ flex: 1 }}>
-                <FlatList
-                  // horizontal
-                  data={arrivalData}
-                  keyExtractor={(item, index) => index?.toString()}
-                  renderItem={renderArrivalItem}
-                  showsVerticalScrollIndicator={false}
-                  showsHorizontalScrollIndicator={false}
-                  snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
-                  snapToAlignment="start"
-                  decelerationRate="fast"
-                />
-              </View>
-
+            <View style={{flex: 1}}>
+              <FlatList
+                // horizontal
+                data={arrivalData}
+                keyExtractor={(item, index) => index?.toString()}
+                renderItem={renderArrivalItem}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
+                snapToAlignment="start"
+                decelerationRate="fast"
+              />
             </View>
-        }
-
+          </View>
+        )}
       </ScrollView>
-
-
 
       <SearchModal
         setModalVisible={setModalVisible}
@@ -568,7 +500,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 0,
     marginBottom: 10,
-    width: "100%"
+    width: '100%',
   },
   arrivalTxt: {
     fontSize: 18,
@@ -638,22 +570,23 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   newCatContainer: {
-    width: "48%",
+    width: '48%',
     height: 150,
     borderRadius: 15,
-    overflow: "hidden"
+    overflow: 'hidden',
   },
   innerNewCatBox: {
-    position: "absolute",
-    left: "35%",
-    bottom: 10,
-    backgroundColor: "#00000050",
-    paddingHorizontal: 10,
-    borderRadius: 2
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    flex: 1,
   },
   txtNewCat: {
     fontSize: 13,
     color: color.white,
-    fontWeight: "500"
-  }
+    fontWeight: '500',
+    backgroundColor: '#00000050',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
 });
