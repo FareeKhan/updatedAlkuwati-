@@ -190,8 +190,8 @@ console.log('ssss',productObject)
 
   const sharePress = async () => {
     try {
-      const iosLink = `https://nextjs-sample-ten-cyan.vercel.app/productDetails/${id}`;
-      const androidLink = `https://nextjs-sample-ten-cyan.vercel.app/productDetails/productDetails/${id}`;
+      const iosLink = `https://app.alkwaityalawal.com/productDetails/${id}`;
+      const androidLink = `https://app.alkwaityalawal.com/productDetails/productDetails/${id}`;
       const shareLink = Platform.OS == 'ios' ? iosLink : androidLink;
       await Share.share({
         message: shareLink

@@ -6,7 +6,7 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:nextjs-sample-ten-cyan.vercel.app</string>
+		<string>applinks:app.alkwaityalawal.com</string>
 	</array>
 </dict>
 </plist>

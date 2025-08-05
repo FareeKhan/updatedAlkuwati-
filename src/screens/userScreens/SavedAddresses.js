@@ -28,6 +28,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import EmptyScreen from '../../components/EmptyScreen';
 import Feather from 'react-native-vector-icons/Feather';
 import CustomButton from '../../components/CustomButton';
+import { fonts } from '../../constants/fonts';
 
 const SavedAddresses = ({navigation, route}) => {
   const {t} = useTranslation();
@@ -36,7 +37,6 @@ const SavedAddresses = ({navigation, route}) => {
   const userAddress = useSelector(
     state => state?.customerAddress?.storeAddress,
   );
-  console.log('sss', Object?.keys(userAddress)?.length);
   const addressId = isAdd ? '' : userAddress?.addressId;
   const [data, setData] = useState();
   const [loader, setLoader] = useState(false);
@@ -319,16 +319,15 @@ const styles = StyleSheet.create({
     // marginVertical: 15
   },
   label: {
-    fontFamily: 'Montserrat-SemiBold',
-    fontWeight: '600',
     color: color.theme,
     textAlign: 'left',
     marginRight: 2,
+    fontFamily:fonts.medium
   },
   value: {
     color: color.grayShade,
-    fontWeight: '400',
-    fontFamily: 'Montserrat-Regular',
     textAlign: 'left',
+    fontFamily:fonts.regular
+
   },
 });

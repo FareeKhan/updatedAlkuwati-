@@ -33,10 +33,10 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="nextjs-sample-ten-cyan.vercel.app" android:pathPattern="/productDetails/.*" />
-                <!-- <data android:scheme="https" android:host="nextjs-sample-ten-cyan.vercel.app" android:pathPattern="/app/" /> -->
+                <data android:scheme="https" android:host="app.alkwaityalawal.com" android:pathPattern="/productDetails/.*" />
+                <!-- <data android:scheme="https" android:host="app.alkwaityalawal.com" android:pathPattern="/app/" /> -->
 
-                <!-- <data android:scheme="https" android:host="nextjs-sample-ten-cyan.vercel.app" android:pathPrefix="/productDetails" /> -->
+                <!-- <data android:scheme="https" android:host="app.alkwaityalawal.com" android:pathPrefix="/productDetails" /> -->
             </intent-filter>
       </activity>
 

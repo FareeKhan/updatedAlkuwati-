@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyBRuDnpEQarAm8Bvi9PZt9VCXeFb8Cs0mY</string>
+	<string>AIzaSyCwse2cTCOMMwPwis8q271zTj35BU-zTtU</string>
 	<key>GCM_SENDER_ID</key>
-	<string>190364361983</string>
+	<string>427159766490</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>org.reactjs.native.cyberpixel.kuwaiti</string>
 	<key>PROJECT_ID</key>
-	<string>alkwaity-1ab13</string>
+	<string>kuwati-app</string>
 	<key>STORAGE_BUCKET</key>
-	<string>alkwaity-1ab13.firebasestorage.app</string>
+	<string>kuwati-app.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:190364361983:ios:350d2e9deee24f5d9e18ca</string>
+	<string>1:427159766490:ios:65e4b624866f082f9d6ce3</string>
 </dict>
 </plist>

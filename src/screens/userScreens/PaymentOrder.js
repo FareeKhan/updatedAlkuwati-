@@ -1,6 +1,4 @@
 import {
-  FlatList,
-  Image,
   Platform,
   ScrollView,
   I18nManager,
@@ -8,17 +6,12 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Share,
-  Linking,
-  Alert,
 } from 'react-native';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ExportSvg from '../../constants/ExportSvg';
 import { color } from '../../constants/color';
 import { paymentMethodCard } from '../../constants/data';
-import PaymentModal from '../../components/PaymentModal';
 import {
-  addShippingAddress,
   orderConfirmed,
   tokenPrice,
   userShippingAddress,
@@ -31,16 +24,12 @@ import {
 } from '../../redux/reducer/ProductAddToCart';
 import HeaderLogo from '../../components/HeaderLogo';
 import { personalData } from '../../services/UserServices';
-import RBSheet from '@poki_san/react-native-bottom-sheet';
-import MFPaymentCyber from '../../FatoorahPayment/MFPaymentCyber';
 import CustomButton from '../../components/CustomButton';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { baseUrl } from '../../constants/data';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import CustomLoader from '../../components/CustomLoader';
-import { storeUserAddress } from '../../redux/reducer/UserShippingAddress';
 import { fonts } from '../../constants/fonts';
 import MyFatoorahPayment from '../../components/MyFatoorahPayment';
 const PaymentOrder = ({ navigation, route }) => {
@@ -49,14 +38,9 @@ const PaymentOrder = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const userId = useSelector(state => state.auth?.userId);
-  const reduxAddress = useSelector((item) => item?.customerAddress?.storeAddress)
-  const { totalPrice } = useSelector(state => state.cartProducts);
-  console.log('datadatadata',data)
-
   const refRBSheet = useRef(null);
   const { t } = useTranslation();
 
-  const getSummaryAmount = totalPrice;
 
   const [modalVisible, setModalVisible] = useState(false);
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
@@ -73,6 +57,7 @@ const PaymentOrder = ({ navigation, route }) => {
   const userAddress = useSelector(
     state => state?.customerAddress?.storeAddress,
   );
+  console.log('==--',typeof userAddress?.addressId)
 
   const [SupportURL, setSupportURL] = useState();
 
@@ -115,22 +100,9 @@ const PaymentOrder = ({ navigation, route }) => {
 
   useEffect(() => {
     getShippingAddress();
-    getuser_details();
+    // getuser_details();
     profileData();
   }, []);
-
-  const OpenURLButton = useCallback(async url => {
-    // Checking if the link is supported for links with custom URL scheme.
-    const supported = await Linking.canOpenURL(url);
-
-    if (supported) {
-      // Opening the link with some app, if the URL scheme is "http" the web link should be opened
-      // by some browser in the mobile
-      await Linking.openURL(url);
-    } else {
-      Alert.alert(`Don't know how to open this URL: ${url}`);
-    }
-  });
 
   useEffect(() => {
     if (getToken?.token !== undefined) {
@@ -180,10 +152,6 @@ const PaymentOrder = ({ navigation, route }) => {
     const productNo = data?.length;
     setCashLoader(true)
     try {
-      //selectedPayment
-
-      //console.log(email, "PPPOPOP");
-      //console.log(userAddress, "PPP");
 
       const getuserId = userId ? userId : 0;
 
@@ -223,32 +191,6 @@ const PaymentOrder = ({ navigation, route }) => {
       console.log(error);
     }
   };
-
-  // useEffect(() => {
-  //   if(address?.length == 0){
-  //   handlePress()
-  //   console.log('=-=--=-=')
-  //   }
-  // }, [])
-
-  const handlePress = async () => {
-    const response = await addShippingAddress(reduxAddress, userId)
-    try {
-      if (response?.data) {
-        dispatch(
-          storeUserAddress({
-            ...reduxAddress,
-            addressId: response.data.id,
-          }),
-        );
-
-      }
-    } catch (error) {
-      console.log('naswaar', error)
-    }
-  }
-
-
 
 
   return (
@@ -310,7 +252,7 @@ const PaymentOrder = ({ navigation, route }) => {
 
 
         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 20 }}>
-          <Text style={{ fontSize: 15, color: '#AAA' }}>
+          <Text style={{ fontSize: 15, color: '#AAA',fontFamily:fonts.medium }}>
             {t('total_price')}
           </Text>
           <Text style={styles.bottomPrice}>KD{FinalTotal}</Text>

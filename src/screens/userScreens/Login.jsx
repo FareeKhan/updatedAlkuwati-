@@ -418,7 +418,7 @@ const Login = ({ navigation, route }) => {
                                     alignItems: 'center',
                                     borderBottomWidth: 1,
                                     borderBottomColor: '#ccc',
-                                    paddingBottom: 10,
+                                    paddingBottom: I18nManager.isRTL ? 0 : 10,
                                     gap: 5
 
                                 }}>
@@ -433,7 +433,7 @@ const Login = ({ navigation, route }) => {
                                     }}
                                     autoCorrect={false}
                                     maxLength={10}
-                                    style={{ color: "#000" }}
+                                    style={{ color: "#000" ,fontFamily:fonts.regular,width:"90%",textAlign:"left" }}
                                     placeholderTextColor={'#cecece'}
 
                                 />
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         backgroundColor: color.theme,
         borderRadius: 50,
-        marginTop: 15
+        marginTop: 40
     },
     subTitle: {
         fontSize: 13,

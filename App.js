@@ -122,8 +122,8 @@ useEffect(() => {
 
   const linking = {
     prefixes: Platform.select({
-      ios: ['https://nextjs-sample-ten-cyan.vercel.app'],
-      android: ['https://nextjs-sample-ten-cyan.vercel.app/productDetails'],
+      ios: ['https://app.alkwaityalawal.com'],
+      android: ['https://app.alkwaityalawal.com/productDetails'],
     }),
     config: {
       screens: {

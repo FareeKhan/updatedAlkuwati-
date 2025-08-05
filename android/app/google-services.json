@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "190364361983",
-    "project_id": "alkwaity-1ab13",
-    "storage_bucket": "alkwaity-1ab13.firebasestorage.app"
+    "project_number": "427159766490",
+    "project_id": "kuwati-app",
+    "storage_bucket": "kuwati-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:190364361983:android:1f874ce9efddf74d9e18ca",
+        "mobilesdk_app_id": "1:427159766490:android:3f1b1cad5117d0609d6ce3",
         "android_client_info": {
           "package_name": "com.alkwaityalawal"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAFfkSvq-BfcISTRZLdflKlYjxlRy1TpeU"
+          "current_key": "AIzaSyBoskC_UDwDb5wnPLf44LQQfQ7_o6dhwj0"
         }
       ],
       "services": {

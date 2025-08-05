@@ -258,9 +258,6 @@ const HomeScreen = ({navigation}) => {
               marginTop: 5,
               textAlign: 'center',
             }}>
-              {
-
-              }
             {I18nManager.isRTL?  item?.name : item?.name_en  || item?.name}
           </Text>
         </AnimatedPressButton>

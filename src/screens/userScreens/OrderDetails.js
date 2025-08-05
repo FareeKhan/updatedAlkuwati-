@@ -34,7 +34,8 @@ import Text from '../../components/CustomText';
 import {fonts} from '../../constants/fonts';
 import {showMessage} from 'react-native-flash-message';
 import SmallImageLoader from '../../components/SmallImageLoader';
-import { storeUserAddress } from '../../redux/reducer/UserShippingAddress';
+import {storeUserAddress} from '../../redux/reducer/UserShippingAddress';
+import HeaderBox from '../../components/HeaderBox';
 const OrderDetails = ({navigation, route}) => {
   //const { totalPrice } = route?.params
   const dispatch = useDispatch();
@@ -270,9 +271,12 @@ const OrderDetails = ({navigation, route}) => {
         message: t('noAvailable'),
       });
 
-      navigation.navigate("Login")
+      navigation.navigate('Login');
     }
   };
+
+
+
 
   return (
     <View style={styles.mainContainer}>
@@ -290,6 +294,10 @@ const OrderDetails = ({navigation, route}) => {
         </TouchableOpacity>
         <HeaderLogo />
       </View>
+
+
+
+
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <Text style={[styles.productName]}>{t('delivery_address')}</Text>
         {address?.length !== 0 && userId && (
@@ -318,7 +326,7 @@ const OrderDetails = ({navigation, route}) => {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{paddingHorizontal: 4, paddingBottom: 70}}>
-        {address?.length == 0 || Object.keys(userAddress || {}).length === 0 ?  (
+        {address?.length == 0 || Object.keys(userAddress || {}).length === 0 ? (
           <TouchableOpacity
             onPress={() => onPressEmptyAddress()}
             style={styles.addCardBox}>
@@ -335,19 +343,10 @@ const OrderDetails = ({navigation, route}) => {
         ) : (
           <View>
             <View style={styles.userAddressBox}>
-               <AddressLine
-                    label={t('house')}
-                    value={userAddress?.house}
-                  />
+              <AddressLine label={t('house')} value={userAddress?.house} />
 
-                    <AddressLine
-                    label={t('city')}
-                    value={userAddress?.city}
-                  />
-                   <AddressLine
-                    label={t('street')}
-                    value={userAddress?.street}
-                  />
+              <AddressLine label={t('city')} value={userAddress?.city} />
+              <AddressLine label={t('street')} value={userAddress?.street} />
               {userAddress?.country == t('Kuwait') ? (
                 <>
                   <AddressLine
@@ -485,18 +484,28 @@ const OrderDetails = ({navigation, route}) => {
               </View>
             )}
 
-            <View
-              style={{width: '100%', height: 1, backgroundColor: '#ececec'}}
-            />
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <CustomText>{t('total')}</CustomText>
-              <CustomText>KD {FinalTotal}</CustomText>
-            </View>
+            {Object?.keys(userAddress)?.length !== 0 &&
+            userAddress !== undefined ? (
+              // Object?.keys(userAddress)?.length !== 0 || userAddress !== undefined &&
+              <>
+                <View
+                  style={{width: '100%', height: 1, backgroundColor: '#ececec'}}
+                />
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <CustomText>{t('total')}</CustomText>
+                  <CustomText>KD {FinalTotal}</CustomText>
+                </View>
+              </>
+            ) : (
+              ''
+            )}
+
             <TouchableOpacity
               style={{
                 ...styles.bottomPlaceOrderBox,
@@ -525,8 +534,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
-    marginTop: 15,
-    width: '70%',
+    marginTop: Platform.OS == 'ios'?25 : 10,
+    width: '65%',
     justifyContent: 'space-between',
   },
   logoBox: {

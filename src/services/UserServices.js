@@ -311,6 +311,7 @@ export const orderConfirmed = async (
           full_name: address?.fullName,
           phone_number: address?.phone,
           user_id: userID,
+          user_address_id:address?.addressId ,
           order_status: 'confirmed',
           payment_status: 'pending',
           paymentType: token_obj,
@@ -333,7 +334,7 @@ export const orderConfirmed = async (
     });
 
     const result = await response.json();
-    console.error(result, 'sdddsd');
+    console.log(result, 'sdddsd');
     return result;
   } catch (e) {
     console.log('oo', e);
