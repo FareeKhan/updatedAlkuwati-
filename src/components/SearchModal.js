@@ -134,6 +134,7 @@ const SearchModal = ({ setModalVisible, modalVisible, navigation }) => {
                                     renderItem={({ item }) => {
                                         return (
                                             <SingleProductCard
+                                            isShowPlusIcon={true}
                                                 isDot={false}
                                                 item={item}
                                                 setModalVisible={setModalVisible}

@@ -201,6 +201,16 @@
 "additionalInfo": "Additional info (Optional)",
 "area": "Area",
 "fillAll": "Please fill all the fields",
-"addAddress": "Please add the address"
+"addAddress": "Please add the address",
+    "PleaseEnterno":"Please Enter Phone No",
+          "enterCorrectPhoneNumber":"Enter Correct Phone Number",
+          "sendSuccess":"OTP sent successfully",
+    "WrongOtp":"The OTP you entered is not correct",
+    "pleaseEnterCode":"Please Enter OTP",
+
+
+
+
+
 
 }

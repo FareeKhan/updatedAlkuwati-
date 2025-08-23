@@ -238,22 +238,6 @@ const UserProfile = ({navigation}) => {
       {text: t('OK'), onPress: () => LogoutPress()},
     ]);
 
-  // const handleWhatsapp = () => {
-  //   // const email = 'info@alkwaityalawal.com';
-  //   // const subject = 'Hello';
-  //   // const body = 'I would like to get in touch with you.';
-
-  //   // const mailUrl = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-  //   // Linking.openURL(mailUrl).catch(err => {
-  //   //   Alert.alert('Error', 'Could not open mail app.');
-  //   //   console.error('Email error:', err);
-  //   // });
-  //   const mobileNo ='+971554087425'
-  //   const whatsappNo = `https://api.whatsapp.com/send/?phone=${mobileNo}`
-  //   Linking.openURL(whatsappNo)
-
-  // };
 
   const handleWhatsapp = () => {
     // const mobileNo = '+971554087425';
@@ -306,7 +290,6 @@ const UserProfile = ({navigation}) => {
               {userId && (
                 <Text style={styles.userEmail}>
                   {'\u202A'}
-                  {countryCode}
                   {userPhone}
                   {'\u202C'}
                 </Text>

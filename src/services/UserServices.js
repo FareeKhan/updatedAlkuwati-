@@ -1,6 +1,54 @@
 import {I18nManager} from 'react-native';
 import {baseUrl} from '../constants/data';
 
+
+export const loginPhoneNo = async (phoneNo) => {
+    try {
+        const response = await fetch(`${baseUrl}/customer/send-otp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify({
+                "phone": phoneNo,
+                "token": 'thisisFcmToken',
+            })
+        });
+
+        const result = await response.json();
+        return result;
+    } catch (e) {
+        console.log('oo', e)
+    }
+};
+
+
+export const otpVerification = async (phoneNo,value) => {
+    console.log(phoneNo,value)
+    try {
+        const response = await fetch(`${baseUrl}/customer/verify-otp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify({
+                phone:phoneNo,
+                otp: value,
+                token: 'FCNToken'
+            })
+        });
+
+        const result = await response.json();
+        return result;
+    } catch (e) {
+        console.log('oo', e)
+    }
+};
+
+
+
 export const homeBanner = async () => {
   try {
     const response = await fetch(`${baseUrl}/getBanners`, {

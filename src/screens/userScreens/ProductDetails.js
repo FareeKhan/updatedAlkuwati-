@@ -520,7 +520,7 @@ const styles = StyleSheet.create({
     flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
     justifyContent: 'space-between',
     backgroundColor: color.theme,
-    paddingVertical: 12,
+    paddingVertical: 5,
     borderRadius: 8,
     paddingHorizontal: 10,
     alignItems: 'center',

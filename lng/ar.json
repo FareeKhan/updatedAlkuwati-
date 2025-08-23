@@ -10,6 +10,8 @@
   "price_range": "نطاق السعر",
   "videoSection": "قسم الفيديو",
   // "categories": "الاقسام",
+  "PleaseEnterno": "يرجى إدخال رقم الهاتف",
+  "enterCorrectPhoneNumber": "يرجى إدخال رقم هاتف صحيح",
   "categories": "الفئات",
   "sorting": "الترتيب",
   "apply": "تطبيق",
@@ -38,7 +40,7 @@
   "total_price": "السعر الإجمالي",
   "place_order": "إتمام الطلب",
   "continue": "متابعة",
-  "send": "إرسال",
+  "Send": "إرسال",
   "payment": "الدفع",
   "history": "السجل",
   "order_placed": "تم تقديم الطلب",
@@ -48,7 +50,7 @@
   "language": "اللغة",
   "emailTxt": "البريد الإلكتروني",
   "no_order": "لا يوجد طلبات",
-  "verify": "التحقق",
+  "Verify": "التحقق",
   "DidntRcvcode": "لم تستلم الرمز؟",
   "otp": "رمز التحقق",
   "enterDigits": "أدخل الرمز المكون من 4 أرقام المرسل إليك على",
@@ -190,6 +192,9 @@
 "area": "المنطقة",
 
 "avenues": "الجادة",
+"sendSuccess": "تم إرسال رمز التحقق بنجاح",
+"WrongOtp": "رمز التحقق الذي أدخلته غير صحيح",
 
+"pleaseEnterCode": "يرجى إدخال رمز التحقق"
 
 }

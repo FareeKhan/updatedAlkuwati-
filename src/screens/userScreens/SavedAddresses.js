@@ -44,6 +44,8 @@ const SavedAddresses = ({navigation, route}) => {
 
   const dispatch = useDispatch();
 
+  console.log('userIduserIduserIduserId',userId)
+
   useFocusEffect(
     useCallback(() => {
       getShippingAddress(true);
