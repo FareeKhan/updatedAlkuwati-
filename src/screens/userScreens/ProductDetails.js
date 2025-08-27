@@ -73,6 +73,7 @@ const ProductDetails = ({ navigation, route }) => {
     return '';
   };
 
+
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, gestureState) => {
@@ -93,6 +94,7 @@ const ProductDetails = ({ navigation, route }) => {
       isMountedRef.current = false;
     };
   }, []);
+
 
   const getProductDetail = async () => {
     setIsLoader(true);
@@ -154,14 +156,15 @@ const ProductDetails = ({ navigation, route }) => {
   };
 
 
-console.log('ssss',productObject)
+
   const addToCart = () => {
     dispatch(
       addProductToCart({
         id: id,
         odo_id: productObject?.odoo_id,
+        varID: selectedVariant?.id,
         productName: productObject?.name,
-        price: productObject?.price,
+        price:selectedVariant?.price ? selectedVariant?.price : productObject?.price,
         size: selectedSize,
         counter: productOrder,
         Variants: selectedAttributes ? selectedAttributes : '',
@@ -255,9 +258,9 @@ console.log('ssss',productObject)
     (selectedVariant && selectedVariant?.stock_quantity == 0) ||
     selectedVariant == undefined;
 
-  if (isLoader || !imagesPreloaded) {
-    return <ScreenLoader />;
-  }
+  // if (isLoader || !imagesPreloaded) {
+  //   return <ScreenLoader />;
+  // }
 
   return (
     <SafeAreaView style={styles.mainContainer}>

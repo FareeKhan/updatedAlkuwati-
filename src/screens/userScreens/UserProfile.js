@@ -50,18 +50,11 @@ const UserProfile = ({navigation}) => {
   const isCheckAvailableName = userDataFromRedux?.find(
     item => item?.phoneUserNumber == phoneUserNumber,
   );
-  // const userName = useSelector((state) => state.customerAddress?.storeAddress?.fullName);
 
-  // const userName = useSelector((state) => state.customerAddress?.storeAddress?.fullName);
   const {t} = useTranslation();
-  const [userData, setUserData] = useState('');
-  const [getName, setName] = useState();
   const [storeOrder, setStoreOrder] = useState([]);
   const [isLoader, setIsLoader] = useState(false);
-  const [profileLoader, setProfileLoader] = useState(false);
-  const [SupportURL, setSupportURL] = useState();
   const isLanguage = useSelector(state => state.auth?.isLanguage);
-
 
   const UserNavigation = ({SVG, title, onPress, lng  }) => {
     return (
@@ -113,32 +106,6 @@ const UserProfile = ({navigation}) => {
     }
   };
 
-
-
-  // const onPressLanguage = async (value) => {
-  //   setIsSelectedLang(value);
-
-  //   dispatch(
-  //     changeLanguage({
-  //       isLanguage: value,
-  //     })
-  //   );
-
-  //   if (value !== isSelectedLang) {
-  //     setlng(value);
-  //     if (value !== "en") {
-  //       I18nManager.forceRTL(true);
-  //       setTimeout(() => {
-  //         RNRestart.Restart();
-  //       }, 100);
-  //     } else {
-  //       I18nManager.forceRTL(false);
-  //       setTimeout(() => {
-  //         RNRestart.Restart();
-  //       }, 100);
-  //     }
-  //   }
-  // };
   const onPressLanguage = async  => {
     const isChangeLanguage = isLanguage == 'en' ? 'ar' : 'en'
     console.log('isLanguage',isChangeLanguage)
@@ -159,68 +126,12 @@ const UserProfile = ({navigation}) => {
         setTimeout(() => {
             RNRestart.Restart();
         }, 800);
-
-    // if (value === 'ar') {
-    //    console.log('Setting RTL');
-    //   I18nManager.allowRTL(true);
-    //   I18nManager.forceRTL(true);
-    // } else {
-    //     console.log('Setting LTR');
-    //   I18nManager.allowRTL(false); 
-    //   I18nManager.forceRTL(false); 
-    // }
-
-    // setTimeout(() => {
-    //   console.log('Restarting App...');
-    //   RNRestart.Restart();
-    // }, 500);
   };
-
-  const OpenURLButton = useCallback(async url => {
-    // Checking if the link is supported for links with custom URL scheme.
-    const supported = await Linking.canOpenURL(url);
-
-    if (supported) {
-      // Opening the link with some app, if the URL scheme is "http" the web link should be opened
-      // by some browser in the mobile
-      await Linking.openURL(url);
-    } else {
-      Alert.alert(`Don't know how to open this URL: ${url}`);
-    }
-  });
 
   useEffect(() => {
     orderData();
   }, [userId]);
 
-  const profileData = async () => {
-    setProfileLoader(true);
-    try {
-      const response = await personalData(userId);
-      console.log('responsekljjkljklj', response);
-      if (response?.status) {
-        setUserData(response?.data);
-        setProfileLoader(false);
-      }
-    } catch (error) {
-      setProfileLoader(false);
-      console.log(error);
-    } finally {
-      setProfileLoader(false);
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      profileData();
-    });
-
-    return unsubscribe;
-  }, [navigation]);
-
-  const setImage = name => {
-    setName(name.substring(0, 1));
-  };
 
   const LogoutPress = () => {
     dispatch(logout());
@@ -339,7 +250,40 @@ const UserProfile = ({navigation}) => {
                       })
                     }
                   />
-                  <TouchableOpacity
+              
+                </>
+              )}
+              <UserNavigation
+                SVG={
+                  <View
+                    style={{
+                      width: 40,
+                      height: 40,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: '#cecece90',
+                      borderRadius: 7,
+                    }}>
+                    <Fontisto
+                      name={'world-o'}
+                      size={25}
+                      color={'#67300f'}
+                      styles={{}}
+                    />
+                  </View>
+                }
+                title={t('language')}
+                lng={true}
+                onPress={() =>  onPressLanguage()  }
+              />
+
+              
+
+           
+
+         
+                <>
+                    <TouchableOpacity
                     onPress={() => handleWhatsapp()}
                     style={styles.userContainer}>
                     <View
@@ -508,33 +452,11 @@ const UserProfile = ({navigation}) => {
                       <ExportSvg.RightArrow style={{marginLeft: 'auto'}} />
                     )}
                   </TouchableOpacity>
-                </>
-              )}
-              <UserNavigation
-                SVG={
-                  <View
-                    style={{
-                      width: 40,
-                      height: 40,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: '#cecece90',
-                      borderRadius: 7,
-                    }}>
-                    <Fontisto
-                      name={'world-o'}
-                      size={25}
-                      color={'#67300f'}
-                      styles={{}}
-                    />
-                  </View>
-                }
-                title={t('language')}
-                lng={true}
-                onPress={() =>  onPressLanguage()  }
-              />
 
-              {userId && (
+
+
+
+   {userId && (
                 <>
                   <TouchableOpacity
                     onPress={LogoutPress}
@@ -614,9 +536,12 @@ const UserProfile = ({navigation}) => {
                 </>
               )}
 
-              {!userId && (
-                <>
-                  <TouchableOpacity
+
+
+
+              {
+                !userId && 
+                    <TouchableOpacity
                     onPress={() => navigation.navigate('Login')}
                     style={styles.userContainer}>
                     <View
@@ -654,8 +579,8 @@ const UserProfile = ({navigation}) => {
                       <ExportSvg.RightArrow style={{marginLeft: 'auto'}} />
                     )}
                   </TouchableOpacity>
+              }
                 </>
-              )}
             </View>
           </ScrollView>
         </>

@@ -116,7 +116,7 @@ const MyFatoorahPayment = ({ modalVisible, setModalVisible ,confirmOrder,totalPr
 
     const pay = async () => {
         // var executePaymentRequest = new MFExecutePaymentRequest(10);
-        var executePaymentRequest = new MFExecutePaymentRequest();
+        var executePaymentRequest = new MFExecutePaymentRequest(totalPrice);
         executePaymentRequest.sessionId = sessionId ?? '';
 
         await cardPaymentView

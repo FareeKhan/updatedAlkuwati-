@@ -41,6 +41,7 @@ import SliderDots from '../../components/SliderDots';
 import ScreenLoader from '../../components/ScreenLoader';
 import SameProduct from './SameProduct';
 import FastImage from 'react-native-fast-image';
+import { locationPermission } from '../../constants/helper';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -72,6 +73,7 @@ const HomeScreen = ({navigation}) => {
 
   useEffect(() => {
     fetchAllApi();
+    locationPermission()
   }, []);
 
   const fetchAllApi = async () => {
@@ -154,7 +156,7 @@ const HomeScreen = ({navigation}) => {
             //   subC_ID: item?.id,
             // })
 
-            setSameScreenId(item?.category_id)
+            setSameScreenId(item?.link_category)
           }>
           <View style={[styles.item, {marginHorizontal: ITEM_MARGIN * 0.1}]}>
             <ImageBackground
@@ -266,6 +268,7 @@ const HomeScreen = ({navigation}) => {
   };
 
   const renderItemNewList = ({item, index}) => {
+ 
     return (
       <TouchableOpacity
         // onPress={() => navigation.navigate('SameProduct', {

@@ -9,6 +9,7 @@ import {
   I18nManager,
   Modal,
   Dimensions,
+  Linking,
 } from 'react-native';
 import React, {useEffect, useRef, useState} from 'react';
 import {color} from '../../constants/color';
@@ -30,7 +31,6 @@ import CustomDropDown from '../../components/CustomDropDown';
 import MapView, {Marker} from 'react-native-maps';
 import Entypo from 'react-native-vector-icons/Entypo';
 import EvilIcons from 'react-native-vector-icons/EvilIcons';
-import {LocationPermission} from '../../components/LocationPermission';
 import Geolocation from '@react-native-community/geolocation';
 const {height} = Dimensions.get('screen');
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
@@ -40,6 +40,7 @@ import Text from '../../components/CustomText';
 import {fonts} from '../../constants/fonts';
 import {showMessage} from 'react-native-flash-message';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { locationPermission } from '../../constants/helper';
 
 const ShippingAddress = ({navigation, route}) => {
   const {id, btnText, isMap} = route.params ?? '';
@@ -57,7 +58,8 @@ const ShippingAddress = ({navigation, route}) => {
   const filterName = userName?.find(
     item => item?.phoneUserNumber == phoneUserNumber,
   );
-  console.log('----->>>>>>');
+
+  console.log('----->>>>>>',filterName);
   const [modalVisible, setModalVisible] = useState(false);
   const [userAddress, setUserAddress] = useState();
 
@@ -93,7 +95,7 @@ const ShippingAddress = ({navigation, route}) => {
   }, []);
 
   const getCurrentLocation = async () => {
-    const result = await LocationPermission();
+    const result = await locationPermission();
     console.log('fareed', result);
     if (result == 'granted') {
       Geolocation.getCurrentPosition(
@@ -125,11 +127,20 @@ const ShippingAddress = ({navigation, route}) => {
         },
       );
     } else {
-      Alert.alert(t('PleaseAllow'));
-      showMessage({
-        type: 'warning',
-        message: t('PleaseAllow'),
-      });
+           Alert.alert(
+             'Alert',
+             'Kuwaiti needs access to your location',
+             [
+               {
+                 text: 'Open Setting',
+                 onPress: () => {navigation.goBack(),Linking.openSettings()},
+               },
+               {
+                 text: 'Later',
+                 onPress: () => navigation.goBack(),
+               },
+             ],
+           );
     }
   };
 
@@ -546,7 +557,7 @@ const ShippingAddress = ({navigation, route}) => {
                 bottom: Platform.OS == 'ios' ? 50 : 30,
               }}>
               <Text style={{color: '#fff', fontWeight: '500'}}>
-                {panLoader ? t('loading') + ' .....' : t('confirm')}
+                {panLoader ? t('loading') + '.....' : t('confirm')}
               </Text>
             </TouchableOpacity>
           </View>

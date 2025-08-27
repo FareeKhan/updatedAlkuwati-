@@ -314,33 +314,25 @@ export const orderConfirmed = async (
   delCharges,
   discount,
   finalPrice,
+  fullName
 ) => {
+
   const orderDetails = data?.map((item, index) => ({
     id: item?.id,
-    image: item?.image,
     name: item?.productName,
     price: parseFloat(item?.price),
+    quantity: item?.counter,
+    image: item?.image,
     additional_price: 0,
     size: item?.size,
     color: 0,
-    quantity: item?.counter,
     title: item?.subText,
-    v_id: 1,
+    v_id: item?.varID,
     psize_price: 0,
     psize: 0,
     pcolor: 0,
+    odoo_id:item?.odo_id
   }));
-    // "id": "790",
-    //         "name": "ألعاب الطاولة الصغيرة لكرة السلة",
-    //         "price": 2.75,
-    //         "quantity": 1,
-    //         "image": "https://backend.alkwaityalawl.com/api/odoo/show-image?url=%2Fweb%2Fimage%2Fproduct.template%2F19466%2Fimage_1920",
-    //         "title": "0...",
-    //         "psize": "",
-    //         "psize_price": 0,
-    //         "pcolor": "",
-    //         "v_id": 0,
-    //         "odoo_id": 46775
 
   try {
     const response = await fetch(`${baseUrl}/order/store`, {
@@ -356,7 +348,7 @@ export const orderConfirmed = async (
           email: 'order@gmail.com',
           products: productNo,
           address: address?.city + ',' + address?.area + ',' + address?.country,
-          full_name: address?.fullName,
+          full_name: fullName|| 'test',
           phone_number: address?.phone,
           user_id: userID,
           user_address_id:address?.addressId ,
@@ -382,7 +374,7 @@ export const orderConfirmed = async (
     });
 
     const result = await response.json();
-    console.log(result, 'sdddsd');
+    console.log('sdddsd----',result, 'sdddsd');
     return result;
   } catch (e) {
     console.log('oo', e);

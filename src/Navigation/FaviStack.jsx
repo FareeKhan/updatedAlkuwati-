@@ -12,6 +12,7 @@ import TrackOrder from '../screens/userScreens/TrackOrder';
 import { createStackNavigator } from '@react-navigation/stack';
 import SameProduct from '../screens/userScreens/SameProduct';
 import ProductDetails from '../screens/userScreens/ProductDetails';
+import HomeScreen from '../screens/userScreens/HomeScreen';
 
 
 const Stack = createStackNavigator();
@@ -40,6 +41,8 @@ export const FaviStack = () => {
             <Stack.Screen   name="MyCart" component={MyCart} options={{ headerShown: false }}   />
             <Stack.Screen name="UserProfile" component={UserProfile} />
             <Stack.Screen name="TrackOrder" component={TrackOrder} />
+            <Stack.Screen name="HomeScreen" component={HomeScreen} />
+
         </Stack.Navigator>
     )
 }

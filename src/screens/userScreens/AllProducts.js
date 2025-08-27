@@ -62,7 +62,6 @@ const AllProducts = ({navigation}) => {
     setIsLoader(true);
     try {
       const response = await categoriesList();
-      console.log('===>>>', response);
       if (response?.status) {
         setIsLoader(false);
         setStoreCat(response?.data);

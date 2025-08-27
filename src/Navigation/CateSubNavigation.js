@@ -45,7 +45,6 @@ const CateSubNavigation = ({ subCates, isactive,navigation,setStateValue }) => {
     
 
     const _renderContent = (section, index) => {
-        console.log('===>>',section)
         return (
             <View style={styles.content}>
                 {section?.sub ? (
@@ -69,8 +68,6 @@ const CateSubNavigation = ({ subCates, isactive,navigation,setStateValue }) => {
     const _updateSections = (activeSections) => {
         setActiveSections(activeSections);
     };
-
-    console.log('subCatessubCatessubCates',subCates)
 
     return (
         <View style={styles.container}>

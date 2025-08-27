@@ -17,12 +17,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {color} from '../../constants/color';
 import {
   deleteAddress,
-  editAddress,
   userShippingAddress,
 } from '../../services/UserServices';
-import {storeUserAddress} from '../../redux/reducer/UserShippingAddress';
+import {emptyStoreUserAddress, storeUserAddress} from '../../redux/reducer/UserShippingAddress';
 import {useTranslation} from 'react-i18next';
-import {Swipeable} from 'react-native-gesture-handler';
 import ScreenLoader from '../../components/ScreenLoader';
 import {useFocusEffect} from '@react-navigation/native';
 import EmptyScreen from '../../components/EmptyScreen';
@@ -37,33 +35,47 @@ const SavedAddresses = ({navigation, route}) => {
   const userAddress = useSelector(
     state => state?.customerAddress?.storeAddress,
   );
-  const addressId = isAdd ? '' : userAddress?.addressId;
   const [data, setData] = useState();
   const [loader, setLoader] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(addressId);
+  const [selectedItem, setSelectedItem] = useState(userAddress?.addressId);
+
+
+  console.log('userAddressuserAddressuserAddress',Object.keys(userAddress).length)
 
   const dispatch = useDispatch();
-
-  console.log('userIduserIduserIduserId',userId)
 
   useFocusEffect(
     useCallback(() => {
       getShippingAddress(true);
     }, [userId]),
   );
-  console.log('====', userAddress);
 
   const getShippingAddress = async value => {
     setLoader(value);
     try {
       const response = await userShippingAddress(userId);
-      console.log('responseresponse', response);
       if (response?.data?.length > 0) {
         setData(response?.data);
         setLoader(false);
+        if(Object.keys(userAddress).length == 0){
+          const item = response?.data[0]
+              const addressredux = {
+      house: item?.house,
+      city: item?.city,
+      street: item?.street,
+      avenuePostal: item?.emirates,
+      fullName: item?.full_name,
+      governorate: item?.governorate,
+      phone: item?.phone?.slice(4),
+      country: item?.country,
+      addressId: item?.id,
+    };
+
+              dispatch(storeUserAddress(addressredux));
+        }
       } else {
         setData([]);
-        dispatch(storeUserAddress({}));
+        dispatch(emptyStoreUserAddress())
         setLoader(false);
       }
     } catch (error) {
@@ -78,7 +90,6 @@ const SavedAddresses = ({navigation, route}) => {
 
   const handleAddress = item => {
     setSelectedItem(item?.id);
-    console.log('hellot testing address', item);
     const addressredux = {
       house: item?.house,
       city: item?.city,
@@ -86,7 +97,7 @@ const SavedAddresses = ({navigation, route}) => {
       avenuePostal: item?.emirates,
       fullName: item?.full_name,
       governorate: item?.governorate,
-      phone: item?.phone,
+      phone: item?.phone?.slice(4),
       country: item?.country,
       addressId: item?.id,
     };
@@ -172,7 +183,7 @@ const SavedAddresses = ({navigation, route}) => {
 
           <AddressLine
             label={t('phoneNumber')}
-            value={`\u2066${item?.phone}\u2069`}
+            value={`${item?.phone?.slice(4)}`}
           />
           <AddressLine label={t('Country')} value={item?.country} />
         </View>

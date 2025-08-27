@@ -105,7 +105,6 @@ const Login = ({navigation, route}) => {
     },
   ];
 
-  const [getTextReSend, setTextReSend] = useState();
   const [phoneNo, setPhoneNo] = useState('');
   const [country, setCountry] = useState(
     I18nManager.isRTL ? countries_ar[0]?.label : countries_en[0]?.label,
@@ -182,7 +181,7 @@ const Login = ({navigation, route}) => {
         setIsShowOtp(true);
         showMessage({
           type: 'success',
-          message: t('sendSuccess'),
+          message: t('sendSuccess') + ' '+response?.otp,
           duration: 3000,
         });
       } else {
@@ -330,6 +329,7 @@ const Login = ({navigation, route}) => {
                   </Text>
                 </TouchableOpacity> */}
                 <CustomButton
+                 disabled={otpLoader}
                   onPress={() => confirmOTP()}
                   title={t('Verify')}
                   isLoader={otpLoader}
@@ -391,12 +391,9 @@ const Login = ({navigation, route}) => {
               </View>
             </View>
 
-            {/* <TouchableOpacity onPress={() => onPressSend()} style={styles.bottomPlaceOrderBox}> */}
-            {/* <TouchableOpacity onPress={() => onPressContinue()} style={styles.bottomPlaceOrderBox}>
-                            <Text style={[styles.orderTxt, { textAlign: 'center' }]}>{t("send")}</Text>
-                        </TouchableOpacity> */}
 
             <CustomButton
+              disabled={isLoader}
               title={t('Send')}
               isLoader={isLoader}
               style={{marginTop: 30}}

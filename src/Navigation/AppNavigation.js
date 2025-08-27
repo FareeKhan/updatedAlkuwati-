@@ -18,8 +18,6 @@ const AppNavigation = ({navigation}) => {
   const token = useSelector(state => state.auth.token);
   const isLanguage = useSelector(state => state.auth?.isLanguage);
 
-  console.log('=========>>>>>>>>>>', isLanguage);
-
   useEffect(() => {
     i18next.changeLanguage(isLanguage);
   }, [isLanguage]);
@@ -33,19 +31,6 @@ const AppNavigation = ({navigation}) => {
       }
     }, 1000);
   }, [isLanguage]);
-
-  // useEffect(() => {
-  //   i18next.changeLanguage(isLanguage);
-  // }, []);
-
-  //   useEffect(() => {
-
-  //   if (isLanguage == 'ar') {
-  //     I18nManager.forceRTL(true);
-  //     !I18nManager.isRTL && RNRestart.Restart()
-  //     // RNRestart.Restart()
-  //   }
-  // }, [isLanguage]);
 
   useEffect(() => {
     if (!token) {

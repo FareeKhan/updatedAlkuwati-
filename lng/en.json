@@ -209,7 +209,9 @@
     "pleaseEnterCode":"Please Enter OTP",
 
 
-
+  "PleasePromo": "Please enter the promo code",
+  "loginFavorite": "Please log in to add this product to your favorites",
+  "seeFavorite": "Log in to see your favorite products"
 
 
 

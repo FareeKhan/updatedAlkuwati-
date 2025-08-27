@@ -11,8 +11,12 @@ import { useTranslation } from 'react-i18next';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import HeaderBox from '../../components/HeaderBox'
 const MyFavorite = ({ navigation }) => {
+      const userId = useSelector(state => state.auth?.userId);
+    
     const favoriteData = useSelector((state) => state?.favorite?.AddInFavorite)
     const { t } = useTranslation();
+
+    console.log('ssfavoriteDatas',favoriteData)
 
     const renderItem = ({ item, index }) => {
         return (
@@ -20,7 +24,7 @@ const MyFavorite = ({ navigation }) => {
                 <SingleProductCard
                     isDot={false}
                     item={item}
-                    onPress={() => navigation.navigate('ProductDetails', { id: item?.pid })}
+                    onPress={() => navigation.navigate('ProductDetails', { id: item?.id })}
                 />
             </>
         )
@@ -28,21 +32,14 @@ const MyFavorite = ({ navigation }) => {
 
     return (
         <View style={styles.mainContainer}>
-            {/* <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Ionicons size={40} name={I18nManager.isRTL ? 'chevron-forward-circle' : 'chevron-back-circle'} color={color.theme} />
-                </TouchableOpacity>
-                <View style={{ marginLeft: "auto", marginRight: "auto" }}>
-                    <HeaderLogo />
-                </View>
-            </View> */}
-
             <HeaderBox
                 cartIcon={true}
                 style={{ marginTop: Platform.OS == 'ios'? 30:20, marginBottom: 20 }}
             />
 
             {
+                userId ? 
+
                 favoriteData?.length == 0 ?
                     <EmptyScreen
                         text={t("no_product_in_favorite")}
@@ -56,6 +53,10 @@ const MyFavorite = ({ navigation }) => {
                         numColumns={2}
                         contentContainerStyle={{ paddingBottom: 100 }}
                         columnWrapperStyle={{ justifyContent: "space-between", flexGrow: 1, }}
+                    />
+                    :
+                     <EmptyScreen
+                        text={t("seeFavorite")}
                     />
             }
 

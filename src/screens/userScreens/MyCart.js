@@ -41,7 +41,6 @@ const MyCart = ({ navigation }) => {
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const { t } = useTranslation();
   const { totalPrice } = useSelector(state => state.cartProducts);
-console.log('data',data)
 
   const incrementProduct = (stock,id) => {
     const checkStock = data?.find((item)=>item?.id == id)
@@ -58,9 +57,13 @@ console.log('data',data)
     dispatch(deleteProduct(id));
   };
 
+  console.log('data',data)
+
   const renderItem = ({ item, index }) => {
     return (
-      <View style={styles.productContainer}>
+      <TouchableOpacity onPress={()=>navigation.navigate('ProductDetails',{
+        id:item?.id
+      })} style={styles.productContainer}>
 
         <SmallImageLoader
           imagePath={item?.image}
@@ -69,7 +72,7 @@ console.log('data',data)
 
           <Text style={styles.productTitle}>{item?.productName}</Text>
           <Text style={styles.subTitle}>{item?.subText}</Text>
-           {
+             {
                     Object.entries(item?.Variants || {}).map(([key, value]) => {
                         if (key === "undefined" || value === undefined) return null;
                         return (
@@ -104,7 +107,7 @@ console.log('data',data)
             </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 

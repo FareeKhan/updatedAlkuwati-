@@ -15,9 +15,15 @@ import Video from 'react-native-video';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FastImage from 'react-native-fast-image';
+import { showMessage } from 'react-native-flash-message';
+import { useTranslation } from 'react-i18next';
 
 
 const ProductSlider = ({ variantArray, carouselRef, currentIndex, setSelectedVariant, selectedVariant, setCurrentIndex, data, setImgUrl, item, setSelectedImage, selectedImage }) => {
+   const {t} = useTranslation()
+   
+    const userId = useSelector(state => state.auth?.userId);
+ 
     const youtubeUrls = typeof item?.youtube_urls === 'string'
         ? JSON.parse(item.youtube_urls || '[]')
         : item?.youtube_urls || [];
@@ -52,13 +58,9 @@ const ProductSlider = ({ variantArray, carouselRef, currentIndex, setSelectedVar
         return "";
     }
 
-    // const handleSnapToItem = (index) => {
-    //     setCurrentIndex(index)
-    //     setSelectedImage(null)
-    // }
-
     const favoriteProduct = (item) => {
-        if (isFavorite) {
+if(userId){
+ if (isFavorite) {
             dispatch(removeFavorite({
                 id: item?.id
             }))
@@ -68,10 +70,16 @@ const ProductSlider = ({ variantArray, carouselRef, currentIndex, setSelectedVar
                 id: item?.id,
                 productName: item?.name,
                 description: removeHTMLCode(item?.description),
-                // image: item?.image_url
                 image: data[0]?.image_url
             }))
         }
+}else{
+     showMessage({
+            type:"warning",
+            message:t('loginFavorite')
+          })
+}
+       
     }
 
     const onStateChange = useCallback((state) => {

@@ -56,7 +56,7 @@ const CateThreeNavigation = ({ subCates, cate, navigation, setStateValue }) => {
     const _renderContent = (section) => {
         return (
             <View style={styles.content}>
-                <Text>dasdas</Text>
+                <Text>Empty</Text>
             </View>
         );
     };

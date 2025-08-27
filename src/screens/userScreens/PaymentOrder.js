@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef,  } from 'react';
 import ExportSvg from '../../constants/ExportSvg';
 import { color } from '../../constants/color';
 import { paymentMethodCard } from '../../constants/data';
@@ -34,6 +34,11 @@ import { fonts } from '../../constants/fonts';
 import MyFatoorahPayment from '../../components/MyFatoorahPayment';
 const PaymentOrder = ({ navigation, route }) => {
   const { subTotal, delCharges, discount, FinalTotal } = route?.params
+    const userName = useSelector(state => state.auth?.userData);
+      const userPhone = useSelector(state => state.auth?.mobile);
+const fullName =
+  userName?.find(item => item?.phoneUserNumber?.slice(4) == userPhone)?.fullName
+  || 'test';
 
   const dispatch = useDispatch();
   const data = useSelector(state => state.cartProducts?.cartProducts);
@@ -57,52 +62,6 @@ const PaymentOrder = ({ navigation, route }) => {
   const userAddress = useSelector(
     state => state?.customerAddress?.storeAddress,
   );
-  console.log('==--',typeof userAddress?.addressId)
-
-  const [SupportURL, setSupportURL] = useState();
-
-  const profileData = async () => {
-    try {
-      const response = await personalData(userId);
-      if (response?.status) {
-        setSupportURL(response?.supporturl);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const getuser_details = async () => {
-    const url = `${baseUrl}/getAppUsersById/${userId}`;
-
-    let config = {
-      method: 'get',
-      url: url,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization:
-          'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L21yLXRhYmxlLWFwaS8iLCJpYXQiOjE3MDIzMTUxMjYsImV4cCI6MTcwNDkwNzEyNiwiZGF0YSI6IjcifQ.Ai3W5TsMnGi7H0amVTL0wW8O1ACB6olOMy08dHj-yew',
-      },
-    };
-
-    axios
-      .request(config)
-      .then(response => {
-        if (response.data) {
-          setEmail(response.data.data.email);
-        }
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  };
-
-  useEffect(() => {
-    getShippingAddress();
-    // getuser_details();
-    profileData();
-  }, []);
 
   useEffect(() => {
     if (getToken?.token !== undefined) {
@@ -123,21 +82,6 @@ const PaymentOrder = ({ navigation, route }) => {
     }
   }, [paymentStatus]);
 
-  const getShippingAddress = async () => {
-    try {
-      const response = await userShippingAddress(userId);
-      if (response) {
-        setAddress(response?.data);
-      } else {
-        alert('something went wrong');
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-
-
   const paymentPress = payment => {
     setSelectedPayment(payment);
     if (payment == 1) {
@@ -152,9 +96,7 @@ const PaymentOrder = ({ navigation, route }) => {
     const productNo = data?.length;
     setCashLoader(true)
     try {
-
       const getuserId = userId ? userId : 0;
-
       const response = await orderConfirmed(
         productNo,
         userAddress,
@@ -164,6 +106,7 @@ const PaymentOrder = ({ navigation, route }) => {
         getToken,
         subTotal, delCharges, discount,
         FinalTotal,
+        fullName
 
       );
 
