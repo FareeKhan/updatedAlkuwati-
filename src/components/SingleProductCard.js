@@ -1,11 +1,9 @@
 import {
   ActivityIndicator,
-  Animated,
+  Animated as Anim,
   Dimensions,
   Easing,
   I18nManager,
-  Image,
-  ImageBackground,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -15,7 +13,8 @@ import ExportSvg from '../constants/ExportSvg';
 import {color} from '../constants/color';
 import {useDispatch, useSelector} from 'react-redux';
 import {productFavorite, removeFavorite} from '../redux/reducer/AddFavorite';
-import * as Animatable from 'react-native-animatable';
+import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
+
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 import {addProductToCart} from '../redux/reducer/ProductAddToCart';
 import {useNavigation} from '@react-navigation/native';
@@ -23,68 +22,38 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import Text from './CustomText';
 import {useTranslation} from 'react-i18next';
 import {productDetails} from '../services/UserServices';
-import LottieView from 'lottie-react-native';
-const {width} = Dimensions.get('screen');
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import FastImage from 'react-native-fast-image';
 import {fonts} from '../constants/fonts';
 import {showMessage} from 'react-native-flash-message';
+
+const {width} = Dimensions.get('screen');
 
 const SingleProductCard = ({
   item,
   index,
   isDot = true,
   onPress,
-  countList = 1,
   isShowPlusIcon,
-  setModalVisible,
   isPreloaded = false,
 }) => {
   const dispatch = useDispatch();
   const userId = useSelector(state => state.auth?.userId);
   const data = useSelector(state => state.cartProducts?.cartProducts);
   const favoriteList = useSelector(state => state?.favorite?.AddInFavorite);
-
   const navigation = useNavigation();
   const [loading, setLoading] = useState(!isPreloaded);
   const [isCartLoader, setIsCartLaoder] = useState(false);
   const [isStockLoader, setIsStockLoader] = useState(false);
-  const [isCheckStockIsAvaialable, setIsCheckStockIsAvailable] =
-    useState(false);
+  const [isCheckStockIsAvaialable, setIsCheckStockIsAvailable] = useState(false);
 
   const isCheck = data?.some(value => value?.id == item?.id);
-
   const isFavorite = favoriteList.some(favorite => favorite.id === item.id);
-
-  const animation = 'fadeInUp';
-  const durationInner = 1000;
-  const delayInner = 100;
 
   const {t} = useTranslation();
 
-  const favoriteProduct = item => {
-    if (userId) {
-      if (isFavorite) {
-        dispatch(
-          removeFavorite({
-            id: item?.id,
-          }),
-        );
-        ReactNativeHapticFeedback.trigger('impactLight');
-      } else {
-        ReactNativeHapticFeedback.trigger('notificationError');
-        dispatch(productFavorite(item));
-      }
-    }else{
-      showMessage({
-        type:"warning",
-        message:t('loginFavorite')
-      })
-    }
-  };
-
-  const [cartCount, setCartCount] = useState(0);
-  const animatedValue = useRef(new Animated.Value(0)).current;
-  const shadowOpacity = useRef(new Animated.Value(1)).current;
+  const animatedValue = useRef(new Anim.Value(0)).current;
+  const shadowOpacity = useRef(new Anim.Value(1)).current;
 
   const startX = 150;
   const startY = 500;
@@ -130,18 +99,29 @@ const SingleProductCard = ({
     }
   };
 
+  const favoriteProduct = item => {
+    if (userId) {
+      if (isFavorite) {
+        dispatch(removeFavorite({id: item?.id}));
+        ReactNativeHapticFeedback.trigger('impactLight');
+      } else {
+        ReactNativeHapticFeedback.trigger('notificationError');
+        dispatch(productFavorite(item));
+      }
+    } else {
+      showMessage({
+        type: 'warning',
+        message: t('loginFavorite'),
+      });
+    }
+  };
+
   const getProductDetail = async item => {
-    console.log('ss', item?.id);
     setIsCartLaoder(true);
     try {
       const response = await productDetails(item?.id);
       if (response?.status) {
         if (response?.data?.quantity > 0) {
-          console.log(
-            'Object.keys(response?.variant_system?.available_attributes || {}).length > 0',
-            Object.keys(response?.variant_system?.available_attributes || {})
-              .length > 0,
-          );
           if (
             Object.keys(response?.variant_system?.available_attributes || {})
               .length > 0
@@ -151,12 +131,8 @@ const SingleProductCard = ({
             addToCart(response?.data?.variants[0]?.id);
           }
         } else {
-          showMessage({
-            type: 'danger',
-            message: t('outOfStocks'),
-          });
+          showMessage({type: 'danger', message: t('outOfStocks')});
         }
-      } else {
       }
     } catch (error) {
       setIsCartLaoder(false);
@@ -167,15 +143,12 @@ const SingleProductCard = ({
 
   const addToCart = var_id => {
     if (isCheck) {
-      showMessage({
-        type: 'warning',
-        message: t('alreadyAdded'),
-      });
+      showMessage({type: 'warning', message: t('alreadyAdded')});
     } else {
       animatedValue.setValue(0);
       shadowOpacity.setValue(1);
 
-      Animated.timing(animatedValue, {
+      Anim.timing(animatedValue, {
         toValue: 1,
         duration: 700,
         easing: Easing.out(Easing.ease),
@@ -196,12 +169,9 @@ const SingleProductCard = ({
           }),
         );
 
-        showMessage({
-          type: 'success',
-          message: t('productAdded'),
-        });
+        showMessage({type: 'success', message: t('productAdded')});
         ReactNativeHapticFeedback.trigger('impactLight');
-        Animated.timing(shadowOpacity, {
+        Anim.timing(shadowOpacity, {
           toValue: 0,
           duration: 200,
           useNativeDriver: true,
@@ -224,48 +194,33 @@ const SingleProductCard = ({
     if (value) {
       const regex = /(<([^>]+)>)/gi;
       const val = value.replace(regex, '');
-      const string = val.replace(
-        /&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});/gi,
-        '',
-      );
-      return string;
+      return val.replace(/&([a-z0-9]+|#[0-9]{1,6}|#x[0-9a-fA-F]{1,6});/gi, '');
     }
     return '';
   };
 
   return (
-    <Animatable.View
-      animation={animation}
-      duration={durationInner}
-      delay={countList * delayInner}>
+    <Animated.View
+           entering={FadeInDown.delay(index * 100).duration(600)}
+      >
       {loading && (
-        <View
-          style={{
-            borderWidth: 1,
-            marginBottom: 10,
-            borderColor: '#cecece',
-            width: 170,
-            height: 170,
-            marginRight: 5,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 20,
-            position: 'absolute',
-            zIndex: 100,
-          }}>
-          <LottieView
-            source={require('../assets/loader.json')} // Local JSON file
-            autoPlay
-            loop
-            style={{width: 100, height: 100, color: 'red'}}
-          />
+        <View style={styles.loaderWrapper}>
+          <SkeletonPlaceholder borderRadius={4}>
+            <View style={styles.loaderBox}>
+              <View style={styles.loaderHeader}>
+                <View style={styles.loaderCircle} />
+                <View style={styles.loaderCircle} />
+              </View>
+              <View style={styles.loaderBottom} />
+            </View>
+          </SkeletonPlaceholder>
         </View>
       )}
 
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={onPress}
-        style={{alignItems: 'center', marginBottom: 15}}>
+        style={styles.cardContainer}>
         <FastImage
           onLoad={() => setLoading(false)}
           onError={() => setLoading(false)}
@@ -274,43 +229,31 @@ const SingleProductCard = ({
             priority: FastImage.priority.high,
             cache: FastImage.cacheControl.immutable,
           }}
-          style={{width: 170, height: 170, marginRight: 5, borderRadius: 20}}
+          style={styles.productImage}
           borderRadius={20}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              margin: 10,
-            }}>
+          <View style={styles.cardHeader}>
             {isShowPlusIcon && (
               <TouchableOpacity
                 disabled={isCheckStockIsAvaialable}
                 onPress={() => getProductDetail(item)}
-                style={{}}>
+                style={styles.plusButton}>
                 {isCartLoader || isStockLoader ? (
                   <ActivityIndicator size={'small'} color={color.theme} />
                 ) : (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 3,
-                    }}>
+                  <View style={styles.plusRow}>
                     <AntDesign
                       name="pluscircle"
                       size={20}
-                      color={isCheckStockIsAvaialable ? '#cecece90' : '#67300f'}
-                      style={{marginBottom: 0}}
+                      color={
+                        isCheckStockIsAvaialable ? '#cecece90' : '#67300f'
+                      }
                     />
                     {isCheckStockIsAvaialable && (
-                      <View
-                        style={{
-                          paddingHorizontal: 5,
-                          backgroundColor: '#cecece90',
-                          borderRadius: 5,
-                        }}>
-                        <Text style={{fontSize: I18nManager.isRTL ? 12 : 13}}>
+                      <View style={styles.outOfStockBadge}>
+                        <Text
+                          style={{
+                            fontSize: I18nManager.isRTL ? 12 : 13,
+                          }}>
                           {t('outOfStock')}
                         </Text>
                       </View>
@@ -320,14 +263,16 @@ const SingleProductCard = ({
               </TouchableOpacity>
             )}
 
-            <TouchableOpacity onPress={() => favoriteProduct(item)} style={{}}>
+            <TouchableOpacity
+              onPress={() => favoriteProduct(item)}
+              style={styles.favoriteBtn}>
               {isFavorite ? <ExportSvg.Favorite /> : <ExportSvg.whiteFav />}
             </TouchableOpacity>
           </View>
         </FastImage>
 
         {isDot && (
-          <Animated.View
+          <Anim.View
             style={[
               styles.shadow,
               {transform: [{translateX}, {translateY}], opacity: shadowOpacity},
@@ -335,7 +280,7 @@ const SingleProductCard = ({
           />
         )}
 
-        <View style={{width: width / 2.5}}>
+        <View style={styles.productInfo}>
           <Text numberOfLines={1} style={styles.arrivalTitle}>
             {item?.name || item?.productName}
           </Text>
@@ -347,13 +292,83 @@ const SingleProductCard = ({
           <Text style={styles.arrivalPrice}>KD{item?.price}</Text>
         </View>
       </TouchableOpacity>
-    </Animatable.View>
+    </Animated.View>
   );
 };
 
 export default SingleProductCard;
 
 const styles = StyleSheet.create({
+  loaderWrapper: {
+    marginBottom: 10,
+    borderColor: '#cecece',
+    width: 170,
+    height: 170,
+    marginRight: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    position: 'absolute',
+    zIndex: 100,
+    top: 5,
+  },
+  loaderBox: {
+    borderWidth: 1,
+    width: 170,
+    height: 170,
+    marginBottom: 10,
+    borderRadius: 10,
+  },
+  loaderHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    marginTop: 10,
+  },
+  loaderCircle: {
+    width: 25,
+    height: 25,
+    borderRadius: 50,
+  },
+  loaderBottom: {
+    height: 110,
+    width: '100%',
+    marginTop: 'auto',
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  cardContainer: {
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  productImage: {
+    width: 170,
+    height: 170,
+    marginRight: 5,
+    borderRadius: 20,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    margin: 10,
+  },
+  plusButton: {},
+  plusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  outOfStockBadge: {
+    paddingHorizontal: 5,
+    backgroundColor: '#cecece90',
+    borderRadius: 5,
+  },
+  favoriteBtn: {},
+  productInfo: {
+    width: width / 2.5,
+  },
   arrivalTitle: {
     fontSize: 15,
     fontWeight: '600',
@@ -363,18 +378,15 @@ const styles = StyleSheet.create({
   },
   arrivalSubTitle: {
     color: color.gray,
-    // fontWeight: "300",
     marginVertical: 2,
     fontSize: 12,
     textAlign: 'left',
   },
   arrivalPrice: {
     color: color.theme,
-    // fontWeight: "500",
     textAlign: 'left',
     fontFamily: fonts.bold,
   },
-
   shadow: {
     position: 'absolute',
     width: 20,

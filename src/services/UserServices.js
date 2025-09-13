@@ -1,5 +1,6 @@
 import {I18nManager} from 'react-native';
 import {baseUrl} from '../constants/data';
+import axios from 'axios';
 
 
 export const loginPhoneNo = async (phoneNo) => {
@@ -731,10 +732,27 @@ export const categoriesListSubTwoCategory = async () => {
 //     }
 // };
 
-export const categoriesListSub = async id => {
+// export const categoriesListSub = async id => {
+//   try {
+//     const response = await fetch(`${baseUrl}/category/${id}/products`, {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Accept: 'application/json',
+//         'Accept-Language': I18nManager.isRTL ? 'ar' : 'en',
+//       },
+//     });
+
+//     const result = await response.json();
+//     return result;
+//   } catch (e) {
+//     console.log('oo', e);
+//   }
+// };
+
+export const categoriesListSub = async (id) => {
   try {
-    const response = await fetch(`${baseUrl}/category/${id}/products`, {
-      method: 'GET',
+    const response = await axios.get(`${baseUrl}/category/${id}/products`, {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
@@ -742,10 +760,11 @@ export const categoriesListSub = async id => {
       },
     });
 
-    const result = await response.json();
-    return result;
-  } catch (e) {
-    console.log('oo', e);
+    // Axios automatically parses JSON
+    return response.data;
+  } catch (error) {
+    console.log('Axios error:', error);
+    return null;
   }
 };
 

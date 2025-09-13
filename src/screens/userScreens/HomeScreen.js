@@ -11,7 +11,7 @@ import {
   View,
   I18nManager,
 } from 'react-native';
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useState, useRef, Suspense} from 'react';
 import ExportSvg from '../../constants/ExportSvg';
 import {color} from '../../constants/color';
 
@@ -42,6 +42,9 @@ import ScreenLoader from '../../components/ScreenLoader';
 import SameProduct from './SameProduct';
 import FastImage from 'react-native-fast-image';
 import { locationPermission } from '../../constants/helper';
+import RenderArrivalItem from '../../components/RenderArrivalItem';
+import RenderCategories from '../../components/RenderCategories';
+import RenderFeature from '../../components/RenderFeature';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -61,11 +64,6 @@ const HomeScreen = ({navigation}) => {
   const [SameScreenId, setSameScreenId] = useState('');
   const [imageHeights, setImageHeights] = useState({});
   const [modalVisible, setModalVisible] = useState(false);
-
-  const animation = 'fadeInRightBig';
-  const animationMain = 'fadeInRight';
-  const durationInner = 1000;
-  const delayInner = 100;
 
   useEffect(() => {
     LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
@@ -144,10 +142,7 @@ const HomeScreen = ({navigation}) => {
 
   const renderItem = ({item, index}) => {
     return (
-      <Animatable.View
-        animation={animationMain}
-        duration={durationInner}
-        delay={(1 + index) * delayInner}>
+      <View>
         <TouchableOpacity
           activeOpacity={1}
           onPress={() =>
@@ -174,96 +169,7 @@ const HomeScreen = ({navigation}) => {
             </ImageBackground>
           </View>
         </TouchableOpacity>
-      </Animatable.View>
-    );
-  };
-
-  const renderArrivalItem = ({item, index}) => {
-    const bannersToShow = secBanners?.filter(
-      banner => Number(banner?.show_after_section_number) === index + 1,
-    );
-
-    return (
-      <View>
-        {item?.category?.products?.length > 0 && (
-          <>
-            <View style={styles.arrivalBox}>
-              <Text style={styles.arrivalTxt}>{item?.category?.name}</Text>
-              <TouchableOpacity
-                // onPress={() => navigation.navigate('SameProduct', {
-                //   selected: item?.category?.name,
-                //   subC_ID: item?.category?.id
-                // })}
-                onPress={() => setSameScreenId(item?.category?.id)}>
-                <Text style={styles.viewTxt}>{t('view_all')}</Text>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {item?.category?.products?.map((innerItem, index) => {
-                return (
-                  <SingleProductCard
-                    isShowPlusIcon={true}
-                    item={innerItem}
-                    onPress={() =>
-                      navigation.navigate('ProductDetails', {id: innerItem?.id})
-                    }
-                  />
-                );
-              })}
-            </ScrollView>
-          </>
-        )}
-
-        {bannersToShow?.length > 0 && (
-          <SliderDots
-            data={bannersToShow}
-            imageHeights={imageHeights}
-            dataIndex={index}
-            setSameScreenId={setSameScreenId}
-          />
-        )}
       </View>
-    );
-  };
-
-  const renderCategories = ({item, index}) => {
-    return (
-      <Animatable.View
-        animation={animation}
-        duration={durationInner}
-        delay={(1 + index) * delayInner}
-        style={styles.cateListBox}>
-        <AnimatedPressButton
-          style={{alignItems: 'center', marginBottom: 15}}
-          animation="rubberBand"
-          mode="contained"
-          // onPress={() => {
-          //   setTimeout(() => {
-          //     navigation.navigate('SameProduct', {
-          //       text: item?.name,
-          //       subC_ID: item?.id,
-          //     });
-          //   }, 300);
-
-          //   ReactNativeHapticFeedback.trigger('impactLight');
-          // }}
-
-          onPress={() => setSameScreenId(item?.id)}>
-          <ImageBackground
-            source={{uri: item.image}}
-            style={{width: 60, height: 60, marginRight: 5}}
-            borderRadius={10}></ImageBackground>
-          <Text
-            style={{
-              fontSize: 12,
-              marginTop: 5,
-              textAlign: 'center',
-            }}>
-            {I18nManager.isRTL?  item?.name : item?.name_en  || item?.name}
-          </Text>
-        </AnimatedPressButton>
-      </Animatable.View>
     );
   };
 
@@ -275,13 +181,13 @@ const HomeScreen = ({navigation}) => {
         //  text: item?.name,
         //   subC_ID: item?.id,
         // })}
-
         onPress={() => setSameScreenId(item?.id)}
         style={styles.newCatContainer}>
         <FastImage
           source={{
             uri: item?.image,
             priority: FastImage.priority.high,
+            cache: FastImage.cacheControl.immutable,
           }}
           style={{width: '100%', height: 150}}>
           <View style={styles.innerNewCatBox}>
@@ -333,9 +239,13 @@ const HomeScreen = ({navigation}) => {
           paddingBottom: Platform.OS == 'ios' ? 70 : 50,
         }}>
         {SameScreenId ? (
+          <Suspense fallback={<Text>Loading...</Text>}>
+
           <View style={{flex: 1, marginTop: Platform.OS == 'ios' ? -80 : -40}}>
             <SameProduct subId={SameScreenId} />
           </View>
+          </Suspense>
+
         ) : (
           <View>
             <View style={{}}>
@@ -365,7 +275,11 @@ const HomeScreen = ({navigation}) => {
                 horizontal
                 data={getCategoies}
                 keyExtractor={(item, index) => index?.toString()}
-                renderItem={renderCategories}
+                renderItem={({item,index})=>{
+                  return(
+                    <RenderCategories  item={item}   index={index} setSameScreenId={setSameScreenId}/>
+                  )
+                }}
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
                 snapToInterval={ITEM_WIDTH + ITEM_MARGIN * 0.2}
@@ -378,6 +292,7 @@ const HomeScreen = ({navigation}) => {
               data={featureData}
               keyExtractor={(item, index) => index?.toString()}
               renderItem={renderItemNewList}
+                // renderItem={({ item }) => <RenderFeature item={item} />}
               columnWrapperStyle={{
                 justifyContent: 'space-between',
                 marginBottom: 15,
@@ -393,11 +308,12 @@ const HomeScreen = ({navigation}) => {
               />
             )}
 
-            <View style={{flex: 1}}>
+            {/* <View style={{flex: 1}}>
               <FlatList
                 // horizontal
-                data={arrivalData}
+                data={arrivalData?.slice(0,2)}
                 keyExtractor={(item, index) => index?.toString()}
+                // renderItem={renderArrivalItem}
                 renderItem={renderArrivalItem}
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
@@ -405,7 +321,12 @@ const HomeScreen = ({navigation}) => {
                 snapToAlignment="start"
                 decelerationRate="fast"
               />
-            </View>
+            </View> */}
+            <RenderArrivalItem
+            data={arrivalData}
+            setSameScreenId={setSameScreenId}
+            imageHeights={imageHeights}
+            />
           </View>
         )}
       </ScrollView>

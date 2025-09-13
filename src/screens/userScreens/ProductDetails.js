@@ -258,9 +258,9 @@ const ProductDetails = ({ navigation, route }) => {
     (selectedVariant && selectedVariant?.stock_quantity == 0) ||
     selectedVariant == undefined;
 
-  // if (isLoader || !imagesPreloaded) {
-  //   return <ScreenLoader />;
-  // }
+  if (isLoader || !imagesPreloaded) {
+    return <ScreenLoader />;
+  }
 
   return (
     <SafeAreaView style={styles.mainContainer}>
