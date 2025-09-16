@@ -6,12 +6,14 @@ import { useSelector } from 'react-redux'
 import Video, { VideoRef } from 'react-native-video';
 import { preloadImagesInBatches, extractProductImages } from './utils/ImagePreloader';
 import { newArrivalsData, getFeaturedData, homeBanner } from './services/UserServices';
+import ScreenLoader from './components/ScreenLoader'
 
 const { width, height } = Dimensions.get('screen')
 
 const SplashScreen = ({ navigation }) => {
   const isLanguage = useSelector(state => state.auth?.isLanguage);
   const [isPreloading, setIsPreloading] = useState(true);
+  const [isVideo, setIsVideo] = useState(true);
   const videoRef = useRef();
 
   useEffect(() => {
@@ -77,6 +79,14 @@ const SplashScreen = ({ navigation }) => {
     preloadHomepageImages();
   }, []);
 
+  useEffect(()=>{
+    const timer = setTimeout(()=>{
+      setIsVideo(false)
+    },1000)
+
+   return ()=> clearTimeout(timer)
+  },[])
+
   const onVideoEnd = () => {
     if (!isPreloading) {
       // Video has ended and preloading is complete, ready to transition
@@ -86,13 +96,19 @@ const SplashScreen = ({ navigation }) => {
 
   return (
     <View style={styles.mainContainer}>
-      <Video
+      {
+        isVideo ?
+             <Video
         source={require('./assets/splash.mp4')}
         ref={videoRef}
         style={styles.backgroundVideo}
         onEnd={onVideoEnd}
-        repeat={isPreloading} // Keep looping the video until preloading is complete
+        repeat={isPreloading} 
       />
+        :
+        <ScreenLoader/>
+      }
+ 
     </View>
   )
 }

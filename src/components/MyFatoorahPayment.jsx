@@ -24,6 +24,7 @@ import {
 import CustomText from './CustomText';
 import CustomButton from './CustomButton';
 import Entypo from 'react-native-vector-icons/Entypo'
+import ApplePayment from './ApplePayment';
 
 const MyFatoorahPayment = ({ modalVisible, setModalVisible ,confirmOrder,totalPrice}) => {
     const [sessionId, setSessionId] = useState('');
@@ -168,6 +169,7 @@ const MyFatoorahPayment = ({ modalVisible, setModalVisible ,confirmOrder,totalPr
                                 backgroundColor: 'white',
                             }}
                         />
+                        {/* <ApplePayment  sessionId={sessionId} /> */}
 
                         <CustomButton
                             title={"PAY"}

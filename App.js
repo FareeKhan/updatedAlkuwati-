@@ -24,6 +24,7 @@ import { color } from './src/constants/color'
 import { fonts } from './src/constants/fonts'
 import FlashMessage from 'react-native-flash-message'
 import FastImage from 'react-native-fast-image'
+import ApplePayment from './src/components/ApplePayment';
 
 
 const App = () => {

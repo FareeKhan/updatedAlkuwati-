@@ -753,10 +753,12 @@ export const categoriesListSubTwoCategory = async () => {
 export const categoriesListSub = async (id) => {
   try {
     const response = await axios.get(`${baseUrl}/category/${id}/products`, {
+    params: { limit: 5, page: 1 } ,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
         'Accept-Language': I18nManager.isRTL ? 'ar' : 'en',
+            'Accept-Encoding': 'gzip, deflate, br',
       },
     });
 

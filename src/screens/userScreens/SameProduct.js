@@ -758,7 +758,7 @@ const SameProduct = ({route, subId}) => {
           />
         )}
 
-        {isFooterLoader && (
+        {isFooterLoader && storeCategories?.products?.length > 0&& (
           <View>
             <ActivityIndicator size={'large'} color={color.theme} />
           </View>

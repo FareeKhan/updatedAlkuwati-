@@ -80,8 +80,8 @@ android {
         applicationId "com.alkwaityalawal"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 45
-        versionName "45.0"
+        versionCode 46
+        versionName "46.0"
     }
     signingConfigs {
         debug {
