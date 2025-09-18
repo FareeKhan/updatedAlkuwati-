@@ -147,7 +147,7 @@ const CategorySubList = ({ navigation, innetCate }) => {
                             windowSize={7}
                             removeClippedSubviews={true}
                             updateCellsBatchingPeriod={50}
-                            columnWrapperStyle={{gap:2,width:"100%"}}
+                            columnWrapperStyle={[{gap:2,width:"100%"},innetCate?.length == 2 && {width:"72%",justifyContent:"space-between"}]}
                         />
                     </View>
                 </View>

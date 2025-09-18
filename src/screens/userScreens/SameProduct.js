@@ -457,6 +457,8 @@ const SameProduct = ({route, subId}) => {
           isDot={false}
           isShowPlusIcon={true}
           isPreloaded={isPreloaded}
+          stockAvailable={item?.quantity > 0}
+          hasVariant={item?.has_variants > 0}
           onPress={() =>
             navigation.navigate('ProductDetails', {
               id: item?.id,

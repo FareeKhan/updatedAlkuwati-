@@ -179,11 +179,14 @@ const Login = ({navigation, route}) => {
       if (response?.success) {
         setIsLoader(false);
         setIsShowOtp(true);
-        showMessage({
+       {
+        __DEV__ &&
+         showMessage({
           type: 'success',
           message: t('sendSuccess') + ' '+response?.otp,
           duration: 3000,
         });
+       }
       } else {
         setIsLoader(false);
         showMessage({
