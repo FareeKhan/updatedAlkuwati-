@@ -27,6 +27,7 @@ import EmptyScreen from '../../components/EmptyScreen';
 import Feather from 'react-native-vector-icons/Feather';
 import CustomButton from '../../components/CustomButton';
 import { fonts } from '../../constants/fonts';
+import { locationPermission } from '../../constants/helper';
 
 const SavedAddresses = ({navigation, route}) => {
   const {t} = useTranslation();
@@ -49,6 +50,8 @@ const SavedAddresses = ({navigation, route}) => {
       getShippingAddress(true);
     }, [userId]),
   );
+
+
 
   const getShippingAddress = async value => {
     setLoader(value);

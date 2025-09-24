@@ -71,7 +71,7 @@ const HomeScreen = ({navigation}) => {
 
   useEffect(() => {
     fetchAllApi();
-    locationPermission()
+
   }, []);
 
   const fetchAllApi = async () => {

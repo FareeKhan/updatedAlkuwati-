@@ -7,7 +7,7 @@ export const LocationPermission = async () => {
   const askSetting = () => {
     Alert.alert(
       'Alert',
-      'Kuwaiti needs access to your location',
+      'Kuwaiti needs access to your location to provide accurate delivery. Please enable location in Settings to continue.',
       [
         {
           text: 'Open Setting',

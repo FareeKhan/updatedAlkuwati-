@@ -90,7 +90,7 @@ const ShippingAddress = ({navigation, route}) => {
   useEffect(() => {
  
      if (!id) {
-      getCurrentLocation();
+      locationPermission();
     }
   }, []);
 
@@ -129,15 +129,15 @@ const ShippingAddress = ({navigation, route}) => {
     } else {
            Alert.alert(
              'Alert',
-             'Kuwaiti needs access to your location',
+             'Kuwaiti needs access to your location to provide accurate delivery. Please enable location in Settings to continue.',
              [
                {
                  text: 'Open Setting',
-                 onPress: () => {navigation.goBack(),Linking.openSettings()},
+                 onPress: () => { setModalVisible(false),Linking.openSettings()},
                },
                {
                  text: 'Later',
-                 onPress: () => navigation.goBack(),
+                 onPress: () => {setModalVisible(false)},
                },
              ],
            );
@@ -495,11 +495,11 @@ const ShippingAddress = ({navigation, route}) => {
               ref={mapRef}
               style={{width: '100%', height: height / 1.1 - 50}}
               region={{
-                latitude: pickupLocation.latitude,
-                longitude: pickupLocation.longitude,
+                latitude: pickupLocation.latitude ||25.197741664033977,
+                longitude: pickupLocation.longitude || 55.27969625835015,
                 latitudeDelta: 0.01,
                 longitudeDelta: 0.01,
-              }}
+              }} 
               onPanDrag={onRegionChange}
               onRegionChangeComplete={onRegionChangeComplete}
             />
