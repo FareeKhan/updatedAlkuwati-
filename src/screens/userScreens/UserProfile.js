@@ -38,6 +38,7 @@ import HeaderBox from '../../components/HeaderBox';
 import {showMessage} from 'react-native-flash-message';
 import {emptyStoreUserAddress} from '../../redux/reducer/UserShippingAddress';
 import linking from './Linking';
+import { clearCart } from '../../redux/reducer/ProductAddToCart';
 
 const UserProfile = ({navigation}) => {
   const dispatch = useDispatch();
@@ -136,6 +137,7 @@ const UserProfile = ({navigation}) => {
   const LogoutPress = () => {
     dispatch(logout());
     dispatch(emptyStoreUserAddress());
+    dispatch(clearCart());
     navigation.navigate('Login');
   };
 
@@ -586,9 +588,9 @@ const UserProfile = ({navigation}) => {
         </>
       </View>
 
-      <View>
+      {/* <View>
         <Text style={styles.navigationTxt}>{t('logout')}</Text>
-      </View>
+      </View> */}
     </DrawerSceneWrapper>
   );
 };

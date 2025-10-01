@@ -38,7 +38,7 @@ const PaymentOrder = ({ navigation, route }) => {
       const userPhone = useSelector(state => state.auth?.mobile);
 const fullName =
   userName?.find(item => item?.phoneUserNumber?.slice(4) == userPhone)?.fullName
-  || 'test';
+  || '';
 
   const dispatch = useDispatch();
   const data = useSelector(state => state.cartProducts?.cartProducts);
@@ -109,7 +109,7 @@ const fullName =
         fullName
 
       );
-
+console.log('response',response)
       if (response.status == 'success') {
         setModalVisible(false);
         setIsLoading(false);
