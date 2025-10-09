@@ -375,7 +375,7 @@ export default class MFPaymentCyber extends React.Component {
       2,
       5,
       new MFBoxShadow(0, 0, 0, 0, processColor('#c7c700')),
-      new MFCardViewPlaceHolder('Name On Card test', 'Number test', 'MM / YY test', 'CVV test'),
+      new MFCardViewPlaceHolder('Name On Card', 'Number', 'MM / YY', 'CVV'),
     );
     var cardViewLabel = new MFCardViewLabel(
       false,
@@ -383,7 +383,7 @@ export default class MFPaymentCyber extends React.Component {
       12,
       MFFontFamily.Tahoma,
       MFFontWeight.Normal,
-      new MFCardViewText('Card Holder Name test', 'Card Number test', 'Expiry Date test', 'Security Code test'),
+      new MFCardViewText('Card Holder Name test', 'Card Number', 'Expiry Date', 'Security Code'),
     );
     var cardViewError = new MFCardViewError(processColor('red'), 8, new MFBoxShadow(10, 10, 10, 10, processColor('#c7c700')));
     var cardViewStyle = new MFCardViewStyle(false, 'ltr', 300, cardViewInput, cardViewLabel, cardViewError);

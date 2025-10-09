@@ -59,6 +59,7 @@ const ProductDetails = ({ navigation, route }) => {
   const [imagesPreloaded, setImagesPreloaded] = useState(false);
   const carouselRef = useRef(null);
   const isMountedRef = useRef(true);
+  console.log('idid',id)
 
   const removeHTMLCode = value => {
     if (value) {

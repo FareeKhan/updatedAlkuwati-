@@ -349,7 +349,7 @@ export const orderConfirmed = async (
           email: 'order@gmail.com',
           products: productNo,
           address: address?.city + ',' + address?.area + ',' + address?.country,
-          full_name: fullName|| 'test',
+          full_name: fullName|| '',
           phone_number: address?.phone,
           user_id: userID,
           user_address_id:address?.addressId ,

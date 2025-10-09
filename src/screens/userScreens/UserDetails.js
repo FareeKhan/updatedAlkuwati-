@@ -138,7 +138,7 @@ const UserDetails = ({ navigation, route }) => {
               <CustomLoader />
             ) : (
               <CustomButton
-                title={btnText !== undefined ? btnText : 'save'}
+                title={btnText !== undefined ? btnText : t('Save')}
                 onPress={handlePress}
               />
             )}
@@ -154,7 +154,7 @@ export default UserDetails;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    paddingTop: Platform.OS == 'ios' ? 70 : 20,
+    paddingTop: Platform.OS == 'ios' ? 70 : 35,
     paddingHorizontal: 15,
     backgroundColor: '#fff',
   },

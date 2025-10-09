@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, PermissionsAndroid, I18nManager, Text, View, Alert, Button } from 'react-native'
+import { Platform, StyleSheet, PermissionsAndroid, I18nManager,Text, TextInput  , View, Alert, Button } from 'react-native'
 import React, { useEffect } from 'react'
 
 import { NavigationContainer } from '@react-navigation/native'
@@ -6,7 +6,6 @@ import AppNavigation from './src/Navigation/AppNavigation'
 import Orientation from 'react-native-orientation-locker';
 import { Provider } from 'react-redux'
 import { store, persistor } from './src/redux/store'
-
 //import persistStore from 'redux-persist/es/persistStore';
 import { PersistGate } from "redux-persist/es/integration/react";
 
@@ -28,8 +27,16 @@ import ApplePayment from './src/components/ApplePayment';
 
 
 const App = () => {
-  //     id: 'kuwaitiApp2024',
-  //     name: 'Kuwaiti App',
+
+  
+  // For Keeping the Text Size Not depending on the phone text
+if (Text.defaultProps == null) Text.defaultProps = {};
+if (TextInput.defaultProps == null) TextInput.defaultProps = {};
+
+Text.defaultProps.allowFontScaling = false;
+TextInput.defaultProps.allowFontScaling = false;
+
+
 
 
     useEffect(() => {

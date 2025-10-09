@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState, useRef, useMemo} from 'react';
+import React, {useEffect, useState, useRef, useMemo, useCallback} from 'react';
 import ExportSvg from '../../constants/ExportSvg';
 import {color} from '../../constants/color';
 import SingleProductCard from '../../components/SingleProductCard';
@@ -24,7 +24,14 @@ import {
 
 const ITEM_WIDTH = Dimensions.get('window').width * 0.8;
 
-import Animated, {FadeInDown, FadeInRight, SlideInDown, SlideInLeft, SlideInRight, SlideOutRight} from 'react-native-reanimated';
+import Animated, {
+  FadeInDown,
+  FadeInRight,
+  SlideInDown,
+  SlideInLeft,
+  SlideInRight,
+  SlideOutRight,
+} from 'react-native-reanimated';
 import {categoriesListSub} from '../../services/UserServices';
 import EmptyScreen from '../../components/EmptyScreen';
 import {useTranslation} from 'react-i18next';
@@ -33,6 +40,7 @@ import HeaderBox from '../../components/HeaderBox';
 import {fonts} from '../../constants/fonts';
 import {useNavigation} from '@react-navigation/native';
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import CustomLoader from '../../components/CustomLoader';
 
 const SameProduct = ({route, subId}) => {
   const navigation = useNavigation();
@@ -339,76 +347,146 @@ const SameProduct = ({route, subId}) => {
     });
   };
 
+  // const CardShadow = () => {
+  //   const renderCardItem = useCallback(() => {
+  //     return (
+  //       <Animated.View
+  //         entering={FadeInDown}
+  //         style={{
+  //           marginBottom: 10,
+  //           borderColor: '#cecece',
+  //           width: 170,
+  //           height: 200,
+  //           marginRight: 5,
+  //           alignItems: 'center',
+  //           justifyContent: 'center',
+  //           borderRadius: 20,
+  //           zIndex: 100,
+  //           top: 10,
+  //         }}>
+  //         <SkeletonPlaceholder borderRadius={4}>
+  //           <View
+  //             style={{
+  //               borderWidth: 1,
+  //               borderColor: '#eee',
+  //               width: 170,
+  //               height: 200,
+  //               marginBottom: 10,
+  //               borderRadius: 10,
+  //             }}>
+  //             <View
+  //               style={{
+  //                 flexDirection: 'row',
+  //                 justifyContent: 'space-between',
+  //                 alignItems: 'center',
+  //                 marginHorizontal: 10,
+  //                 marginTop: 10,
+  //               }}>
+  //               <View width={25} height={25} borderRadius={50} style={{}} />
+  //               <View width={25} height={25} borderRadius={50} style={{}} />
+  //             </View>
+
+  //             <View
+  //               style={{
+  //                 height: 150,
+  //                 width: '100%',
+  //                 marginTop: 'auto',
+  //                 borderRadius: 0,
+  //                 borderBottomLeftRadius: 10,
+  //                 borderBottomRightRadius: 10,
+  //               }}
+  //             />
+  //           </View>
+  //         </SkeletonPlaceholder>
+  //       </Animated.View>
+  //     );
+  //   });
+  //   return (
+  //     <View>
+  //       <FlatList
+  //         data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+  //         numColumns={2}
+  //         keyExtractor={(item, index) => index?.toString()}
+  //         renderItem={renderCardItem}
+  //         columnWrapperStyle={{justifyContent:"space-between"}}
+  //       />
+  //     </View>
+  //   );
+  // };
+
+  const SkeletonCard = React.memo(() => {
+    return (
+      <Animated.View
+        entering={FadeInDown}
+        style={{
+          marginBottom: 10,
+          borderColor: '#cecece',
+          width: 170,
+          height: 200,
+          marginRight: 5,
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: 20,
+          zIndex: 100,
+          top: 10,
+        }}>
+        <SkeletonPlaceholder borderRadius={4}>
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: '#eee',
+              width: 170,
+              height: 200,
+              marginBottom: 10,
+              borderRadius: 10,
+            }}>
+            {/* Header row */}
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginHorizontal: 10,
+                marginTop: 10,
+              }}>
+              <View width={25} height={25} borderRadius={50} />
+              <View width={25} height={25} borderRadius={50} />
+            </View>
+
+            {/* Bottom section */}
+            <View
+              style={{
+                height: 150,
+                width: '100%',
+                marginTop: 'auto',
+                borderRadius: 0,
+                borderBottomLeftRadius: 10,
+                borderBottomRightRadius: 10,
+              }}
+            />
+          </View>
+        </SkeletonPlaceholder>
+      </Animated.View>
+    );
+  });
   const CardShadow = () => {
+    // Static data (memoized once)
+    const data = useMemo(() => Array.from({length: 10}, (_, i) => i + 1), []);
+
+    // FlatList renderItem (returns memoized component)
+    const renderItem = useCallback(() => <SkeletonCard />, []);
+
     return (
       <View>
         <FlatList
-          data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+          data={data}
           numColumns={2}
-          keyExtractor={(item, index) => index?.toString()}
-          renderItem={({}) => {
-            return (
-              <Animated.View
-                   entering={FadeInDown}
-                style={{
-                  marginBottom: 10,
-                  borderColor: '#cecece',
-                  width: 170,
-                  height: 200,
-                  marginRight: 5,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 20,
-                  zIndex: 100,
-                  top: 10,
-                }}>
-                <SkeletonPlaceholder borderRadius={4}>
-                  <View
-                    style={{
-                      borderWidth: 1,
-                      borderColor: '#eee',
-                      width: 170,
-                      height: 200,
-                      marginBottom: 10,
-                      borderRadius: 10,
-                    }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        marginHorizontal: 10,
-                        marginTop: 10,
-                      }}>
-                      <View
-                        width={25}
-                        height={25}
-                        borderRadius={50}
-                        style={{}}
-                      />
-                      <View
-                        width={25}
-                        height={25}
-                        borderRadius={50}
-                        style={{}}
-                      />
-                    </View>
-
-                    <View
-                      style={{
-                        height: 150,
-                        width: '100%',
-                        marginTop: 'auto',
-                        borderRadius: 0,
-                        borderBottomLeftRadius: 10,
-                        borderBottomRightRadius: 10,
-                      }}
-                    />
-                  </View>
-                </SkeletonPlaceholder>
-              </Animated.View>
-            );
-          }}
+          keyExtractor={item => item.toString()}
+          renderItem={renderItem}
+          removeClippedSubviews
+          initialNumToRender={6} // ⚡ improves perf
+          maxToRenderPerBatch={6} // ⚡ limits background renders
+          windowSize={5} // ⚡ controls how many screens worth are kept
         />
       </View>
     );
@@ -435,8 +513,7 @@ const SameProduct = ({route, subId}) => {
                       marginBottom: 10,
                       borderRadius: 50,
                       marginRight: 10,
-                    }}>
-                  </View>
+                    }}></View>
                 </SkeletonPlaceholder>
               </View>
             );
@@ -665,7 +742,7 @@ const SameProduct = ({route, subId}) => {
   }, [all]);
 
   return (
-    <Animated.View entering={SlideInRight}  style={{flex: 1,}}>
+    <Animated.View entering={SlideInRight} style={{flex: 1}}>
       <View style={styles.mainContainer}>
         {!subId && (
           <>
@@ -733,10 +810,12 @@ const SameProduct = ({route, subId}) => {
         </View>
 
         {productLoader || isLoader ? (
-          <CardShadow />
-        )  : (
+          <View
+            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <ActivityIndicator size={'large'} color={color.theme} />
+          </View>
+        ) : (
           <FlatList
-            // data={storeCategories?.products?.slice(0,2)}
             data={data}
             renderItem={renderItem}
             keyExtractor={(item, index) =>
@@ -760,11 +839,13 @@ const SameProduct = ({route, subId}) => {
           />
         )}
 
-        {isFooterLoader && storeCategories?.products?.length > 0&& (
-          <View>
-            <ActivityIndicator size={'large'} color={color.theme} />
-          </View>
-        )}
+        {isFooterLoader &&
+          storeCategories?.products?.length > 0 &&
+          !isLoader && (
+            <View>
+              <ActivityIndicator size={'large'} color={color.theme} />
+            </View>
+          )}
 
         <SearchModal
           setModalVisible={setModalVisible}

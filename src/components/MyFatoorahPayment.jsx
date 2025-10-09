@@ -78,7 +78,7 @@ const MyFatoorahPayment = ({ modalVisible, setModalVisible ,confirmOrder,totalPr
             processColor('#c7c7c7'),
             2,
             8,
-            new MFCardViewPlaceHolder('Name On Card test', 'Number test', 'MM / YY', 'CVV test')
+            new MFCardViewPlaceHolder('Name On Card', 'Number', 'MM / YY', 'CVV')
         );
         var cardViewLabel = new MFCardViewLabel(
             true,
@@ -86,7 +86,7 @@ const MyFatoorahPayment = ({ modalVisible, setModalVisible ,confirmOrder,totalPr
             13,
             MFFontFamily.CourierNew,
             MFFontWeight.Bold,
-            new MFCardViewText('Card Holder Name test', 'Card Number test', 'Expiry Date test', 'Security Code test')
+            new MFCardViewText('Card Holder Name', 'Card Number', 'Expiry Date', 'Security Code')
         );
         var cardViewError = new MFCardViewError(processColor('red'), 8, new MFBoxShadow(10, 10, 5, 0, processColor('yellow')));
         var cardViewStyle = new MFCardViewStyle(false, 'initial', 230, cardViewInput, cardViewLabel, cardViewError);
